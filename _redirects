@@ -1,0 +1,7 @@
+# O endereço antigo da página de vendas continua funcionando.
+/conheca      /   301
+/conheca/*    /   301
+
+# Página de divulgação da turma: endereço bonito /p/<slug> em vez de /p/?c=<slug>.
+# O ?c=<slug> antigo continua funcionando (serve o mesmo arquivo direto).
+/p/:slug      /p/index.html   200

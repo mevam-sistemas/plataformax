@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Painel ao vivo — MODOX</title>
+<style>
+  /* ============================================================
+     PAINEL AO VIVO — feito para ficar aberto numa TV ou monitor
+     na sala da liderança. Fundo escuro para não cansar, números
+     grandes para ler de longe, e nada clicável: quem olha, olha.
+     Atualiza sozinho a cada 10 minutos.
+     ============================================================ */
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { height:100%; }
+  body {
+    background:#17120e; color:#f3ece4;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    display:flex; flex-direction:column; min-height:100vh; padding:28px 34px 18px;
+  }
+  .topo { display:flex; align-items:center; gap:16px; margin-bottom:22px; }
+  .marca { display:flex; align-items:center; gap:12px; }
+  .cubo { width:42px; height:42px; border-radius:11px; background:#c8500c;
+    display:grid; place-items:center; font-weight:800; font-size:17px; color:#fff; }
+  .marca b { font-size:21px; letter-spacing:.02em; }
+  .marca small { display:block; color:#b7a795; font-size:13px; margin-top:2px; }
+  .sp { flex:1; }
+  .relogio { text-align:right; }
+  .relogio b { font-size:32px; font-variant-numeric:tabular-nums; }
+  .relogio small { display:block; color:#b7a795; font-size:12.5px; margin-top:2px; }
+
+  .kpis { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:14px; }
+  .kpi { background:#211a14; border:1px solid #322820; border-radius:16px; padding:18px 20px 16px; }
+  .kpi .n { font-size:44px; font-weight:800; line-height:1.05; font-variant-numeric:tabular-nums; }
+  .kpi .t { color:#b7a795; font-size:13.5px; margin-top:6px; line-height:1.3; }
+  .kpi.destaque { background:#2b1708; border-color:#7a3a10; }
+  .kpi.destaque .n { color:#ff9d57; }
+  .kpi.alerta { background:#2e1410; border-color:#8a3324; }
+  .kpi.alerta .n { color:#ff8a70; }
+
+  .meio { display:grid; grid-template-columns:1.25fr 1fr 1fr; gap:14px; flex:1; min-height:0; }
+  .cartao { background:#211a14; border:1px solid #322820; border-radius:16px;
+    padding:18px 20px; overflow:hidden; display:flex; flex-direction:column; }
+  .cartao h2 { font-size:13px; text-transform:uppercase; letter-spacing:.09em;
+    color:#b7a795; margin-bottom:12px; font-weight:700; }
+  .lista { display:flex; flex-direction:column; gap:10px; overflow:hidden; }
+  .item { display:flex; align-items:baseline; gap:10px; font-size:15.5px; line-height:1.35; }
+  .item .qdo { color:#ff9d57; font-weight:700; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .item .det { color:#b7a795; font-size:13px; }
+  .rank .item b.pos { color:#ff9d57; width:22px; }
+  .rank .pts { margin-left:auto; color:#b7a795; font-size:13.5px; white-space:nowrap; }
+  .vazio { color:#7d6f5f; font-size:14px; }
+
+  .presenca-barra { background:#322820; border-radius:99px; height:12px; overflow:hidden; margin:10px 0 8px; }
+  .presenca-barra i { display:block; height:100%; background:#c8500c; border-radius:99px; }
+
+  .rodape { display:flex; align-items:center; gap:10px; margin-top:16px;
+    color:#7d6f5f; font-size:12.5px; }
+  .rodape .sp { flex:1; }
+
+  /* estados fora do painel (sem sessão / escolha de escola / erro) */
+  .aviso { margin:auto; max-width:520px; text-align:center; }
+  .aviso h1 { font-size:26px; margin-bottom:12px; }
+  .aviso p { color:#b7a795; line-height:1.6; font-size:15.5px; }
+  .aviso a, .aviso button { display:inline-block; margin-top:18px; background:#c8500c; color:#fff;
+    border:none; border-radius:12px; padding:12px 22px; font-size:15.5px; font-weight:700;
+    text-decoration:none; cursor:pointer; }
+  .aviso .escolas { display:flex; flex-direction:column; gap:10px; margin-top:18px; }
+
+  @media (max-width:1000px){
+    .kpis { grid-template-columns:repeat(2,1fr); }
+    .meio { grid-template-columns:1fr; }
+    .kpi .n { font-size:34px; }
+  }
+</style>
+</head>
+<body>
+<div id="app" class="aviso"><h1>Painel ao vivo</h1><p>Carregando…</p></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+const SB_URL = 'https://lshjtlzlywipxtfwbxxe.supabase.co';
+const SB_KEY = 'sb_publishable_7-sR87eV6b4I8nx-k6Hriw_DEVprjfz';
+const sb = supabase.createClient(SB_URL, SB_KEY); /* mesma sessão do app, mesma origem */
+
+const $ = s => document.querySelector(s);
+let escolaId = null, timerDados = null;
+
+const hd = d => new Date(d).toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit' });
+const hh = d => new Date(d).toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+const esc = t => String(t ?? '').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+
+async function iniciar(){
+  const { data:{ session } } = await sb.auth.getSession();
+  if(!session){
+    $('#app').innerHTML = `<h1>Painel ao vivo</h1>
+      <p>Este monitor mostra a escola em tempo real, mas precisa de alguém da
+      gestão conectado neste aparelho. Entre no MODOX uma vez e volte aqui —
+      a sessão fica guardada.</p>
+      <a href="/app/">Entrar no MODOX</a>`;
+    return;
+  }
+  const { data: vs, error } = await sb.from('vinculos')
+    .select('escola_id, escolas(id, nome)')
+    .eq('ativo', true).in('papel', ['gestor','admin']);
+  if(error || !vs || !vs.length){
+    $('#app').innerHTML = `<h1>Painel ao vivo</h1>
+      <p>Sua conta não tem papel de gestão em nenhuma escola — o painel é
+      da sala da liderança. Peça acesso a quem administra a escola.</p>`;
+    return;
+  }
+  const unicas = [...new Map(vs.map(v => [v.escola_id, v])).values()];
+  const lembrada = localStorage.getItem('monitor-escola');
+  if(unicas.length === 1) escolaId = unicas[0].escola_id;
+  else if(lembrada && unicas.some(v => v.escola_id === lembrada)) escolaId = lembrada;
+  else {
+    $('#app').innerHTML = `<h1>Qual escola vai para a TV?</h1>
+      <div class="escolas">${unicas.map(v =>
+        `<button onclick="escolher('${v.escola_id}')">${esc(v.escolas?.nome || 'Escola')}</button>`).join('')}</div>`;
+    return;
+  }
+  await carregar();
+  clearInterval(timerDados);
+  timerDados = setInterval(carregar, 10 * 60 * 1000); /* o combinado: 10 minutos */
+  document.addEventListener('visibilitychange', () => { if(!document.hidden) carregar(); });
+}
+function escolher(id){ localStorage.setItem('monitor-escola', id); escolaId = id; iniciar(); }
+
+async function carregar(){
+  const { data: d, error } = await sb.rpc('painel_escola', { p_escola: escolaId });
+  if(error){
+    console.error(error);
+    if(!document.querySelector('.kpis'))
+      $('#app').innerHTML = `<h1>Painel ao vivo</h1><p>Não consegui buscar os números agora.
+        Tento de novo sozinho em alguns minutos.</p>`;
+    return;
+  }
+  desenhar(d);
+}
+
+function desenhar(d){
+  const ue = d.ultimo_encontro;
+  const pct = ue && ue.total ? Math.round(100 * ue.presentes / ue.total) : null;
+  document.body.className = '';
+  document.getElementById('app').className = '';
+  document.getElementById('app').innerHTML = `
+  <div class="topo">
+    <div class="marca"><div class="cubo">M</div>
+      <div><b>${esc(d.escola?.nome || 'Escola')}</b>
+      <small>Painel ao vivo · MODOX</small></div></div>
+    <div class="sp"></div>
+    <div class="relogio"><b id="hora">--:--</b>
+      <small>atualiza sozinho a cada 10 min · dados de ${hh(d.gerado_em)}</small></div>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi destaque"><div class="n">${d.alunos_ativos}</div><div class="t">alunos com matrícula ativa</div></div>
+    <div class="kpi"><div class="n">${d.inscricoes_7d}</div><div class="t">inscrições nos últimos 7 dias</div></div>
+    <div class="kpi"><div class="n">${d.aulas_concluidas_hoje}</div><div class="t">aulas concluídas hoje</div></div>
+    <div class="kpi"><div class="n">${d.aulas_concluidas_7d}</div><div class="t">aulas concluídas na semana</div></div>
+    <div class="kpi"><div class="n">${d.minutos_ouvidos_7d}</div><div class="t">minutos de áudio ouvidos na semana</div></div>
+    <div class="kpi ${d.matriculas_pendentes > 0 ? 'alerta' : ''}"><div class="n">${d.matriculas_pendentes}</div><div class="t">matrículas esperando decisão</div></div>
+    <div class="kpi ${d.perguntas_abertas > 0 ? 'alerta' : ''}"><div class="n">${d.perguntas_abertas}</div><div class="t">perguntas de alunos sem resposta</div></div>
+    <div class="kpi"><div class="n">${d.certificados_30d}</div><div class="t">certificados emitidos em 30 dias</div></div>
+  </div>
+
+  <div class="meio">
+    <div class="cartao">
+      <h2>Acontecendo agora</h2>
+      <div class="lista">${
+        (d.atividade_recente || []).length
+          ? d.atividade_recente.map(a => `<div class="item">
+              <span class="qdo">${hd(a.quando)} ${hh(a.quando)}</span>
+              <span><b>${esc(a.nome)}</b> concluiu <span class="det">${esc(a.aula)}</span></span>
+            </div>`).join('')
+          : '<div class="vazio">Sem atividade registrada ainda.</div>'
+      }</div>
+    </div>
+    <div class="cartao">
+      <h2>Próximos encontros</h2>
+      <div class="lista">${
+        (d.proximos_eventos || []).length
+          ? d.proximos_eventos.map(e => `<div class="item">
+              <span class="qdo">${hd(e.inicio)} ${hh(e.inicio)}</span>
+              <span><b>${esc(e.titulo)}</b><br><span class="det">${esc(e.turma || '')}${e.local ? ' · ' + esc(e.local) : ''}</span></span>
+            </div>`).join('')
+          : '<div class="vazio">Nada agendado por enquanto.</div>'
+      }
+      ${ue ? `<div style="margin-top:auto">
+        <h2 style="margin:14px 0 0">Último encontro — ${esc(ue.titulo)}</h2>
+        <div class="presenca-barra"><i style="width:${pct}%"></i></div>
+        <div class="det" style="color:#b7a795;font-size:13.5px">${ue.presentes} de ${ue.total} presentes (${pct}%)</div>
+      </div>` : ''}</div>
+    </div>
+    <div class="cartao rank">
+      <h2>Alunos em ritmo — pontos</h2>
+      <div class="lista">${
+        (d.ranking || []).length
+          ? d.ranking.map((r, i) => `<div class="item"><b class="pos">${i+1}º</b>
+              <b>${esc(r.nome)}</b>
+              <span class="pts">${r.pontos} pts${r.streak_dias > 1 ? ' · ' + r.streak_dias + ' dias seguidos' : ''}</span>
+            </div>`).join('')
+          : '<div class="vazio">A pontuação aparece conforme os alunos estudam.</div>'
+      }</div>
+    </div>
+  </div>
+
+  <div class="rodape">
+    <span>${d.cursos_publicados} curso${d.cursos_publicados === 1 ? '' : 's'} no ar · ${d.turmas_ativas} turma${d.turmas_ativas === 1 ? '' : 's'} ativa${d.turmas_ativas === 1 ? '' : 's'}</span>
+    <div class="sp"></div>
+    <span><b>ARBOR Labs</b> — desenvolvido orgulhosamente no Brasil</span>
+  </div>`;
+  document.body.style.display = 'flex';
+  relogio();
+}
+
+function relogio(){
+  const el = document.getElementById('hora');
+  if(el) el.textContent = new Date().toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+}
+setInterval(relogio, 5000);
+iniciar();
+</script>
+</body>
+</html>
