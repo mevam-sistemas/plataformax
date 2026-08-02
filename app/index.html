@@ -122,6 +122,9 @@ input[type=file]::file-selector-button,input[type=file]::-webkit-file-upload-but
 input[type=file]::file-selector-button:hover,input[type=file]::-webkit-file-upload-button:hover{filter:brightness(.95)}
 select{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' stroke='%236b6b73' stroke-width='1.8' fill='none' stroke-linecap='round'/></svg>");
   background-repeat:no-repeat;background-position:right 14px center;padding-right:38px}
+input[type=date]::-webkit-calendar-picker-indicator{filter:invert(46%) sepia(78%) saturate(1704%) hue-rotate(360deg) brightness(101%) contrast(101%);
+  cursor:pointer;opacity:.8}
+input[type=date]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .row{display:flex;gap:12px;align-items:flex-start}
 .row>*{flex:1}
 .check{display:flex;gap:10px;align-items:flex-start;background:var(--tint);border:1px solid var(--line);
@@ -174,13 +177,16 @@ h2 .ic,h3 .ic{width:.9em;height:.9em;margin-right:2px}
 .empty .big .ic{width:40px;height:40px;vertical-align:0}
 .dica .ic{color:var(--marca);margin-right:2px;vertical-align:-0.16em}
 .pill .ic{width:.95em;height:.95em}
+.ic.chevron{transition:transform .15s}
+.btn.xs.up .ic.chevron{transform:rotate(180deg)}
 .dot{display:inline-block;width:7px;height:7px;border-radius:50%;vertical-align:1px;margin-right:2px}
 .dot.warn{background:var(--warn)}
 .dot.mute{background:var(--line)}
 
 /* ---------- selos / abas ---------- */
 .pill{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:750;border-radius:100px;
-  padding:5px 11px;background:var(--accent-soft);color:var(--accent-ink);white-space:nowrap}
+  padding:5px 11px;background:var(--accent-soft);color:var(--accent-ink);white-space:nowrap;max-width:100%;min-width:0}
+.pill .txt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .pill.ok{background:#e6f7ee;color:#0a7c3d}
 .pill.warn{background:#fff3e0;color:#b56800}
 .pill.dgr{background:#fdeeee;color:#b3282c}
@@ -196,7 +202,7 @@ h2 .ic,h3 .ic{width:.9em;height:.9em;margin-right:2px}
 /* ---------- listas de pessoas / aulas ---------- */
 .item{display:flex;align-items:center;gap:13px;padding:14px 2px;border-bottom:1px solid var(--line);flex-wrap:wrap}
 .item:last-child{border-bottom:0}
-.item .t{flex:1;min-width:150px;font-size:15px}
+.item .t{flex:1;min-width:150px;font-size:15px;overflow-wrap:break-word}
 .item .t small{display:block;color:var(--sub);font-size:12.5px;margin-top:2px}
 .ck{width:26px;height:26px;border-radius:50%;border:2px solid var(--line);flex:none;
   display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff}
@@ -401,7 +407,7 @@ h2 .ic,h3 .ic{width:.9em;height:.9em;margin-right:2px}
   border-radius:100px;padding:4px 10px;color:var(--sub)}
 .pres-item{display:flex;align-items:center;gap:11px;padding:9px 2px;border-bottom:1px solid var(--line);flex-wrap:wrap}
 .pres-item:last-child{border-bottom:0}
-.pres-nome{flex:1;min-width:140px;font-size:14.5px;font-weight:600}
+.pres-nome{flex:1;min-width:140px;font-size:14.5px;font-weight:600;overflow-wrap:break-word}
 .pres-nome small{display:block;font-weight:400;font-size:12px;color:var(--sub);margin-top:2px}
 .pres-bt{display:flex;gap:5px;flex:none}
 .pres-bt button{border:1px solid var(--line);background:var(--card);border-radius:100px;padding:6px 11px;
@@ -850,6 +856,7 @@ const ICONS = {
   play:'<path d="M6 4.3v15.4a1 1 0 0 0 1.5.86l12.5-7.7a1 1 0 0 0 0-1.72L7.5 3.44A1 1 0 0 0 6 4.3Z" fill="currentColor" stroke="none"/>',
   parar:'<rect x="6" y="6" width="12" height="12" rx="1.6" fill="currentColor" stroke="none"/>',
   x:'<path d="M6 6l12 12M18 6 6 18"/>',
+  chevron:'<path d="M6 9.5l6 6 6-6"/>',
 };
 function ic(name, cls){
   const p = ICONS[name];
@@ -1588,8 +1595,9 @@ async function abrirCurso(cid, origem){
         ${libM ? `<div style="font-size:12.5px;color:${libM.getTime()>agora?'var(--warn)':'var(--sub)'};margin-top:3px">
           ${libM.getTime()>agora?`${ic('cadeado')} abre`:'aberto desde'} ${libM.toLocaleDateString('pt-BR')} às ${libM.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</div>`:''}</div>
       ${ctx.podeAula? `<div style="display:flex;gap:6px;flex:none">
-        <button class="btn xs ghost" onclick="definirLancamento('${m.id}','${m.libera_em||''}')">Data</button>
-        <button class="btn xs ghost" onclick="formAula('${m.id}')">+ aula</button></div>`:''}</div>`;
+        <button class="btn xs ghost" onclick="formLancamento('${m.id}','${m.libera_em||''}')">Data</button>
+        <button class="btn xs ghost" onclick="formAula('${m.id}')">+ aula</button></div>`:''}</div>
+      <div id="dl-${m.id}"></div>`;
     if(!(m.aulas||[]).length) html += `<div style="font-size:13.5px;color:var(--sub);padding:10px 0 2px">
       ${ctx.podeAula?'Nenhuma aula aqui ainda — toque em “+ aula” para subir vídeo, texto ou PDF.':'Conteúdo em preparação.'}</div>`;
     (m.aulas||[]).forEach(a0 => {
@@ -1608,7 +1616,8 @@ async function abrirCurso(cid, origem){
   });
   if(!(mods||[]).length) html = `<div class="card empty"><div class="big">${ic('filme')}</div><b>Curso sem conteúdo ainda</b>
     <p>${ctx.podeAula?'Crie um módulo e comece a subir suas aulas.':'A escola está preparando o material.'}</p></div>`;
-  if(ctx.podeAula) html += `<button class="btn ghost" style="margin-top:14px" onclick="novoModulo()">+ Novo módulo</button>`;
+  if(ctx.podeAula) html += `<button class="btn ghost" style="margin-top:14px" onclick="formModulo()">+ Novo módulo</button>
+    <div id="nm-slot"></div>`;
   $('cu-modulos').innerHTML = html;
 
   if(ctx.podeAula) montarTurmas(cid, souStaff);
@@ -1646,14 +1655,22 @@ async function salvarCurso(){
   if(error) return alert('Ops: '+error.message);
   $('cu-editor').innerHTML=''; abrirCurso(ctx.curso, ctx.origem);
 }
-async function definirLancamento(mid, atual){
-  const hoje = atual ? new Date(atual).toISOString().slice(0,16) : '';
-  const v = prompt('Data e hora de abertura deste módulo (formato AAAA-MM-DD HH:MM).\nDeixe vazio para abrir imediatamente.', hoje.replace('T',' '));
-  if(v === null) return;
-  const iso = v.trim() ? new Date(v.trim().replace(' ','T')).toISOString() : null;
-  if(v.trim() && isNaN(new Date(iso))) return alert('Data inválida. Use o formato 2026-08-15 19:00');
+function formLancamento(mid, atual){
+  const slot = $('dl-'+mid); if(!slot) return;
+  if(slot.innerHTML){ slot.innerHTML=''; return; }
+  slot.innerHTML = `<div class="inline" style="margin-top:8px">
+    <label>Data e hora de abertura deste módulo <span class="opt">— vazio abre imediatamente</span></label>
+    <input id="dl-input-${mid}" type="datetime-local" value="${atual?paraLocal(atual):''}">
+    <div class="row" style="margin-top:12px">
+      <button class="btn sm" onclick="salvarLancamento('${mid}')">Salvar</button>
+      <button class="btn sm ghost" onclick="formLancamento('${mid}')">Cancelar</button></div>
+    <div class="msg" id="dl-msg-${mid}"></div></div>`;
+}
+async function salvarLancamento(mid){
+  const v = $('dl-input-'+mid).value;
+  const iso = v ? new Date(v).toISOString() : null;
   const { error } = await sb.from('modulos').update({ libera_em: iso }).eq('id', mid);
-  if(error) return alert('Ops: '+error.message);
+  if(error){ $('dl-msg-'+mid).textContent = 'Ops: '+error.message; return; }
   abrirCurso(ctx.curso, ctx.origem);
 }
 
@@ -1913,11 +1930,24 @@ async function montarTurmas(cid, souStaff){
   carregarFotos();
 }
 
-async function novoModulo(){
-  const t = prompt('Nome do módulo (ex.: “Fase 1 — Fundamentos”):'); if(!t) return;
+function formModulo(){
+  const slot = $('nm-slot'); if(!slot) return;
+  if(slot.innerHTML){ slot.innerHTML=''; return; }
+  slot.innerHTML = `<div class="inline" style="margin-top:12px">
+    <label>Nome do módulo</label>
+    <input id="nm-titulo" placeholder="Ex.: Fase 1 — Fundamentos">
+    <div class="row" style="margin-top:12px">
+      <button class="btn sm" onclick="salvarModulo()">Criar módulo</button>
+      <button class="btn sm ghost" onclick="formModulo()">Cancelar</button></div>
+    <div class="msg" id="nm-msg"></div></div>`;
+}
+async function salvarModulo(){
+  const t = $('nm-titulo').value.trim();
+  if(!t){ $('nm-msg').textContent = 'Escreva um nome para o módulo.'; return; }
   const { data: mods } = await sb.from('modulos').select('ordem').eq('curso_id', ctx.curso);
   const ordem = 1 + Math.max(0, ...(mods||[]).map(m=>m.ordem));
-  await sb.from('modulos').insert({ curso_id: ctx.curso, titulo: t.trim(), ordem });
+  const { error } = await sb.from('modulos').insert({ curso_id: ctx.curso, titulo: t, ordem });
+  if(error){ $('nm-msg').textContent = 'Ops: '+error.message; return; }
   abrirCurso(ctx.curso, ctx.origem);
 }
 // ---------- criar / editar turma (com modalidade) ----------
@@ -2033,7 +2063,7 @@ async function abrirEquipe(){
             : `<span class="pill warn">não entrou ainda</span>`}
         </div></div>
       ${tl.length ? `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px">
-          ${tl.map(t=>`<span class="pill mute">${ic('capelo')} ${esc(t.curso)} · ${esc(t.turma)}</span>`).join('')}</div>`
+          ${tl.map(t=>`<span class="pill mute">${ic('capelo')}<span class="txt">${esc(t.curso)} · ${esc(t.turma)}</span></span>`).join('')}</div>`
         : p.papel === 'professor' ? `<div class="hint" style="margin-top:12px">
             Ainda sem turma. Enquanto não tiver, ele entra mas não vê aluno nenhum.</div>` : ''}
       ${souAdmin ? `<div class="row" style="margin-top:14px;flex-wrap:wrap;gap:6px">
@@ -3003,7 +3033,7 @@ function pessoaItem(m, acoes, onde, valorCents){
     ${wa?`<a class="wa" href="${wa}" target="_blank" rel="noopener" title="Chamar no WhatsApp">${WA_SVG}</a>`:''}
     ${acoes||''}
     <button class="btn xs ghost" title="Ver ficha completa"
-      onclick="const d=$('${id}');const ab=d.style.display!=='none';d.style.display=ab?'none':'';this.textContent=ab?'▾':'▴'">▾</button>
+      onclick="const d=$('${id}');const ab=d.style.display!=='none';d.style.display=ab?'none':'';this.classList.toggle('up',!ab)">${ic('chevron')}</button>
     <div id="${id}" class="det" style="display:none">
       <b>E-mail:</b> ${esc(p.email||'—')}<br>
       <b>WhatsApp:</b> ${esc(p.telefone||'—')}<br>
