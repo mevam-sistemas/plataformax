@@ -612,10 +612,10 @@ h2 .ic,h3 .ic{width:.9em;height:.9em;margin-right:2px}
   <div id="es-assinaturas"></div>
   <div id="es-plano"></div>
   <div class="row" id="es-acoes" style="margin-top:24px;flex-wrap:wrap">
-    <button class="btn ghost sm" id="b-painel" style="display:none">${ic('tv')} Painel ao vivo</button>
+    <button class="btn ghost sm" id="b-painel" style="display:none"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4" width="19" height="13.5" rx="1.6"/><path d="M8.5 21h7M12 17.5v3.5"/></svg> Painel ao vivo</button>
     <button class="btn ghost sm" id="b-equipe" style="display:none">Equipe e acessos</button>
     <button class="btn ghost sm" id="b-assinaturas" style="display:none">Assinaturas do certificado</button>
-    <button class="btn ghost sm" id="b-plano" style="display:none">${ic('cartao')} Plano da escola</button>
+    <button class="btn ghost sm" id="b-plano" style="display:none"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14.5" rx="1.8"/><path d="M2 10h20"/></svg> Plano da escola</button>
     <button class="btn ghost sm" id="b-historico" style="display:none">Histórico de alterações</button>
   </div>
 </section>
@@ -1306,10 +1306,8 @@ async function abrirEscola(eid){
     const alunos = ts.reduce((s,t) => s + (t.matriculas||[]).filter(m=>m.status==='ativa').length, 0);
     const esperando = ts.reduce((s,t) => s + (t.matriculas||[]).filter(m=>['pendente','aguardando_pagamento'].includes(m.status)).length, 0);
     return `<div class="card tap ${c.arquivado_em?'arq':''}" onclick="abrirCurso('${c.id}','escola')">
-      <div class="row" style="justify-content:space-between;align-items:flex-start">
-        <div style="flex:1"><h3>${esc(c.titulo)}</h3>
-          <div style="font-size:13px;color:var(--sub);margin-top:4px">${esc((c.descricao||'').slice(0,70)||'Sem descrição')}</div></div>
-        <span class="pill ${c.valor_cents?'':'mute'}" style="flex:none">${c.valor_cents?money(c.valor_cents):'Gratuito'}</span></div>
+      <div><h3>${esc(c.titulo)}</h3>
+        <div style="font-size:13px;color:var(--sub);margin-top:4px">${esc((c.descricao||'').slice(0,70)||'Sem descrição')}</div></div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
         <span class="pill mute">${ts.length} turma${ts.length===1?'':'s'}</span>
         <span class="pill mute">${alunos} aluno${alunos===1?'':'s'}</span>
