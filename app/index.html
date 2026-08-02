@@ -64,7 +64,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Inter
   white-space:nowrap;flex:none}
 @media(max-width:640px){ .modo{display:none} }
 .ctx{font-size:12.5px;font-weight:700;color:var(--accent-ink);background:var(--accent-soft);
-  border-radius:100px;padding:5px 12px;white-space:nowrap}
+  border-radius:100px;padding:5px 12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  min-width:0;max-width:min(44vw,420px)}
+@media(max-width:640px){ .ctx{max-width:56vw} }
 .top-sp{flex:1}
 .tlink{font-size:13.5px;color:var(--sub);background:none;border:0;cursor:pointer;
   font-family:inherit;font-weight:600;padding:6px 4px;border-radius:8px}
@@ -94,6 +96,11 @@ h3{font-size:17px;font-weight:700;letter-spacing:-.01em}
 .dica{border-left:3px solid var(--marca) !important;
   font-size:13px;color:var(--sub);line-height:1.6;background:var(--tint);border:1px solid var(--line);
   border-radius:var(--r-md);padding:12px 14px;margin:10px 0}
+/* texto corrido sempre justificado — pedido do Israel (02/08/2026):
+   "não existe texto sem justificação". Curto e sem quebra de linha não
+   muda em nada; só entra em ação quando o texto passa de uma linha. */
+.sub,.dica,.det,.leitura,.cert .txt,.empty p{
+  text-align:justify;text-justify:inter-word;hyphens:auto;-webkit-hyphens:auto}
 
 /* ---------- formulário ---------- */
 label{font-size:13px;font-weight:650;color:var(--ink);display:block;margin:16px 0 6px}
@@ -103,7 +110,16 @@ input,textarea,select{width:100%;border:1px solid var(--line);background:var(--c
   padding:13px 14px;font-size:15.5px;font-family:inherit;color:var(--ink);outline:none;
   transition:border-color .15s,box-shadow .15s;resize:vertical}
 input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3.5px var(--accent-soft)}
-input[type=file]{padding:10px 12px;font-size:14px}
+/* upload de arquivo: o input nativo do navegador (botão cinza dos anos 90)
+   troca de roupa pra combinar com o resto — mesma pílula dos outros botões */
+input[type=file]{padding:9px 12px;font-size:13.5px;color:var(--sub);
+  background:var(--tint);border:1.5px dashed #d5d5e0;cursor:pointer}
+input[type=file]:hover{border-color:var(--accent)}
+input[type=file]::file-selector-button,input[type=file]::-webkit-file-upload-button{
+  margin-right:12px;border:0;border-radius:100px;background:var(--accent-soft);
+  color:var(--accent-ink);font-family:inherit;font-size:13px;font-weight:700;
+  padding:9px 16px;cursor:pointer;transition:filter .15s}
+input[type=file]::file-selector-button:hover,input[type=file]::-webkit-file-upload-button:hover{filter:brightness(.95)}
 select{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' stroke='%236b6b73' stroke-width='1.8' fill='none' stroke-linecap='round'/></svg>");
   background-repeat:no-repeat;background-position:right 14px center;padding-right:38px}
 .row{display:flex;gap:12px;align-items:flex-start}
@@ -150,6 +166,17 @@ select{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns=
 .empty b{font-size:17px;display:block;margin-bottom:7px}
 .empty p{font-size:14px;color:var(--sub);line-height:1.65;max-width:44ch;margin:0 auto}
 .empty .btn{margin-top:20px}
+
+/* ---------- ícones (substituem os emojis) ---------- */
+.ic{width:1em;height:1em;flex:none;vertical-align:-0.14em;stroke:currentColor}
+h2 .ic,h3 .ic{width:.9em;height:.9em;margin-right:2px}
+.empty .big{color:var(--sub);opacity:.55}
+.empty .big .ic{width:40px;height:40px;vertical-align:0}
+.dica .ic{color:var(--marca);margin-right:2px;vertical-align:-0.16em}
+.pill .ic{width:.95em;height:.95em}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;vertical-align:1px;margin-right:2px}
+.dot.warn{background:var(--warn)}
+.dot.mute{background:var(--line)}
 
 /* ---------- selos / abas ---------- */
 .pill{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:750;border-radius:100px;
@@ -220,7 +247,8 @@ select{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns=
 .txt-aula{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);
   padding:34px 38px;margin:18px 0;max-width:68ch;box-shadow:var(--sh-1);
   font-size:17.5px;line-height:1.78;color:#22222a;letter-spacing:-.003em;
-  overflow-wrap:break-word}
+  overflow-wrap:break-word;text-align:justify;text-justify:inter-word;
+  hyphens:auto;-webkit-hyphens:auto}
 @media(max-width:600px){ .txt-aula{padding:24px 20px;font-size:17px;line-height:1.75;border-radius:var(--r-md)} }
 .txt-aula > *:first-child{margin-top:0}
 .txt-aula > *:last-child{margin-bottom:0}
@@ -578,10 +606,10 @@ select{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns=
   <div id="es-assinaturas"></div>
   <div id="es-plano"></div>
   <div class="row" id="es-acoes" style="margin-top:24px;flex-wrap:wrap">
-    <button class="btn ghost sm" id="b-painel" style="display:none">📺 Painel ao vivo</button>
+    <button class="btn ghost sm" id="b-painel" style="display:none">${ic('tv')} Painel ao vivo</button>
     <button class="btn ghost sm" id="b-equipe" style="display:none">Equipe e acessos</button>
     <button class="btn ghost sm" id="b-assinaturas" style="display:none">Assinaturas do certificado</button>
-    <button class="btn ghost sm" id="b-plano" style="display:none">💳 Plano da escola</button>
+    <button class="btn ghost sm" id="b-plano" style="display:none">${ic('cartao')} Plano da escola</button>
     <button class="btn ghost sm" id="b-historico" style="display:none">Histórico de alterações</button>
   </div>
 </section>
@@ -778,6 +806,57 @@ function notificar(tipo, matricula_id){
 const esc = s => String(s??'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money = c => 'R$ ' + ((c||0)/100).toFixed(2).replace('.',',');
 
+/* ═══════════════ ÍCONES ═══════════════
+   Traço único, sem cor própria (herda a cor do texto ao redor) — pra não
+   parecer aplicativo de conversa. Cada símbolo aqui substitui um emoji que
+   a interface usava antes (02/08/2026, pedido do Israel: "não é uma
+   conversa de whatsapp", nada de emoji fazendo o trabalho de ícone). */
+const ICONS = {
+  escola:'<path d="M4 21V8.5a1 1 0 0 1 .52-.88l7-3.82a1 1 0 0 1 .96 0l7 3.82a1 1 0 0 1 .52.88V21"/><path d="M2.5 21h19"/><path d="M9 21v-5.5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1V21"/><path d="M8 11h.01M12 11h.01M16 11h.01"/>',
+  online:'<rect x="2.5" y="4" width="19" height="13" rx="1.6"/><path d="M8.5 21h7M12 17v4"/>',
+  capelo:'<path d="M12 4 2 9l10 5 10-5-10-5Z"/><path d="M6 11.5V17c0 1.4 2.7 2.5 6 2.5s6-1.1 6-2.5v-5.5"/><path d="M22 9v6.5"/>',
+  professor:'<circle cx="9" cy="7.5" r="3.6"/><path d="M2.5 20.5c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><path d="M16 10.5l2 2 3.5-4"/>',
+  pessoas:'<circle cx="8.5" cy="8" r="3.4"/><path d="M2 20c0-3.3 2.9-5.6 6.5-5.6S15 16.7 15 20"/><path d="M15.5 5.4a3.4 3.4 0 0 1 0 6.5"/><path d="M17.5 14.6c2.4.7 4 2.7 4 5.4"/>',
+  cadeado:'<rect x="4.5" y="10.5" width="15" height="10.5" rx="1.6"/><path d="M7.5 10.5V7a4.5 4.5 0 0 1 9 0v3.5"/>',
+  chave:'<circle cx="7.5" cy="15.5" r="4.5"/><path d="M11 12 20.5 2.5"/><path d="M16 7l2.5 2.5"/><path d="M13.3 9.7l2.4 2.4"/>',
+  chama:'<path d="M12 2.5s4.5 4 4.5 8.6a4.5 4.5 0 1 1-9 0c0-1 .3-1.8.8-2.6.4.9 1.2 1.4 1.9 1.1-.5-2 .3-4.3 1.8-5.7Z"/>',
+  arquivo:'<path d="M3 7.5h18M3 7.5v11a1.6 1.6 0 0 0 1.6 1.6h14.8A1.6 1.6 0 0 0 21 18.5v-11M3 7.5l1.8-3.6a1 1 0 0 1 .9-.6h12.6a1 1 0 0 1 .9.6L21 7.5"/><path d="M10 12h4"/>',
+  celebra:'<path d="M12 3v2.2M18.4 6.6l-1.6 1.6M21 12h-2.2M5.6 6.6l1.6 1.6M3 12h2.2"/><circle cx="12" cy="12" r="3.2"/><path d="M9.5 20.5 6 22l1-3.8M14.5 20.5 18 22l-1-3.8"/>',
+  check:'<circle cx="12" cy="12" r="9.2"/><path d="M8 12.3l2.6 2.6L16.3 9"/>',
+  pin:'<path d="M19.5 10.3c0 6-7.5 11.2-7.5 11.2s-7.5-5.2-7.5-11.2a7.5 7.5 0 0 1 15 0Z"/><circle cx="12" cy="10.3" r="2.6"/>',
+  certificado:'<circle cx="12" cy="8" r="5.8"/><path d="M8.3 12.9 7.2 20l4.8-2.7 4.8 2.7-1.1-7.1"/>',
+  hibrido:'<path d="M15 3h5.5v5.5M20.5 3 13 10.5"/><path d="M9 21H3.5v-5.5M3.5 21 11 13.5"/><path d="M3.5 8.5 8 4M16 15.5l4.5 4.5"/>',
+  fone:'<path d="M4 17.5V12a8 8 0 0 1 16 0v5.5"/><rect x="2.5" y="15.5" width="4" height="6" rx="1.4"/><rect x="17.5" y="15.5" width="4" height="6" rx="1.4"/>',
+  cartao:'<rect x="2" y="5" width="20" height="14.5" rx="1.8"/><path d="M2 10h20"/>',
+  calendario:'<rect x="3.5" y="5" width="17" height="16" rx="1.6"/><path d="M8 3v4M16 3v4M3.5 10.5h17"/>',
+  mensagem:'<path d="M20.5 11.5a8 8 0 0 1-8.4 8l-4.6 1.5 1.4-4.4a8 8 0 1 1 11.6-5.1Z"/>',
+  alerta:'<path d="M10.3 3.4 1.8 18.3A1.7 1.7 0 0 0 3.3 21h17.4a1.7 1.7 0 0 0 1.5-2.7L13.7 3.4a1.7 1.7 0 0 0-3.4 0Z"/><path d="M12 9.3v4M12 16.8h.01"/>',
+  bandeira:'<path d="M5 21V4"/><path d="M5 5s1.2-1.3 4-1.3 4.5 2 7.5 2 3.5-1.2 3.5-1.2v9.5s-1 1.2-3.5 1.2-4.7-2-7.5-2-4 1.3-4 1.3"/>',
+  livro:'<path d="M4.5 19.5A2.5 2.5 0 0 1 7 17h13V2.5H7A2.5 2.5 0 0 0 4.5 5Z"/><path d="M4.5 5v14.5"/>',
+  livroAberto:'<path d="M2.5 4.5h6a3.5 3.5 0 0 1 3.5 3.5v13a3 3 0 0 0-3-3h-6.5Z"/><path d="M21.5 4.5h-6a3.5 3.5 0 0 0-3.5 3.5v13a3 3 0 0 1 3-3h6.5Z"/>',
+  vazio:'<circle cx="12" cy="12" r="9.2" stroke-dasharray="2.6 3.2"/>',
+  link:'<path d="M9.5 14.5 14.5 9.5"/><path d="M13 6.3l1.6-1.6a4 4 0 1 1 5.7 5.7l-2.5 2.5a4 4 0 0 1-5.7 0"/><path d="M11 17.7l-1.6 1.6a4 4 0 1 1-5.7-5.7l2.5-2.5a4 4 0 0 1 5.7 0"/>',
+  caixaEntrada:'<path d="M3 12h5l1.8 3h4.4l1.8-3h5"/><path d="M5.4 5.3 3 12v6.5A1.6 1.6 0 0 0 4.6 20h14.8a1.6 1.6 0 0 0 1.6-1.6V12l-2.4-6.7a1.6 1.6 0 0 0-1.5-1H6.9a1.6 1.6 0 0 0-1.5 1Z"/>',
+  microfone:'<rect x="9" y="1.5" width="6" height="12" rx="3"/><path d="M5.5 10.5v1.5a6.5 6.5 0 0 0 13 0v-1.5"/><path d="M12 18.5v4M8.5 22.5h7"/>',
+  tv:'<rect x="2.5" y="4" width="19" height="13.5" rx="1.6"/><path d="M8.5 21h7M12 17.5v3.5"/>',
+  mochila:'<path d="M6 8V6a6 6 0 0 1 12 0v2"/><rect x="3.5" y="8" width="17" height="14" rx="2.4"/><path d="M9 12.5h6M9 22v-6h6v6"/>',
+  filme:'<rect x="2.5" y="3.5" width="19" height="17" rx="1.6"/><path d="M7.5 3.5v17M16.5 3.5v17M2.5 9h5M2.5 15h5M16.5 9h5M16.5 15h5"/>',
+  bloqueado:'<circle cx="12" cy="12" r="9.2"/><path d="M5.5 5.5l13 13"/>',
+  lapis:'<path d="M13.5 5.5 18.5 10.5 8 21H3v-5Z"/><path d="M11.5 7.5l4 4"/>',
+  lampada:'<path d="M9 18.5h6M10 22h4"/><path d="M12 2.5a7 7 0 0 0-4 12.7c.7.5 1 1 1 1.8v.5h6v-.5c0-.8.3-1.3 1-1.8A7 7 0 0 0 12 2.5Z"/>',
+  duvida:'<circle cx="12" cy="12" r="9.2"/><path d="M9 9.3a3 3 0 1 1 4.7 2.5c-.9.6-1.7 1.1-1.7 2.2"/><path d="M12 17.3h.01"/>',
+  moeda:'<circle cx="12" cy="12" r="9.2"/><path d="M12 6.5v11M15.3 9.2A3.2 3.2 0 0 0 12 7c-1.9 0-3.3 1-3.3 2.4 0 3.2 6.6 1.6 6.6 4.8 0 1.5-1.5 2.4-3.3 2.4a3.4 3.4 0 0 1-3.3-2.2"/>',
+  relogio:'<path d="M6 3h12M6 21h12"/><path d="M7 3c0 4 3.2 6.2 5 8-1.8 1.8-5 4-5 8M17 3c0 4-3.2 6.2-5 8 1.8 1.8 5 4 5 8"/>',
+  play:'<path d="M6 4.3v15.4a1 1 0 0 0 1.5.86l12.5-7.7a1 1 0 0 0 0-1.72L7.5 3.44A1 1 0 0 0 6 4.3Z" fill="currentColor" stroke="none"/>',
+  parar:'<rect x="6" y="6" width="12" height="12" rx="1.6" fill="currentColor" stroke="none"/>',
+  x:'<path d="M6 6l12 12M18 6 6 18"/>',
+};
+function ic(name, cls){
+  const p = ICONS[name];
+  if(!p) return '';
+  return `<svg class="ic${cls?' '+cls:''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+}
+
 // mundo visual + contexto na barra
 // O X da marca é uma variável: MODO × quem está usando. A barra de cima diz,
 // em uma linha, em qual modo a pessoa está — e o modo é o que manda no que ela vê.
@@ -936,16 +1015,16 @@ async function entrar(){
       const d0 = new Date(prox[0].inicio);
       const hj = new Date(); hj.setHours(0,0,0,0);
       const dias = Math.round((new Date(d0).setHours(0,0,0,0) - hj) / 86400000);
-      html += `<h2>🗓️ Meus compromissos <span>— o que tem dia e hora marcados</span></h2>
+      html += `<h2>${ic('calendario')} Meus compromissos <span>— o que tem dia e hora marcados</span></h2>
         <div class="card tap" onclick="abrirAgenda()">
           <div class="row" style="justify-content:space-between;align-items:flex-start">
             <div style="flex:1"><h3>${esc(prox[0].titulo)}</h3>
               <div style="font-size:13px;color:var(--sub);margin-top:4px">${esc(prox[0].curso)}
-                · ${prox[0].tipo==='online'?'💻 sala online':'🏫 presencial'}</div></div>
+                · ${prox[0].tipo==='online'?`${ic('online')} sala online`:`${ic('escola')} presencial`}</div></div>
             <span class="pill ${dias<=0?'warn':'ok'}" style="flex:none">${
               dias<=0?'hoje · '+hhmm(d0) : dias===1?'amanhã · '+hhmm(d0) : 'em '+dias+' dias'}</span></div>
           <div style="font-size:13.5px;color:var(--sub);margin-top:12px">${dataLonga(d0)}${
-            prox[0].local?' · 📍 '+esc(prox[0].local):''}</div>
+            prox[0].local?` · ${ic('pin')} `+esc(prox[0].local):''}</div>
           ${prox.length>1?`<div style="font-size:13px;color:var(--accent-ink);font-weight:650;margin-top:12px">
             + ${prox.length-1} outro${prox.length>2?'s':''} nos próximos dias — ver minha agenda →</div>`
             :`<div style="font-size:13px;color:var(--accent-ink);font-weight:650;margin-top:12px">Ver minha agenda →</div>`}
@@ -955,7 +1034,7 @@ async function entrar(){
   if(estudos.length){
     const EST = { ativa:['Liberado','ok'], concluida:['Concluído','ok'], pendente:['Em análise','warn'],
       aguardando_pagamento:['Falta pagar','warn'], cancelada:['Não aprovada','dgr'], inadimplente:['Pagamento pendente','warn'] };
-    html += `<h2>🎓 Meus cursos <span>— onde eu sou aluno</span></h2><div class="grid g2">`;
+    html += `<h2>${ic('capelo')} Meus cursos <span>— onde eu sou aluno</span></h2><div class="grid g2">`;
     html += estudos.map(m => {
       const [rot, cls] = EST[m.status] || [m.status,'mute'];
       const aberto = ['ativa','concluida'].includes(m.status);
@@ -976,14 +1055,14 @@ async function entrar(){
       .select('id,status,turmas(cursos(escola_id))').in('status',['pendente','aguardando_pagamento']);
     const pp = {};
     (pends||[]).forEach(x => { const e = x.turmas?.cursos?.escola_id; if(e) pp[e] = (pp[e]||0)+1; });
-    html += `<h2>🏫 Minhas escolas <span>— onde eu ensino ou administro</span></h2><div class="grid g2">`;
+    html += `<h2>${ic('escola')} Minhas escolas <span>— onde eu ensino ou administro</span></h2><div class="grid g2">`;
     html += gestao.map(v => {
       const n = pp[v.escola.id] || 0;
       return `<div class="card tap" onclick="abrirEscola('${v.escola.id}')">
         <div class="row" style="justify-content:space-between;align-items:flex-start">
           <div style="flex:1"><h3>${esc(v.escola.nome)}</h3>
             <div style="font-size:13px;color:var(--sub);margin-top:4px">Você é ${PAPEL_L[v.papel]}</div></div>
-          ${n? `<span class="pill warn" style="flex:none">${n} ⏳</span>`:`<span class="pill ok" style="flex:none">em ordem</span>`}</div>
+          ${n? `<span class="pill warn" style="flex:none">${n} ${ic('relogio')}</span>`:`<span class="pill ok" style="flex:none">em ordem</span>`}</div>
         ${n? `<div style="font-size:13.5px;color:var(--warn);font-weight:600;margin-top:12px">
           ${n} inscriç${n===1?'ão espera':'ões esperam'} sua decisão →</div>`:''}</div>`;
     }).join('') + `</div>`;
@@ -992,7 +1071,7 @@ async function entrar(){
   // ---- meus certificados
   const { data: certs } = await sb.rpc('meus_certificados');
   if(certs?.length){
-    html += `<h2>📜 Meus certificados <span>— conquistados e verificáveis</span></h2><div class="grid g2">`;
+    html += `<h2>${ic('certificado')} Meus certificados <span>— conquistados e verificáveis</span></h2><div class="grid g2">`;
     ctx.certs = certs;
     html += certs.map(c => `<div class="card tap" onclick="verCertificado('${esc(c.codigo)}')">
       <div class="row" style="justify-content:space-between;align-items:flex-start">
@@ -1007,10 +1086,10 @@ async function entrar(){
       <h3>Bem-vindo ao MODOX</h3>
       <p>Cadastro único e permanente: tudo que você estudar aqui fica registrado pra sempre — cursos, certificados, conquistas.</p></div>
       <div class="grid g2" style="margin-top:16px">
-      <div class="card empty"><div class="big">🏫</div><b>Vou ensinar</b>
+      <div class="card empty"><div class="big">${ic('escola')}</div><b>Vou ensinar</b>
         <p>Crie sua escola, monte o primeiro curso e receba inscrições por um link. Leva menos de dois minutos.</p>
         <button class="btn" onclick="go('escola-nova',{mundo:'gestao',chip:'Nova escola'})">Criar minha escola</button></div>
-      <div class="card empty"><div class="big">🎒</div><b>Vim estudar</b>
+      <div class="card empty"><div class="big">${ic('mochila')}</div><b>Vim estudar</b>
         <p>Quando uma escola te matricular — ou você se inscrever por um link — seus cursos aparecem aqui automaticamente.</p></div></div>`;
   }
   $('home-corpo').innerHTML = html;
@@ -1137,7 +1216,7 @@ async function abrirEscola(eid){
     $('b-painel').style.display = 'none';
     $('b-plano').style.display = souAdminEscola ? '' : 'none';
     $('es-bloqueio').innerHTML = `<div class="card alerta">
-      <h3>⏳ Teste de 7 dias vencido</h3>
+      <h3>${ic('relogio')} Teste de 7 dias vencido</h3>
       <p style="font-size:13.5px;color:var(--sub);margin:8px 0 4px;line-height:1.6">
         Nada foi apagado — cursos, turmas e alunos continuam guardados do jeito que estavam.
         ${souAdminEscola ? 'Assine um plano abaixo para reabrir a gestão da escola.'
@@ -1172,7 +1251,7 @@ async function abrirEscola(eid){
   if(pend?.length){
     $('es-pendencias').innerHTML = `<div class="card alerta">
       <div class="row" style="justify-content:space-between;align-items:center">
-        <h3>⏳ Esperando sua decisão</h3><span class="pill warn">${pend.length}</span></div>
+        <h3>${ic('relogio')} Esperando sua decisão</h3><span class="pill warn">${pend.length}</span></div>
       <div style="font-size:13.5px;color:var(--sub);margin:8px 0 4px;line-height:1.6">
         Toque na setinha para ver tudo que a pessoa enviou. Ao aprovar ou recusar você pode deixar um recado —
         ele vai para o aluno e fica guardado no prontuário dele.</div>
@@ -1192,13 +1271,13 @@ async function abrirEscola(eid){
   if(perg?.length){
     $('es-pendencias').innerHTML += `<div class="card alerta">
       <div class="row" style="justify-content:space-between;align-items:center">
-        <h3>💬 Alunos esperando resposta</h3><span class="pill warn">${perg.length}</span></div>
+        <h3>${ic('mensagem')} Alunos esperando resposta</h3><span class="pill warn">${perg.length}</span></div>
       <div style="font-size:13.5px;color:var(--sub);margin:8px 0 10px;line-height:1.6">
         Cada pergunta vai para o professor da turma. Responder rápido é o que faz o aluno voltar.</div>
       ${perg.slice(0,6).map(p => `<div class="item" style="cursor:pointer" onclick="abrirAula('${p.aula_id}')">
         <div class="t">${esc(p.texto.slice(0,120))}${p.texto.length>120?'…':''}
           <small>${esc(p.autor)} · ${esc(p.curso)} › ${esc(p.aula)} · turma ${esc(p.turma)}
-            · ${p.publica?'👥 pública':'🔒 privada'}</small></div>
+            · ${p.publica?`${ic('pessoas')} pública`:`${ic('cadeado')} privada`}</small></div>
         <span style="color:var(--sub)">›</span></div>`).join('')}
       ${perg.length>6?`<div class="hint" style="margin-top:10px">e mais ${perg.length-6} esperando.</div>`:''}
     </div>`;
@@ -1208,9 +1287,9 @@ async function abrirEscola(eid){
   $('es-cont').textContent = total ? `(${total})` : '';
   if(!total){
     $('es-cursos').innerHTML = arq
-      ? `<div class="card empty"><div class="big">🗂️</div><b>Nada arquivado</b>
+      ? `<div class="card empty"><div class="big">${ic('arquivo')}</div><b>Nada arquivado</b>
          <p>Cursos que você arquivar aparecem aqui. Eles nunca são apagados — o histórico dos alunos fica intacto.</p></div>`
-      : `<div class="card empty"><div class="big">📚</div><b>Seu primeiro curso começa aqui</b>
+      : `<div class="card empty"><div class="big">${ic('livroAberto')}</div><b>Seu primeiro curso começa aqui</b>
          <p>Nome, preço e pronto: a turma nasce junto e você já pode subir vídeo, texto e PDF.</p>
          <button class="btn" onclick="go('curso-novo',{mundo:'gestao',chip:'Novo curso'})">Criar curso</button></div>`;
     return;
@@ -1312,7 +1391,7 @@ async function abrirHistorico(){
     .select('criado_em,acao,tabela,antes,depois,pessoas(nome)')
     .eq('escola_id', ctx.escola).order('criado_em', {ascending:false}).limit(80);
   if(error) return $('hist-lista').innerHTML = `<div class="card empty"><p>${esc(error.message)}</p></div>`;
-  if(!hist?.length) return $('hist-lista').innerHTML = `<div class="card empty"><div class="big">🗂️</div>
+  if(!hist?.length) return $('hist-lista').innerHTML = `<div class="card empty"><div class="big">${ic('arquivo')}</div>
     <b>Nada registrado ainda</b><p>A partir de agora, cada criação, edição e arquivamento aparece aqui.</p></div>`;
   $('hist-lista').innerHTML = hist.map(h => {
     const [tab, op] = (h.acao||'.').split('.');
@@ -1344,7 +1423,7 @@ const GAMIF_TXT = {
     O aluno só conclui a aula acertando pelo menos 70% das objetivas — errando, ele revisa e tenta de novo,
     sem punição.<br><br>
     Junto vêm os estímulos: <b>10 pontos</b> por aula concluída, <b>+5</b> por resposta certa,
-    contador de <b>dias seguidos de estudo 🔥</b> (com um “perdão” caso ele falte um dia)
+    contador de <b>dias seguidos de estudo ${ic('chama')}</b> (com um “perdão” caso ele falte um dia)
     e um <b>ranking só entre os colegas da mesma turma</b> — nunca contra a plataforma inteira.<br><br>
     Você pode adicionar as perguntas depois, aula por aula, sem pressa. E dá pra desligar tudo a qualquer momento.`,
   off: `<b>Curso simples:</b> o aluno assiste, lê, baixa o PDF e marca a aula como concluída — sem perguntas,
@@ -1469,20 +1548,20 @@ async function abrirCurso(cid, origem){
       semanal:'Uma aula por semana — a próxima abre 7 dias depois.' };
     $('cu-progresso').innerHTML = `<div class="card">
       <div class="row" style="justify-content:space-between;align-items:center">
-        <b style="font-size:15px">${pct===100?'Curso concluído! 🎉':'Seu progresso'}</b>
+        <b style="font-size:15px">${pct===100?`Curso concluído! ${ic('celebra')}`:'Seu progresso'}</b>
         <span class="pill ok">${feitas} de ${ctx.aulasSeq.length}</span></div>
       <div class="bar"><i style="width:${pct}%"></i></div>
       ${ctx.gamif ? `<div class="xp">
         <div><b>${g?.pontos||0}</b><small>pontos</small></div>
-        <div><b>${g?.streak_dias||0}🔥</b><small>dias seguidos</small></div>
+        <div><b>${g?.streak_dias||0}${ic('chama')}</b><small>dias seguidos</small></div>
         <div><b>${pct}%</b><small>concluído</small></div>
       </div>` : `<div style="height:12px"></div>`}
       <div style="font-size:13px;color:var(--sub);line-height:1.6">${RITMO[ctx.regra]||''}
-        ${ctx.gamif && (g?.streak_congelamentos||0)>0?' Você tem <b>'+g.streak_congelamentos+' perdão</b> de sequência guardado — se faltar um dia, seu 🔥 não zera.':''}</div>
+        ${ctx.gamif && (g?.streak_congelamentos||0)>0?` Você tem <b>${g.streak_congelamentos} perdão</b> de sequência guardado — se faltar um dia, seu ${ic('chama')} não zera.`:''}</div>
       ${ctx.minhaModalidade !== 'online' || ctx.turmaTemEnc ? `<div class="dica" style="margin-top:14px">
-        ${ctx.minhaModalidade === 'presencial' ? '🏫 Esta turma é <b>presencial</b> — o material fica aqui e os encontros têm dia e hora marcados.'
-        : ctx.minhaModalidade === 'hibrida' ? '🔀 Esta turma é <b>híbrida</b> — você estuda aqui no seu ritmo e também tem encontros marcados.'
-        : '💻 Esta turma é online, e sua escola marcou <b>encontros ao vivo</b>.'}</div>`:''}
+        ${ctx.minhaModalidade === 'presencial' ? `${ic('escola')} Esta turma é <b>presencial</b> — o material fica aqui e os encontros têm dia e hora marcados.`
+        : ctx.minhaModalidade === 'hibrida' ? `${ic('hibrido')} Esta turma é <b>híbrida</b> — você estuda aqui no seu ritmo e também tem encontros marcados.`
+        : `${ic('online')} Esta turma é online, e sua escola marcou <b>encontros ao vivo</b>.`}</div>`:''}
       <div class="row" style="margin-top:14px;flex-wrap:wrap">
         ${ctx.gamif && ctx.minhaTurma?`<button class="btn ghost sm" onclick="abrirRanking()">Ver ranking da turma</button>`:''}
         ${ctx.minhaModalidade !== 'online' || ctx.turmaTemEnc?`<button class="btn ghost sm" onclick="abrirAgenda()">Ver meus compromissos</button>`:''}
@@ -1491,10 +1570,10 @@ async function abrirCurso(cid, origem){
     if(prox && prox.liberada) $('cu-continuar').innerHTML =
       `<button class="btn w" onclick="abrirAula('${prox.id}')">${feitas?'Continuar de onde parei ▶':'Começar a primeira aula ▶'}</button>`;
     else if(prox) $('cu-continuar').innerHTML =
-      `<div class="dica" style="margin-top:16px">🔒 <b>Próxima aula:</b> ${esc(prox.titulo)} — ${esc(prox.motivo||'ainda fechada')}.</div>`;
+      `<div class="dica" style="margin-top:16px">${ic('cadeado')} <b>Próxima aula:</b> ${esc(prox.titulo)} — ${esc(prox.motivo||'ainda fechada')}.</div>`;
     else if(pct === 100) $('cu-continuar').innerHTML =
       `<div class="card" style="border-color:#bfe9d1;background:#f2fbf6;margin-top:16px">
-        <div style="font-size:34px">📜</div>
+        <div style="font-size:34px">${ic('certificado')}</div>
         <h3 style="margin:8px 0 6px">Você concluiu o curso!</h3>
         <div style="font-size:14.5px;color:var(--sub);line-height:1.65;margin-bottom:16px">
           Seu certificado está pronto — com código e QR code para qualquer pessoa conferir a autenticidade.</div>
@@ -1507,7 +1586,7 @@ async function abrirCurso(cid, origem){
     html += `<div class="card"><div class="row" style="justify-content:space-between;align-items:center">
       <div style="flex:1"><b style="font-size:15.5px">${esc(m.titulo)}</b>
         ${libM ? `<div style="font-size:12.5px;color:${libM.getTime()>agora?'var(--warn)':'var(--sub)'};margin-top:3px">
-          ${libM.getTime()>agora?'🔒 abre':'aberto desde'} ${libM.toLocaleDateString('pt-BR')} às ${libM.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</div>`:''}</div>
+          ${libM.getTime()>agora?`${ic('cadeado')} abre`:'aberto desde'} ${libM.toLocaleDateString('pt-BR')} às ${libM.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</div>`:''}</div>
       ${ctx.podeAula? `<div style="display:flex;gap:6px;flex:none">
         <button class="btn xs ghost" onclick="definirLancamento('${m.id}','${m.libera_em||''}')">Data</button>
         <button class="btn xs ghost" onclick="formAula('${m.id}')">+ aula</button></div>`:''}</div>`;
@@ -1517,17 +1596,17 @@ async function abrirCurso(cid, origem){
       const a = ctx.aulasSeq.find(x => x.id === a0.id) || a0;
       const done = !!ctx.progresso[a.id]?.concluida_em;
       const f = a.fonte||{};
-      const partes = [f.url&&'Vídeo', f.audio&&'Áudio 🎧', f.texto&&'Texto', f.pdf&&'PDF'].filter(Boolean).join(' · ') || 'Conteúdo';
+      const partes = [f.url&&'Vídeo', f.audio&&`Áudio ${ic('fone')}`, f.texto&&'Texto', f.pdf&&'PDF'].filter(Boolean).join(' · ') || 'Conteúdo';
       const trancada = a.liberada === false;
       html += `<div class="item ${trancada?'lock':''}" style="cursor:${trancada?'default':'pointer'}"
         ${trancada?'':`onclick="abrirAula('${a.id}')"`}>
-        <div class="ck ${done?'done':''}">${done?'✓':trancada?'🔒':''}</div>
+        <div class="ck ${done?'done':''}">${done?'✓':trancada?ic('cadeado'):''}</div>
         <div class="t">${esc(a.titulo)}<small>${trancada?esc(a.motivo||'fechada'):partes}</small></div>
         <span style="color:var(--sub)">${trancada?'':'›'}</span></div>`;
     });
     html += `<div id="fa-${m.id}"></div></div>`;
   });
-  if(!(mods||[]).length) html = `<div class="card empty"><div class="big">🎬</div><b>Curso sem conteúdo ainda</b>
+  if(!(mods||[]).length) html = `<div class="card empty"><div class="big">${ic('filme')}</div><b>Curso sem conteúdo ainda</b>
     <p>${ctx.podeAula?'Crie um módulo e comece a subir suas aulas.':'A escola está preparando o material.'}</p></div>`;
   if(ctx.podeAula) html += `<button class="btn ghost" style="margin-top:14px" onclick="novoModulo()">+ Novo módulo</button>`;
   $('cu-modulos').innerHTML = html;
@@ -1551,7 +1630,7 @@ function formEditarCurso(){
     <div class="hint">Isso define quando cada aula abre para o aluno. Você e os professores sempre veem tudo.</div>
     <label>Perguntas e gamificação</label>
     <select id="ec-gamif">
-      <option value="1" ${ctx.gamif?'selected':''}>Ativadas — perguntas no fim da aula, pontos, sequência 🔥 e ranking da turma</option>
+      <option value="1" ${ctx.gamif?'selected':''}>Ativadas — perguntas no fim da aula, pontos, sequência ${ic('chama')} e ranking da turma</option>
       <option value="0" ${ctx.gamif?'':'selected'}>Desligadas — curso simples: o aluno assiste e marca como concluída</option>
     </select>
     <div class="hint">Desligar não apaga nada: as perguntas que você já criou ficam guardadas e voltam se você ativar de novo.</div>
@@ -1603,7 +1682,7 @@ async function emitirCertificado(cursoId){
   const { data, error } = await sb.rpc('emitir_certificado', { p_curso: alvo });
   const c = Array.isArray(data)?data[0]:data;
   if(error || !c){
-    $('cert-corpo').innerHTML = `<div class="card empty col" style="margin:0 auto"><div class="big">📜</div>
+    $('cert-corpo').innerHTML = `<div class="card empty col" style="margin:0 auto"><div class="big">${ic('certificado')}</div>
       <b>Certificado ainda não disponível</b>
       <p>${esc(error?.message || 'Conclua todas as aulas do curso para emitir o seu certificado.')}</p>
       <button class="btn" onclick="abrirCurso('${alvo}', ctx.origem)">Voltar ao curso</button></div>`;
@@ -1685,7 +1764,7 @@ async function consultarCertificado(){
   const c = Array.isArray(data)?data[0]:data;
   if(error || !c){
     box.innerHTML = `<div class="card" style="border:1.5px solid #f6c9ca;background:#fdf3f3">
-      <div style="font-size:34px">⚠️</div>
+      <div style="font-size:34px">${ic('alerta')}</div>
       <h3 style="margin:8px 0 6px">Certificado não encontrado</h3>
       <div style="font-size:14.5px;color:var(--sub);line-height:1.65">
         Nenhum certificado com o código <b>${esc(cod)}</b> foi emitido nesta plataforma.
@@ -1694,7 +1773,7 @@ async function consultarCertificado(){
   }
   if(!c.valido){
     box.innerHTML = `<div class="card" style="border:1.5px solid #f6c9ca;background:#fdf3f3">
-      <div style="font-size:34px">🚫</div>
+      <div style="font-size:34px">${ic('bloqueado')}</div>
       <h3 style="margin:8px 0 6px">Certificado revogado</h3>
       <div style="font-size:14.5px;color:var(--sub);line-height:1.65">
         Este certificado foi emitido para <b>${esc(c.nome)}</b> mas
@@ -1703,7 +1782,7 @@ async function consultarCertificado(){
   }
   box.innerHTML = `<div class="card" style="border:1.5px solid #bfe9d1;background:#f2fbf6">
     <div style="display:flex;align-items:center;gap:10px">
-      <div style="font-size:30px">✅</div>
+      <div style="font-size:30px">${ic('check')}</div>
       <div><h3 style="margin:0">Certificado autêntico</h3>
         <div style="font-size:13px;color:var(--sub)">Registro conferido na base do MODOX</div></div></div>
     <div class="det" style="margin-top:16px;background:#fff">
@@ -1728,16 +1807,16 @@ async function abrirRanking(){
   go('ranking', { mundo:'aluno', chip:'Ranking' });
   $('rk-lista').innerHTML = '<div class="card"><div class="skel" style="width:60%"></div></div>';
   const { data, error } = await sb.rpc('ranking_turma', { p_turma: ctx.minhaTurma });
-  if(error || !data?.length) return $('rk-lista').innerHTML = `<div class="card empty"><div class="big">🏁</div>
+  if(error || !data?.length) return $('rk-lista').innerHTML = `<div class="card empty"><div class="big">${ic('bandeira')}</div>
     <b>O ranking começa agora</b><p>Conclua sua primeira aula para aparecer aqui — e chamar os colegas pra corrida.</p></div>`;
   $('rk-lista').innerHTML = `<div class="card">${data.map((r,i) => `
     <div class="item" style="cursor:default;${r.eu?'background:var(--accent-soft);border-radius:12px;padding-left:8px':''}">
-      <div class="pos ${i<3?'p'+(i+1):''}">${i<3?['🥇','🥈','🥉'][i]:(i+1)+'º'}</div>
+      <div class="pos ${i<3?'p'+(i+1):''}">${(i+1)+'º'}</div>
       <div class="t"><b>${esc(r.nome||'Aluno')}${r.eu?' (você)':''}</b>
         <small>${r.aulas} aula${r.aulas===1?'':'s'} concluída${r.aulas===1?'':'s'}</small></div>
       <span class="pill ok">${r.pontos} pts</span></div>`).join('')}</div>
     <div class="dica">A pontuação soma <b>10 pontos por aula concluída</b> e <b>5 por resposta certa</b>.
-      Manter dias seguidos de estudo mantém seu 🔥 aceso.</div>`;
+      Manter dias seguidos de estudo mantém seu ${ic('chama')} aceso.</div>`;
 }
 async function arquivarCurso(arquivar){
   const txt = arquivar
@@ -1764,7 +1843,7 @@ async function montarTurmas(cid, souStaff){
   const lista = ctx.abaMat === 'arquivadas' ? (turmas||[]).filter(t => t.arquivado_em) : vivas;
 
   if(!lista.length){
-    h += `<div class="card empty"><div class="big">${ctx.abaMat==='arquivadas'?'🗂️':'👥'}</div>
+    h += `<div class="card empty"><div class="big">${ctx.abaMat==='arquivadas'?ic('arquivo'):ic('pessoas')}</div>
       <b>${ctx.abaMat==='arquivadas'?'Nenhuma turma arquivada':'Nenhuma turma aqui'}</b>
       <p>${ctx.abaMat==='arquivadas'?'Turmas arquivadas ficam guardadas aqui, com todo o histórico.':'Crie uma turma para começar a receber alunos.'}</p></div>`;
   }
@@ -1789,10 +1868,10 @@ async function montarTurmas(cid, souStaff){
             ${t.max_inscricoes?`<span class="pill ${lotada?'dgr':'mute'}">${ocup}/${t.max_inscricoes} vagas${lotada?' · lotada':''}</span>`:''}
             <span class="pill mute">${MODAL_PILL[t.modalidade||'online']}</span>
             ${(t.turma_professores||[])[0]?.pessoas?.nome
-              ? `<span class="pill ok">👩‍🏫 ${esc(t.turma_professores[0].pessoas.nome)}</span>`
+              ? `<span class="pill ok">${ic('professor')} ${esc(t.turma_professores[0].pessoas.nome)}</span>`
               : `<span class="pill warn">sem professor</span>`}
           </div>
-          ${t.local_padrao?`<div style="font-size:12.5px;color:var(--sub);margin-top:7px">📍 ${esc(t.local_padrao)}</div>`:''}
+          ${t.local_padrao?`<div style="font-size:12.5px;color:var(--sub);margin-top:7px">${ic('pin')} ${esc(t.local_padrao)}</div>`:''}
         </div></div>
       ${souStaff && !t.arquivado_em ? `<div class="row" style="margin-top:14px;flex-wrap:wrap">
         <button class="btn xs" onclick="formLink('${t.id}')">Link de inscrição</button>
@@ -1817,14 +1896,14 @@ async function montarTurmas(cid, souStaff){
         return pessoaItem(m, acoes);
       }).join('')}</div>`
       : `<div style="font-size:13.5px;color:var(--sub);margin-top:14px">${
-          ctx.abaMat==='pendentes'?'Ninguém aguardando análise nesta turma. 👌' :
+          ctx.abaMat==='pendentes'?`Ninguém aguardando análise nesta turma. ${ic('check')}` :
           ctx.abaMat==='recusados'?'Nenhuma inscrição recusada aqui.' :
           ctx.abaMat==='ex'?'Ninguém foi desligado desta turma.' :
           'Nenhum aluno ativo ainda. Compartilhe o link de inscrição!'}</div>`}
       ${ctx.abaMat==='recusados' && recusados.length ? `<div class="dica" style="margin-top:12px">
-        💸 Inscrições não aprovadas em cursos pagos têm <b>devolução integral do valor</b>.</div>`:''}
+        ${ic('moeda')} Inscrições não aprovadas em cursos pagos têm <b>devolução integral do valor</b>.</div>`:''}
       ${ctx.abaMat==='ex' && exAlunos.length ? `<div class="dica" style="margin-top:12px">
-        🗂️ Desligar não apaga nada. As notas, presenças, observações e certificados emitidos
+        ${ic('arquivo')} Desligar não apaga nada. As notas, presenças, observações e certificados emitidos
         continuam no prontuário — o curso é que deixa de aparecer para o aluno.</div>`:''}
     </div>`;
   });
@@ -1871,9 +1950,9 @@ function formTurma(tid){
       value="${t?.max_inscricoes||''}">
     <label>Como esta turma acontece?</label>
     <div class="seg" id="tf-seg">
-      <button type="button" data-m="online" class="${mod==='online'?'on':''}" onclick="setModal('online')">💻<br>Só online</button>
-      <button type="button" data-m="hibrida" class="${mod==='hibrida'?'on':''}" onclick="setModal('hibrida')">🔀<br>Híbrida</button>
-      <button type="button" data-m="presencial" class="${mod==='presencial'?'on':''}" onclick="setModal('presencial')">🏫<br>Só presencial</button>
+      <button type="button" data-m="online" class="${mod==='online'?'on':''}" onclick="setModal('online')">${ic('online')}<br>Só online</button>
+      <button type="button" data-m="hibrida" class="${mod==='hibrida'?'on':''}" onclick="setModal('hibrida')">${ic('hibrido')}<br>Híbrida</button>
+      <button type="button" data-m="presencial" class="${mod==='presencial'?'on':''}" onclick="setModal('presencial')">${ic('escola')}<br>Só presencial</button>
     </div>
     <div class="hint" id="tf-expl" style="margin-top:8px">${MODAL_TXT[mod]}</div>
     <div id="tf-local-box" style="display:${mod==='online'?'none':'block'}">
@@ -1954,7 +2033,7 @@ async function abrirEquipe(){
             : `<span class="pill warn">não entrou ainda</span>`}
         </div></div>
       ${tl.length ? `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px">
-          ${tl.map(t=>`<span class="pill mute">🎓 ${esc(t.curso)} · ${esc(t.turma)}</span>`).join('')}</div>`
+          ${tl.map(t=>`<span class="pill mute">${ic('capelo')} ${esc(t.curso)} · ${esc(t.turma)}</span>`).join('')}</div>`
         : p.papel === 'professor' ? `<div class="hint" style="margin-top:12px">
             Ainda sem turma. Enquanto não tiver, ele entra mas não vê aluno nenhum.</div>` : ''}
       ${souAdmin ? `<div class="row" style="margin-top:14px;flex-wrap:wrap;gap:6px">
@@ -1967,7 +2046,7 @@ async function abrirEquipe(){
 
   $('eq-corpo').innerHTML = `
     ${semProf.length ? `<div class="card alerta">
-      <h3>🎓 ${semProf.length} turma${semProf.length===1?'':'s'} sem professor</h3>
+      <h3>${ic('capelo')} ${semProf.length} turma${semProf.length===1?'':'s'} sem professor</h3>
       <div style="font-size:13.5px;color:var(--sub);margin-top:8px;line-height:1.6">
         Toda turma deveria ter um professor titular — é ele que responde as perguntas dos alunos,
         tira presença e aparece no certificado. ${semProf.map(t=>esc(t.nome)).join(', ')}.</div></div>`:''}
@@ -1981,12 +2060,12 @@ async function abrirEquipe(){
       const prof = profs.find(p => p.pessoa_id === pid);
       return `<div class="item">
         <div class="t">${esc(t.nome)}<small>${esc(t.cursos?.titulo||'')}</small></div>
-        ${prof ? `<span class="pill ok" style="flex:none">👩‍🏫 ${esc(prof.nome)}</span>`
+        ${prof ? `<span class="pill ok" style="flex:none">${ic('professor')} ${esc(prof.nome)}</span>`
                : `<span class="pill warn" style="flex:none">sem professor</span>`}
         ${RANK[v?.papel] >= RANK.gestor ? `<button class="btn xs ghost" style="flex:none"
           onclick="formProfDaTurma('${t.id}','${esc(t.nome).replace(/'/g,'')}','${pid||''}')">Definir</button>`:''}
         <div style="flex-basis:100%" id="pt-${t.id}"></div></div>`;
-    }).join('')}</div>` : `<div class="card empty"><div class="big">🎓</div><b>Nenhuma turma ativa</b>
+    }).join('')}</div>` : `<div class="card empty"><div class="big">${ic('capelo')}</div><b>Nenhuma turma ativa</b>
       <p>Crie um curso e uma turma para poder distribuir os professores.</p></div>`}
     <h2 style="margin-top:34px">O que cada papel pode fazer</h2>
     <div class="grid g2">
@@ -1995,7 +2074,7 @@ async function abrirEquipe(){
         <div style="font-size:13.5px;color:var(--sub);line-height:1.65;margin-top:8px">${PAPEL_EXPL[k]}</div>
       </div>`).join('')}
     </div>
-    <div class="dica" style="margin-top:20px">🔐 O acesso é sempre pelo e-mail cadastrado, com código de
+    <div class="dica" style="margin-top:20px">${ic('cadeado')} O acesso é sempre pelo e-mail cadastrado, com código de
       uso único. Não existe senha para vazar. Se alguém sair da escola, tire o acesso aqui e no mesmo
       instante ele deixa de ver qualquer coisa — o histórico do que ele fez continua registrado.</div>`;
 }
@@ -2013,9 +2092,9 @@ function formEquipe(){
     <input id="eqf-email" type="email" placeholder="maria@escola.com.br">
     <label>Papel</label>
     <div class="seg" id="eqf-seg">
-      <button type="button" data-p="professor" class="on" onclick="setPapelNovo('professor')">👩‍🏫 Professor</button>
-      <button type="button" data-p="gestor" onclick="setPapelNovo('gestor')">🗂️ Gestor</button>
-      <button type="button" data-p="admin" onclick="setPapelNovo('admin')">🔑 Admin</button>
+      <button type="button" data-p="professor" class="on" onclick="setPapelNovo('professor')">${ic('professor')} Professor</button>
+      <button type="button" data-p="gestor" onclick="setPapelNovo('gestor')">${ic('arquivo')} Gestor</button>
+      <button type="button" data-p="admin" onclick="setPapelNovo('admin')">${ic('chave')} Admin</button>
     </div>
     <div class="hint" id="eqf-expl" style="margin-top:8px">${PAPEL_EXPL.professor}</div>
     <div class="row" style="margin-top:16px">
@@ -2167,8 +2246,8 @@ const PLANOS_ESCOLA = {
   instituto: { nome:'Instituto', preco_cents: 37900 },
 };
 const STATUS_PLANO_L = {
-  ativa: '✅ ativo', pendente: '⏳ aguardando confirmação do pagamento',
-  atrasada: '⚠️ pagamento atrasado', cancelada: '⛔ cancelado', sem_assinatura: null,
+  ativa: `${ic('check')} ativo`, pendente: `${ic('relogio')} aguardando confirmação do pagamento`,
+  atrasada: `${ic('alerta')} pagamento atrasado`, cancelada: `${ic('bloqueado')} cancelado`, sem_assinatura: null,
 };
 async function formPlanoEscola(){
   const slot = $('es-plano'); if(!slot) return;
@@ -2254,7 +2333,7 @@ async function confirmarExclusaoTurma(tid){
 }
 
 // ═══════════════ ENCONTROS (calendário da turma) ═══════════════
-const MODAL_PILL = { online:'💻 só online', hibrida:'🔀 híbrida', presencial:'🏫 presencial' };
+const MODAL_PILL = { online:`${ic('online')} só online`, hibrida:`${ic('hibrido')} híbrida`, presencial:`${ic('escola')} presencial` };
 const DIA_SEM = ['dom','seg','ter','qua','qui','sex','sáb'];
 const MES_AB = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
 const hhmm = d => d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
@@ -2295,10 +2374,10 @@ async function painelEncontros(tid){
       <div class="enc-in">
         <b>${esc(e.titulo)}</b>${e.cancelado_em?' <span class="pill dgr">cancelado</span>':''}
         <div class="enc-meta">${dataLonga(d)}${e.fim?' às '+hhmm(new Date(e.fim)):''}
-          · ${e.tipo === 'online' ? '💻 sala online' : '🏫 presencial'}
-          ${localTxt?'<br>📍 '+esc(localTxt):''}
+          · ${e.tipo === 'online' ? `${ic('online')} sala online` : `${ic('escola')} presencial`}
+          ${localTxt?`<br>${ic('pin')} `+esc(localTxt):''}
           ${e.pauta?'<br>'+esc(e.pauta):''}</div>
-        ${aulas.length?`<div class="enc-aulas">${aulas.map(a=>`<span>📘 ${esc(a.titulo)}</span>`).join('')}</div>`:''}
+        ${aulas.length?`<div class="enc-aulas">${aulas.map(a=>`<span>${ic('livro')} ${esc(a.titulo)}</span>`).join('')}</div>`:''}
         ${passado && !e.cancelado_em ? `<div class="enc-meta" style="margin-top:7px">
           ${marcados ? `<b style="color:${marcados>=nAlunos?'var(--accent-ink)':'var(--warn)'}">
               ${pres} presente${pres===1?'':'s'}${just?' · '+just+' justificada'+(just===1?'':'s'):''}
@@ -2317,7 +2396,7 @@ async function painelEncontros(tid){
     <div style="font-size:13px;color:var(--sub);margin:6px 0 2px;line-height:1.6">
       Cada encontro que você marca aparece na agenda dos alunos e vira lista de presença.
       Diga também quais aulas serão ministradas — assim o aluno chega sabendo o que vem.</div>
-    ${pendentes?`<div class="dica" style="margin-top:12px">✍️ <b>${pendentes} encontro${pendentes===1?'':'s'}</b>
+    ${pendentes?`<div class="dica" style="margin-top:12px">${ic('lapis')} <b>${pendentes} encontro${pendentes===1?'':'s'}</b>
       já ${pendentes===1?'aconteceu':'aconteceram'} e ${pendentes===1?'está':'estão'} sem lista de presença completa.</div>`:''}
     <div id="fe-novo-${tid}"></div>
     <button class="btn sm" style="margin-top:14px" onclick="formEncontro('${tid}',null)">+ Marcar encontro</button>
@@ -2346,8 +2425,8 @@ function formEncontro(tid, eid){
     <input id="ef-fim" type="datetime-local" value="${e?.fim?paraLocal(e.fim):''}">
     <label>Como será</label>
     <div class="seg" id="ef-seg">
-      <button type="button" data-t="presencial" class="${tipoPad==='presencial'?'on':''}" onclick="setTipoEnc('presencial')">🏫 Presencial</button>
-      <button type="button" data-t="online" class="${tipoPad==='online'?'on':''}" onclick="setTipoEnc('online')">💻 Sala online</button>
+      <button type="button" data-t="presencial" class="${tipoPad==='presencial'?'on':''}" onclick="setTipoEnc('presencial')">${ic('escola')} Presencial</button>
+      <button type="button" data-t="online" class="${tipoPad==='online'?'on':''}" onclick="setTipoEnc('online')">${ic('online')} Sala online</button>
     </div>
     <label id="ef-local-lb">${tipoPad==='online'?'Link da sala':'Endereço'} <span class="opt">— opcional</span></label>
     <input id="ef-local" placeholder="${tipoPad==='online'?'Cole o link da videochamada':'Deixe vazio para usar o endereço da turma'}"
@@ -2423,14 +2502,14 @@ async function listaPresenca(eid, tid){
   slot.innerHTML = `<div class="inline" style="margin-top:10px">
     <b style="font-size:14px">Quem esteve neste encontro</b>
     <div class="esc-resumo" style="margin-top:10px">
-      <span class="esc-pill">✅ <b>${p}</b> ${p===1?'presente':'presentes'}</span>
-      <span class="esc-pill">🟡 <b>${j}</b> ${j===1?'justificada':'justificadas'}</span>
-      <span class="esc-pill">❌ <b>${f}</b> ${f===1?'falta':'faltas'}</span>
-      ${sem?`<span class="esc-pill">⬜ <b>${sem}</b> sem registro</span>`:''}
+      <span class="esc-pill">${ic('check')} <b>${p}</b> ${p===1?'presente':'presentes'}</span>
+      <span class="esc-pill"><span class="dot warn"></span><b>${j}</b> ${j===1?'justificada':'justificadas'}</span>
+      <span class="esc-pill">${ic('x')} <b>${f}</b> ${f===1?'falta':'faltas'}</span>
+      ${sem?`<span class="esc-pill"><span class="dot mute"></span><b>${sem}</b> sem registro</span>`:''}
     </div>
     ${alunos.map(a => `<div class="pres-item">
       <div class="pres-nome">${esc(a.nome||'—')}
-        ${a.status==='justificada'&&a.justificativa?`<small>🟡 ${esc(a.justificativa)}</small>`:''}
+        ${a.status==='justificada'&&a.justificativa?`<small><span class="dot warn"></span>${esc(a.justificativa)}</small>`:''}
         ${a.status==='falta'?`<small>Falta sem justificativa</small>`:''}
         ${!a.status?`<small>Ainda não registrado</small>`:''}</div>
       <div class="pres-bt">
@@ -2485,13 +2564,13 @@ async function montarPerguntas(aid){
     return `<div class="perg ${p.resposta?'':'aberta'}">
       <div class="perg-top">
         <div class="perg-quem">${p.minha ? 'Você' : esc(p.autor||'Aluno')}
-          <small>${q.toLocaleDateString('pt-BR')} · ${priv?'🔒 só para o professor':'👥 visível para a turma'}</small></div>
+          <small>${q.toLocaleDateString('pt-BR')} · ${priv?`${ic('cadeado')} só para o professor`:`${ic('pessoas')} visível para a turma`}</small></div>
         ${p.resposta ? '<span class="pill ok" style="flex:none">respondida</span>'
                      : '<span class="pill warn" style="flex:none">aguardando</span>'}
       </div>
       <div class="perg-txt">${esc(p.texto)}</div>
       ${p.resposta ? `<div class="perg-resp">
-        <b>👩‍🏫 ${esc(p.professor||'Professor')} respondeu</b>
+        <b>${ic('professor')} ${esc(p.professor||'Professor')} respondeu</b>
         <div>${esc(p.resposta)}</div>
         ${souStaff && !p.resposta_publica && p.publica ? `<div class="hint" style="margin:8px 0 0">
           A pergunta era pública, mas você respondeu em particular — só quem perguntou está vendo.</div>`:''}
@@ -2527,8 +2606,8 @@ function formPerguntar(aid){
     <textarea id="pq-txt" rows="3" placeholder="Ex.: Não entendi a diferença entre os dois exemplos do minuto 4. Pode explicar de novo?"></textarea>
     <label>Quem pode ver</label>
     <div class="seg" id="pq-seg">
-      <button type="button" data-v="0" class="on" onclick="setPergPub(0)">🔒 Só o professor</button>
-      <button type="button" data-v="1" onclick="setPergPub(1)">👥 A turma toda</button>
+      <button type="button" data-v="0" class="on" onclick="setPergPub(0)">${ic('cadeado')} Só o professor</button>
+      <button type="button" data-v="1" onclick="setPergPub(1)">${ic('pessoas')} A turma toda</button>
     </div>
     <div class="hint" id="pq-expl" style="margin-top:8px">Ninguém da turma vê essa pergunta.
       Fica entre você e o professor.</div>
@@ -2563,8 +2642,8 @@ function formResponder(pid, eraPublica){
     <textarea id="rr-txt" rows="3" placeholder="Responda com calma — é essa resposta que o aluno vai reler depois."></textarea>
     ${eraPublica ? `<label>Publicar a resposta para a turma?</label>
       <div class="seg" id="rr-seg">
-        <button type="button" data-v="1" class="on" onclick="setRespPub(1)">👥 Sim, todos veem</button>
-        <button type="button" data-v="0" onclick="setRespPub(0)">🔒 Não, só quem perguntou</button>
+        <button type="button" data-v="1" class="on" onclick="setRespPub(1)">${ic('pessoas')} Sim, todos veem</button>
+        <button type="button" data-v="0" onclick="setRespPub(0)">${ic('cadeado')} Não, só quem perguntou</button>
       </div>
       <div class="hint" style="margin-top:8px">O aluno marcou a pergunta como pública. Publicando,
         a dúvida dele vira material da turma.</div>`
@@ -2597,7 +2676,7 @@ async function abrirAgenda(){
   const { data, error } = await sb.rpc('minha_agenda', { p_dias: 120 });
   if(error) return $('ag-corpo').innerHTML = `<div class="card"><div class="hint">Não consegui abrir sua agenda: ${esc(error.message)}</div></div>`;
   const evs = (data||[]).filter(e => !e.cancelado);
-  if(!evs.length) return $('ag-corpo').innerHTML = `<div class="card empty"><div class="big">🗓️</div>
+  if(!evs.length) return $('ag-corpo').innerHTML = `<div class="card empty"><div class="big">${ic('calendario')}</div>
     <b>Nenhum compromisso marcado</b>
     <p>Seus cursos são no seu ritmo — você estuda quando quiser. Se a escola marcar um encontro,
       ele aparece aqui e você recebe um e-mail toda segunda com a semana.</p></div>`;
@@ -2618,18 +2697,18 @@ async function abrirAgenda(){
         <div class="tl-data">${ehHoje?'Hoje · '+hhmm(d):dataLonga(d)}</div>
         <div class="tl-tit">${esc(e.titulo)}</div>
         <div class="enc-meta" style="margin-top:0">${esc(e.curso)} · ${esc(e.turma)}
-          · ${e.tipo === 'online' ? '💻 sala online' : '🏫 presencial'}
+          · ${e.tipo === 'online' ? `${ic('online')} sala online` : `${ic('escola')} presencial`}
           ${e.local?(/^https?:\/\//.test(e.local)
-            ? `<br>🔗 <a href="${esc(e.local)}" target="_blank" rel="noopener">entrar na sala ↗</a>`
-            : `<br>📍 ${esc(e.local)}`):''}
-          ${e.pauta?'<br>💬 '+esc(e.pauta):''}</div>
+            ? `<br>${ic('link')} <a href="${esc(e.local)}" target="_blank" rel="noopener">entrar na sala ↗</a>`
+            : `<br>${ic('pin')} ${esc(e.local)}`):''}
+          ${e.pauta?`<br>${ic('mensagem')} `+esc(e.pauta):''}</div>
         ${aulas.length?`<div class="enc-aulas">${aulas.map(a =>
-          `<span style="cursor:pointer" onclick="abrirAula('${a.id}')">📘 ${esc(a.titulo)}</span>`).join('')}</div>`:''}
+          `<span style="cursor:pointer" onclick="abrirAula('${a.id}')">${ic('livro')} ${esc(a.titulo)}</span>`).join('')}</div>`:''}
         ${tag?`<div style="margin-top:8px">${tag}</div>`:''}
       </div>`;
     }).join('')}
   </div></div>
-  <div class="dica" style="margin-top:16px">📬 Toda segunda-feira de manhã a gente te manda um e-mail
+  <div class="dica" style="margin-top:16px">${ic('caixaEntrada')} Toda segunda-feira de manhã a gente te manda um e-mail
     com os compromissos da semana e o que ficou pendente. ${prox.length?`Você tem
     <b>${prox.length} encontro${prox.length===1?'':'s'}</b> pela frente.`:''}</div>`;
 }
@@ -2664,7 +2743,7 @@ function formLink(tid){
     <input id="fl-campos-${tid}" placeholder="Ex.: Já toca algum instrumento?, Quantas horas por semana, Como conheceu a escola">
     <div class="hint">Cada item separado por <b>vírgula</b> vira uma pergunta a mais na ficha de inscrição.
       A ficha já pede, sempre: nome, e-mail, WhatsApp, endereço, foto e um “conte sobre você”.</div>
-    <div class="dica" style="margin-top:12px">💡 Este link cai direto na ficha. Se você quiser que a
+    <div class="dica" style="margin-top:12px">${ic('lampada')} Este link cai direto na ficha. Se você quiser que a
       pessoa entenda o curso <b>antes</b> de decidir, publique também a
       <b>Página de divulgação</b> — ela tem texto, imagem e contato, e o botão de inscrição
       já leva para esta mesma ficha.</div>
@@ -2911,12 +2990,12 @@ function pessoaItem(m, acoes, onde, valorCents){
     : m.status==='cancelada' ? `<span class="pill dgr">não aprovado</span>`
     : m.status==='desligada' ? `<span class="pill mute">desligado</span>`
     : m.status==='concluida' ? `<span class="pill ok">concluído</span>`
-    : pago ? `<span class="pill ok">💰 pago</span>` : `<span class="pill warn">em análise</span>`;
+    : pago ? `<span class="pill ok">${ic('moeda')} pago</span>` : `<span class="pill warn">em análise</span>`;
   const extras = Object.entries(m.respostas||{}).filter(([k,v]) => k!=='sobre' && v);
   const d = m.criado_em ? new Date(m.criado_em) : null;
   const avatar = p.foto_url
     ? `<img class="av" data-foto="${esc(p.foto_url)}" alt="">`
-    : `<div class="ck ${m.status==='ativa'?'done':'wait'}">${m.status==='ativa'?'✓':'⏳'}</div>`;
+    : `<div class="ck ${m.status==='ativa'?'done':'wait'}">${m.status==='ativa'?'✓':ic('relogio')}</div>`;
   return `<div class="item" data-mat="${m.id}" style="cursor:default">${avatar}
     <div class="t"><b>${esc(p.nome || p.email || 'Aluno')}</b>
       <small>${esc(onde || sobre.slice(0,70) || p.email || '')}</small></div>
@@ -2956,7 +3035,7 @@ function montarGravador(id, temAudio){
     Este navegador não permite gravar áudio. Abra no Chrome, Safari ou Edge atualizados para usar o microfone.</div>`;
   return `<div class="rec" id="rec-${id}">
     <div class="rec-top">
-      <button type="button" class="rec-btn" id="rb-${id}" onclick="toggleGravar('${id}')" title="Gravar">🎙️</button>
+      <button type="button" class="rec-btn" id="rb-${id}" onclick="toggleGravar('${id}')" title="Gravar">${ic('microfone')}</button>
       <span class="rec-time" id="rt-${id}">3:00</span>
       <span class="rec-txt" id="rx-${id}">${temAudio
         ? 'Já existe um áudio nesta aula. Se gravar de novo, o antigo é substituído. Você tem até 3 minutos.'
@@ -2976,7 +3055,7 @@ async function toggleGravar(id){
     const dur = st.seg; st.dur = dur;
     st.rec.stop();
     clearInterval(st.timer);
-    btn.classList.remove('gravando'); btn.textContent = '🎙️';
+    btn.classList.remove('gravando'); btn.innerHTML = ic('microfone');
     tempo.classList.remove('pouco');
     tempo.textContent = mmss(dur);
     if(bar) bar.classList.remove('on');
@@ -3000,7 +3079,7 @@ async function toggleGravar(id){
     };
     st.rec.start();
     prev.innerHTML = '';
-    btn.classList.add('gravando'); btn.textContent = '⏹';
+    btn.classList.add('gravando'); btn.innerHTML = ic('parar');
     txt.textContent = 'Gravando… fale com calma. Toque no quadrado para parar.';
     tempo.textContent = mmss(REC_MAX);
     if(bar){ bar.classList.add('on'); bar.firstElementChild.style.width = '0%'; }
@@ -3075,10 +3154,10 @@ async function relatorioAudio(aulaId){
   };
   slot.innerHTML = `<div class="esc">
     <div class="esc-resumo">
-      <span class="esc-pill">👥 <b>${alunos.length}</b> ${alunos.length===1?'aluno':'alunos'}</span>
-      <span class="esc-pill">✅ <b>${nOk}</b> ouviram tudo</span>
-      <span class="esc-pill">🎧 <b>${nMeio}</b> ouviram em parte</span>
-      <span class="esc-pill">⬜ <b>${nNao}</b> ainda não ouviram</span>
+      <span class="esc-pill">${ic('pessoas')} <b>${alunos.length}</b> ${alunos.length===1?'aluno':'alunos'}</span>
+      <span class="esc-pill">${ic('check')} <b>${nOk}</b> ouviram tudo</span>
+      <span class="esc-pill">${ic('fone')} <b>${nMeio}</b> ouviram em parte</span>
+      <span class="esc-pill"><span class="dot mute"></span><b>${nNao}</b> ainda não ouviram</span>
     </div>
     ${alunos.map(linha).join('')}
     <div class="hint" style="margin-top:12px">Contamos só o tempo de fala realmente reproduzido —
@@ -3395,7 +3474,7 @@ async function abrirAula(aid){
     c += `<div class="vid-lista">` + vids.map((u,i) => molduraVideo(u, i, vids.length)).join('') + `</div>`;
   }
   if(f.audio) c += `<div class="audio-aula" id="au-audio">
-    <div class="cab"><span style="font-size:22px">🎧</span>
+    <div class="cab"><span style="font-size:22px">${ic('fone')}</span>
       <div><b>Recado do professor</b>
         <div style="font-size:12.5px;color:var(--sub)">Gravado especialmente para esta aula${
           ctx.podeAula ? '' : ' · o professor vê se você ouviu'}</div></div></div>
@@ -3545,7 +3624,7 @@ async function montarQuiz(aid){
   if(!quizQ.length) return;
   const done = !!ctx.progresso[aid]?.concluida_em;
   if(ctx.podeAula){
-    $('au-quiz').innerHTML = `<div class="card"><b style="font-size:15px">❓ ${quizQ.length} pergunta${quizQ.length===1?'':'s'} nesta aula</b>
+    $('au-quiz').innerHTML = `<div class="card"><b style="font-size:15px">${ic('duvida')} ${quizQ.length} pergunta${quizQ.length===1?'':'s'} nesta aula</b>
       <div style="font-size:13.5px;color:var(--sub);margin-top:6px;line-height:1.6">
         O aluno só conclui a aula se acertar ao menos <b>${av.nota_corte||70}%</b> das objetivas.
         Toque em “Perguntas” acima para ver, adicionar ou remover.</div></div>`;
@@ -3649,13 +3728,13 @@ $('b-concluir').onclick = async () => {
   const i = ctx.aulasSeq.findIndex(x=>x.id===ctx.aula);
   const prox = ctx.aulasSeq[i+1];
   $('au-quiz').innerHTML = `<div class="card empty" style="border-color:#bfe9d1;background:#f2fbf6">
-    <div class="big">🎉</div><b>${esc(r.mensagem)}</b>
+    <div class="big">${ic('celebra')}</div><b>${esc(r.mensagem)}</b>
     <div class="xp" style="justify-content:center">
       <div><b>+${r.pontos_ganhos}</b><small>pontos agora</small></div>
       <div><b>${r.pontos_total}</b><small>total</small></div>
-      <div><b>${r.streak}🔥</b><small>dias seguidos</small></div></div>
+      <div><b>${r.streak}${ic('chama')}</b><small>dias seguidos</small></div></div>
     ${prox ? `<button class="btn" onclick="abrirAula('${prox.id}')">Próxima aula ▶</button>`
-           : `<button class="btn" onclick="abrirCurso(ctx.curso, ctx.origem)">Ver meu progresso 🏁</button>`}</div>`;
+           : `<button class="btn" onclick="abrirCurso(ctx.curso, ctx.origem)">Ver meu progresso ${ic('bandeira')}</button>`}</div>`;
   $('b-concluir').style.display = 'none';
   info('m-au','');
   window.scrollTo({ top: $('au-quiz').offsetTop - 80, behavior:'smooth' });
@@ -3746,7 +3825,7 @@ async function salvarQuestao(){
   const { error: e2 } = await sb.from('questoes').insert({ avaliacao_id: avId, tipo, enunciado, opcoes, ordem });
   if(e2) return setErr('Ops: '+e2.message);
   $('nq-enunciado').value = ''; [0,1,2,3].forEach(i => { if($('nq-o'+i)) $('nq-o'+i).value=''; if($('nq-i'+i)) $('nq-i'+i).value=''; });
-  msg.textContent = 'Pergunta adicionada! 👌'; msg.className='msg';
+  msg.innerHTML = `Pergunta adicionada! ${ic('check')}`; msg.className='msg';
   listarQuestoes();
 }
 async function removerQuestao(qid){
@@ -3766,7 +3845,7 @@ async function carregarInscricao(){
   const { data, error } = await sb.rpc('inscricao_info', { p_slug: fslug });
   const f = data && data[0];
   if(error || !f){
-    $('in-info').innerHTML = `<div class="card empty"><div class="big">🔗</div><b>Link não encontrado</b>
+    $('in-info').innerHTML = `<div class="card empty"><div class="big">${ic('link')}</div><b>Link não encontrado</b>
       <p>Confere com quem te enviou — o link pode ter sido digitado errado ou desativado.</p></div>`;
     $('in-form').innerHTML = ''; return;
   }
@@ -3790,7 +3869,7 @@ async function carregarInscricao(){
       :`<b>Como funciona:</b> você preenche a ficha e ${analise?'a escola analisa sua inscrição — você recebe a resposta por e-mail':'seu acesso é liberado na hora'}.`}
       <br><br><b>Seus dados:</b> ficam no seu prontuário permanente, só a escola vê, e você pode revisar quando quiser.</div>`;
   if(lotada){
-    $('in-form').innerHTML = `<div class="card empty"><div class="big">😔</div><b>As vagas desta turma acabaram</b>
+    $('in-form').innerHTML = `<div class="card empty"><div class="big">${ic('bloqueado')}</div><b>As vagas desta turma acabaram</b>
       <p>Se alguma inscrição não for concluída, a vaga reabre aqui automaticamente. Vale conferir mais tarde.</p></div>`;
     return;
   }
@@ -3906,7 +3985,7 @@ async function enviarInscricao(){
   go('inscrito');
   if(r?.situacao === 'aguardando_pagamento'){
     const preco = money(inscForm.valor_cents);
-    $('in-resultado').innerHTML = `<div class="card empty"><div class="big">💳</div>
+    $('in-resultado').innerHTML = `<div class="card empty"><div class="big">${ic('cartao')}</div>
       <b>Ficha recebida! Falta o pagamento</b>
       <p>Sua vaga está reservada por <b>30 minutos</b>. Pague ${preco} por PIX ou cartão para garantir.</p>
       <button class="btn" id="b-pagar">Pagar ${preco} agora</button>
@@ -3917,7 +3996,7 @@ async function enviarInscricao(){
   const ativa = r?.situacao === 'ativa';
   const contaNova = novaConta ? ' Confirme seu e-mail — mandamos um link — e depois é só entrar com e-mail e senha.'
     : ' Você já tem conta na plataforma — entre com seu e-mail e a senha de sempre.';
-  $('in-resultado').innerHTML = `<div class="card empty"><div class="big">${ativa?'🎉':'📬'}</div>
+  $('in-resultado').innerHTML = `<div class="card empty"><div class="big">${ativa?ic('celebra'):ic('caixaEntrada')}</div>
     <b>${ativa?'Matrícula confirmada!':'Inscrição enviada!'}</b>
     <p>${(ativa?'Sua vaga está garantida.'
              :'A escola vai analisar sua ficha com atenção. Você recebe a resposta por e-mail, com um recado da equipe.')+contaNova}</p>
@@ -3941,7 +4020,7 @@ async function pagarMatricula(matId){
   }
 }
 function esperarPagamento(matId, bloqueado, url){
-  $('in-resultado').innerHTML = `<div class="card empty"><div class="big">⌛</div>
+  $('in-resultado').innerHTML = `<div class="card empty"><div class="big">${ic('relogio')}</div>
     <b>Esperando a confirmação</b>
     <p>${bloqueado?`O navegador bloqueou a nova aba — <a href="${url}" target="_blank" rel="noopener" style="color:var(--accent)">toque aqui para pagar</a>. `:'O pagamento abriu em outra aba. '}
     Pode pagar com calma: <b>esta tela avisa sozinha</b> quando cair. PIX costuma levar segundos.</p>
@@ -3954,7 +4033,7 @@ function esperarPagamento(matId, bloqueado, url){
     if(st && st !== 'aguardando_pagamento'){
       clearInterval(timer);
       const ativa = st === 'ativa';
-      $('in-resultado').innerHTML = `<div class="card empty"><div class="big">${ativa?'🎉':'✅'}</div>
+      $('in-resultado').innerHTML = `<div class="card empty"><div class="big">${ativa?ic('celebra'):ic('check')}</div>
         <b>Pagamento confirmado!</b>
         <p>${ativa?'Sua matrícula está ativa. Entre com seu e-mail para começar a estudar.'
                  :'Recebemos seu pagamento. Agora a escola analisa sua inscrição e você recebe a resposta por e-mail — se não for aprovada, o valor volta integralmente.'}</p>
@@ -3976,9 +4055,9 @@ const pgRet = new URLSearchParams(location.search).get('pg');
 if(pgRet){
   history.replaceState(null,'',location.pathname);
   const cfg = {
-    ok:{e:'🎉',t:'Pagamento aprovado!',p:'Sua inscrição está confirmada. Entre com seu e-mail para continuar.'},
-    pendente:{e:'⏳',t:'Pagamento em processamento',p:'Assim que o Mercado Pago confirmar, sua matrícula libera sozinha. Você já pode entrar com seu e-mail.'},
-    falha:{e:'😕',t:'O pagamento não foi concluído',p:'Nada foi cobrado. Sua vaga fica reservada por 30 minutos — abra o link de inscrição novamente para tentar outra forma.'}
+    ok:{e:ic('celebra'),t:'Pagamento aprovado!',p:'Sua inscrição está confirmada. Entre com seu e-mail para continuar.'},
+    pendente:{e:ic('relogio'),t:'Pagamento em processamento',p:'Assim que o Mercado Pago confirmar, sua matrícula libera sozinha. Você já pode entrar com seu e-mail.'},
+    falha:{e:ic('bloqueado'),t:'O pagamento não foi concluído',p:'Nada foi cobrado. Sua vaga fica reservada por 30 minutos — abra o link de inscrição novamente para tentar outra forma.'}
   }[pgRet];
   if(cfg){
     mundo('publico'); go('inscrito');
