@@ -61,8 +61,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Inter
 /* o modo em que a pessoa está — a marca nomeando a própria interface */
 .modo{font-size:11.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;
   color:var(--marca-esc);background:var(--marca-clr);border-radius:100px;padding:5px 11px;
-  white-space:nowrap;flex:none}
+  white-space:nowrap;flex:none;border:0;font-family:inherit;cursor:default}
+.modo.tap{cursor:pointer}
+.modo.tap:hover{filter:brightness(.96)}
+.modo.simulando{background:var(--warn-bg);color:#b56800}
 @media(max-width:640px){ .modo{display:none} }
+.modo-menu{position:absolute;top:calc(100% + 8px);left:0;background:var(--card);border:1px solid var(--line);
+  border-radius:var(--r-md);box-shadow:var(--sh-2);padding:6px;z-index:60;min-width:200px}
+.modo-menu button{display:flex;width:100%;text-align:left;background:none;border:0;font-family:inherit;
+  font-size:13.5px;font-weight:600;color:var(--ink);padding:9px 10px;border-radius:8px;cursor:pointer}
+.modo-menu button:hover{background:var(--tint)}
+.modo-menu button.on{color:var(--accent-ink);background:var(--accent-soft)}
+.modo-menu .mm-lbl{font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--sub);padding:8px 10px 4px}
 .ctx{font-size:12.5px;font-weight:700;color:var(--accent-ink);background:var(--accent-soft);
   border-radius:100px;padding:5px 12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   min-width:0;max-width:min(44vw,420px)}
@@ -93,6 +104,7 @@ h3{font-size:17px;font-weight:700;letter-spacing:-.01em}
 .sub{color:var(--sub);font-size:15.5px;line-height:1.6;margin-bottom:22px;max-width:60ch}
 .crumb{font-size:12.5px;color:var(--sub);margin-bottom:6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .crumb b{color:var(--ink)}
+.au-ctx{display:flex;gap:6px;flex-wrap:wrap;margin:2px 0 16px}
 .dica{border-left:3px solid var(--marca) !important;
   font-size:13px;color:var(--sub);line-height:1.6;background:var(--tint);border:1px solid var(--line);
   border-radius:var(--r-md);padding:12px 14px;margin:10px 0}
@@ -465,7 +477,10 @@ h2 .ic,h3 .ic{width:.9em;height:.9em;margin-right:2px}
 <div class="top" id="topbar" style="display:none">
   <div class="top-in">
     <button class="brand" id="b-marca" title="Início"><svg class="marca-sig"><use href="#sig-modox"/></svg><span class="marca-nome">MODO<i>X</i></span></button>
-    <div class="modo" id="modo-sel">Modo Aluno</div>
+    <div class="modo-wrap" style="position:relative;flex:none">
+      <button class="modo" id="modo-sel" type="button">Modo Aluno</button>
+      <div class="modo-menu" id="modo-menu" style="display:none"></div>
+    </div>
     <div class="ctx" id="ctx-chip">Início</div>
     <div class="top-sp"></div>
     <button class="tlink" id="t-inicio">Início</button>
@@ -702,6 +717,7 @@ h2 .ic,h3 .ic{width:.9em;height:.9em;margin-right:2px}
   <button class="btn link" data-back="curso">‹ Curso</button>
   <div class="crumb" id="au-crumb"></div>
   <h1 id="au-titulo" style="font-size:26px">Aula</h1>
+  <div class="au-ctx" id="au-ctx"></div>
   <div id="au-conteudo"></div>
   <div id="au-quiz" class="col"></div>
   <div id="au-perguntas"></div>
@@ -873,12 +889,59 @@ function mundo(m, chip){
   if(chip) $('ctx-chip').textContent = chip;
   const el = $('modo-sel');
   if(el){
-    const papel = vincMap[ctx.escola]?.papel;
-    el.textContent = m === 'gestao'
-      ? (papel === 'professor' ? 'Modo Professor'
-         : papel === 'admin' ? 'Modo Administrador' : 'Modo Gestor')
-      : m === 'aluno' ? 'Modo Aluno' : 'Modo Visitante';
+    const real = vincMap[ctx.escola]?.papel;
+    if(real === 'admin' && viewAs){
+      el.textContent = 'Vendo como ' + PAPEL_L[viewAs];
+    }else{
+      const papel = real;
+      el.textContent = m === 'gestao'
+        ? (papel === 'professor' ? 'Modo Professor'
+           : papel === 'admin' ? 'Modo Administrador' : 'Modo Gestor')
+        : m === 'aluno' ? 'Modo Aluno' : 'Modo Visitante';
+    }
+    el.classList.toggle('tap', real === 'admin');
+    el.classList.toggle('simulando', !!(real === 'admin' && viewAs));
   }
+  const mn = $('modo-menu'); if(mn) mn.style.display = 'none';
+}
+// admin master pode "ver como" aluno/professor/gestor pra entender a experiência
+// e as dificuldades de cada papel — pedido do Israel (02/08/2026). Nunca muda
+// permissão real no banco (RLS continua valendo o papel de verdade); só filtra
+// o que a interface mostra, usando papelEfetivo() no lugar do papel puro do vínculo.
+let viewAs = null;
+function papelEfetivo(eid){
+  const real = vincMap[eid]?.papel;
+  return (viewAs && real === 'admin') ? viewAs : real;
+}
+document.addEventListener('click', e => {
+  const wrap = e.target.closest ? e.target.closest('.modo-wrap') : null;
+  if(!wrap){ const mn = $('modo-menu'); if(mn) mn.style.display = 'none'; }
+});
+$('modo-sel').onclick = e => {
+  e.stopPropagation();
+  if((vincMap[ctx.escola]?.papel) !== 'admin') return;
+  const mn = $('modo-menu');
+  if(mn.style.display !== 'none' && mn.innerHTML) mn.style.display = 'none';
+  else abrirMenuVisao();
+};
+function abrirMenuVisao(){
+  const mn = $('modo-menu');
+  const opcoes = [['admin','Administrador — visão real'],['gestor','Gestor'],['professor','Professor'],['aluno','Aluno']];
+  const atual = viewAs || 'admin';
+  mn.innerHTML = `<div class="mm-lbl">Ver como</div>` +
+    opcoes.map(([k,l]) => `<button type="button" class="${atual===k?'on':''}" onclick="definirVisao('${k}')">${l}</button>`).join('') +
+    `<div class="mm-lbl" style="font-weight:600;text-transform:none;letter-spacing:0;line-height:1.5;padding:8px 10px 6px">
+      Só muda o que aparece pra você — seus dados e os dos outros continuam intactos.</div>`;
+  mn.style.display = '';
+}
+function definirVisao(p){
+  viewAs = p === 'admin' ? null : p;
+  $('modo-menu').style.display = 'none';
+  if(ctx.aula && $('s-aula')?.classList.contains('on')) abrirAula(ctx.aula);
+  else if(ctx.curso && $('s-curso')?.classList.contains('on')) abrirCurso(ctx.curso, ctx.origem);
+  else if(ctx.escola) abrirEscola(ctx.escola);   // cobre tanto a escola quanto telas só-de-gestão
+                                                    // (equipe, turmas etc.) que não fariam sentido no papel simulado
+  else mundo(document.body.dataset.mundo);
 }
 function go(s, opts){
   document.querySelectorAll('.screen').forEach(e=>e.classList.remove('on'));
@@ -1191,13 +1254,14 @@ document.querySelectorAll('#es-abas button').forEach(b => b.onclick = () => {
 async function abrirEscola(eid){
   ctx.escola = eid;
   const v = vincMap[eid];
+  const papelEf = v && papelEfetivo(eid);
   go('escola', { mundo:'gestao', chip: v ? v.escola.nome : 'Escola' });
   $('es-crumb').innerHTML = 'Minhas escolas';
   $('es-nome').textContent = v ? v.escola.nome : 'Escola';
-  $('es-sub').innerHTML = `Você é <b>${v?PAPEL_L[v.papel]:'…'}</b> aqui. A organização é simples:
+  $('es-sub').innerHTML = `Você é <b>${v?PAPEL_L[papelEf]:'…'}</b> aqui. A organização é simples:
     <b>escola → cursos → turmas → alunos</b>. Toque num curso para abrir o conteúdo e as turmas.`;
-  const podeGerir = v && RANK[v.papel] >= RANK.gestor;
-  const souAdminEscola = v && RANK[v.papel] >= RANK.admin;
+  const podeGerir = v && RANK[papelEf] >= RANK.gestor;
+  const souAdminEscola = v && RANK[papelEf] >= RANK.admin;
   $('es-assinaturas').innerHTML = '';
   $('es-plano').innerHTML = '';
   $('es-bloqueio').innerHTML = '';
@@ -1480,10 +1544,11 @@ async function abrirCurso(cid, origem){
     .select('id,titulo,descricao,escola_id,valor_cents,arquivado_em,config').eq('id', cid).single();
   if(!curso){ $('cu-titulo').textContent='Curso indisponível'; $('cu-modulos').innerHTML=''; return; }
   ctx.escola = curso.escola_id; ctx.cursoValor = curso.valor_cents || 0; ctx.cursoNome = curso.titulo;
-  const papel = vincMap[curso.escola_id]?.papel || 'aluno';
+  const papel = papelEfetivo(curso.escola_id) || 'aluno';
   const souStaff = RANK[papel] >= RANK.gestor;
   ctx.souStaff = souStaff; ctx.podeAula = RANK[papel] >= RANK.professor;
   const souAluno = !ctx.podeAula;
+  ctx.professorNome = ''; ctx.minhaTurmaNome = '';
 
   go('curso', { mundo: souAluno ? 'aluno' : 'gestao', chip: curso.titulo });
   const nomeEsc = vincMap[curso.escola_id]?.escola?.nome || 'Escola';
@@ -1543,10 +1608,12 @@ async function abrirCurso(cid, origem){
     const { data: g } = await sb.from('gamificacao')
       .select('pontos,streak_dias,streak_congelamentos').eq('pessoa_id', me.id).eq('escola_id', curso.escola_id).maybeSingle();
     const { data: minhaMat } = await sb.from('matriculas')
-      .select('turma_id,turmas!inner(curso_id,modalidade,tem_encontros)').eq('pessoa_id', me.id).eq('turmas.curso_id', cid).limit(1).maybeSingle();
+      .select('turma_id,turmas!inner(curso_id,modalidade,tem_encontros,nome,turma_professores(pessoas(nome)))').eq('pessoa_id', me.id).eq('turmas.curso_id', cid).limit(1).maybeSingle();
     ctx.minhaTurma = minhaMat?.turma_id || null;
     ctx.minhaModalidade = minhaMat?.turmas?.modalidade || 'online';
     ctx.turmaTemEnc = !!minhaMat?.turmas?.tem_encontros;
+    ctx.minhaTurmaNome = minhaMat?.turmas?.nome || '';
+    ctx.professorNome = minhaMat?.turmas?.turma_professores?.[0]?.pessoas?.nome || '';
     const RITMO = { imediata:'Você avança no seu ritmo, sem espera.',
       por_conclusao:'Cada aula abre quando você conclui a anterior.',
       diaria:'Uma aula por dia — a próxima abre 24h depois da anterior.',
@@ -1871,7 +1938,7 @@ async function montarTurmas(cid, souStaff){
     const ocup = ativos.length + pendentes.length;
     const sel = ctx.abaMat==='pendentes' ? pendentes : ctx.abaMat==='recusados' ? recusados
               : ctx.abaMat==='ex' ? exAlunos : ativos;
-    const mando = RANK[vincMap[ctx.escola]?.papel] >= RANK.gestor;   // desligar é coisa de gestor/admin
+    const mando = RANK[papelEfetivo(ctx.escola)] >= RANK.gestor;   // desligar é coisa de gestor/admin
     const lotada = t.max_inscricoes && ocup >= t.max_inscricoes;
     h += `<div class="card ${t.arquivado_em?'arq':''}">
       <div class="row" style="justify-content:space-between;align-items:flex-start">
@@ -1895,7 +1962,7 @@ async function montarTurmas(cid, souStaff){
         <button class="btn xs ghost" onclick="formMatricula('${t.id}')">Matricular alguém</button>
         <button class="btn xs ghost" onclick="formTurma('${t.id}')">Editar</button>
         <button class="btn xs ghost" onclick="arquivarTurma('${t.id}',true)">Arquivar</button>
-        ${RANK[vincMap[ctx.escola]?.papel] >= RANK.admin
+        ${RANK[papelEfetivo(ctx.escola)] >= RANK.admin
           ? `<button class="btn xs ghost dgr" onclick="formExcluirTurma('${t.id}','${esc(t.nome).replace(/'/g,'')}')">Excluir</button>`:''}
         </div>`
       : souStaff ? `<div style="margin-top:14px"><button class="btn xs ghost" onclick="arquivarTurma('${t.id}',false)">Reativar turma</button></div>` : ''}
@@ -2033,7 +2100,7 @@ async function abrirEquipe(){
   go('equipe', { mundo:'gestao', chip:'Equipe' });
   $('eq-crumb').innerHTML = esc(v?.escola?.nome||'Escola') + ' › <b>Equipe e acessos</b>';
   $('eq-corpo').innerHTML = `<div class="card"><div class="skel" style="width:55%"></div></div>`;
-  const souAdmin = RANK[v?.papel] >= RANK.admin;
+  const souAdmin = RANK[papelEfetivo(eid)] >= RANK.admin;
   const [{ data: equipe, error }, { data: turmas }] = await Promise.all([
     sb.rpc('equipe_escola', { p_escola: eid }),
     sb.from('turmas').select('id,nome,arquivado_em,cursos!inner(id,titulo,escola_id),turma_professores(pessoa_id)')
@@ -2090,7 +2157,7 @@ async function abrirEquipe(){
         <div class="t">${esc(t.nome)}<small>${esc(t.cursos?.titulo||'')}</small></div>
         ${prof ? `<span class="pill ok" style="flex:none">${ic('professor')} ${esc(prof.nome)}</span>`
                : `<span class="pill warn" style="flex:none">sem professor</span>`}
-        ${RANK[v?.papel] >= RANK.gestor ? `<button class="btn xs ghost" style="flex:none"
+        ${RANK[papelEfetivo(eid)] >= RANK.gestor ? `<button class="btn xs ghost" style="flex:none"
           onclick="formProfDaTurma('${t.id}','${esc(t.nome).replace(/'/g,'')}','${pid||''}')">Definir</button>`:''}
         <div style="flex-basis:100%" id="pt-${t.id}"></div></div>`;
     }).join('')}</div>` : `<div class="card empty"><div class="big">${ic('capelo')}</div><b>Nenhuma turma ativa</b>
@@ -2609,7 +2676,7 @@ async function montarPerguntas(aid){
   };
   slot.innerHTML = `<div class="card" style="margin-top:24px">
     <div class="row" style="justify-content:space-between;align-items:center">
-      <h3 style="margin:0">${souStaff ? 'Perguntas dos alunos' : 'Ficou com dúvida?'}</h3>
+      <h3 style="margin:0">${souStaff ? 'Tira-dúvidas dos alunos' : 'Tira-dúvidas'}</h3>
       ${semResposta ? `<span class="pill warn">${semResposta} sem resposta</span>`:''}</div>
     ${souStaff
       ? `<div style="font-size:13.5px;color:var(--sub);margin-top:8px;line-height:1.6">
@@ -3492,9 +3559,26 @@ async function abrirAula(aid){
   }
   ctx.aula = aid;
   go('aula', { mundo: ctx.podeAula ? 'gestao' : 'aluno', chip: 'Aula' });
-  $('au-crumb').innerHTML = esc(ctx.cursoNome) + ' › <b>' + esc(a.titulo) + '</b>';
+  const modNome = a.modulo?.titulo || '';
+  $('au-crumb').innerHTML = esc(ctx.cursoNome) + (modNome ? ' › ' + esc(modNome) : '') + ' › <b>' + esc(a.titulo) + '</b>';
   $('au-titulo').textContent = a.titulo;
   $('au-edit').innerHTML = '';
+
+  // contexto: onde estou, o que falta, quem ensina — pedido do Israel (02/08/2026):
+  // "nao aparece nem o nome do modulo, nem o nome da aula... o que falta fazer, falta nome do professor"
+  {
+    const doModulo = ctx.aulasSeq.filter(x => x.modulo?.id === a.modulo?.id);
+    const posModulo = doModulo.findIndex(x => x.id === aid);
+    const modsUnicos = [...new Map(ctx.aulasSeq.map(x => [x.modulo?.id, x.modulo])).values()];
+    const posCurso = modsUnicos.findIndex(m => m?.id === a.modulo?.id);
+    const feitasCurso = ctx.aulasSeq.filter(x => ctx.progresso[x.id]?.concluida_em).length;
+    const feitasModulo = doModulo.filter(x => ctx.progresso[x.id]?.concluida_em).length;
+    $('au-ctx').innerHTML = `
+      ${modNome ? `<span class="pill marca">${ic('livroAberto')}<span class="txt">Módulo ${posModulo>=0&&posCurso>=0?(posCurso+1)+' de '+modsUnicos.length+' · ':''}${esc(modNome)}</span></span>` : ''}
+      ${doModulo.length ? `<span class="pill mute">${ic('bandeira')}<span class="txt">Aula ${posModulo+1} de ${doModulo.length} neste módulo${!ctx.podeAula?` · ${feitasModulo} concluída${feitasModulo===1?'':'s'}`:''}</span></span>` : ''}
+      ${ctx.aulasSeq.length && !ctx.podeAula ? `<span class="pill mute">${ic('celebra')}<span class="txt">${feitasCurso} de ${ctx.aulasSeq.length} concluídas no curso</span></span>` : ''}
+      ${ctx.professorNome ? `<span class="pill ok">${ic('professor')}<span class="txt">Professor(a): ${esc(ctx.professorNome)}</span></span>` : ''}`;
+  }
   const f = a.fonte || {};
   let c = '';
   const vids = videosDe(f), imgs = imagensDe(f);
