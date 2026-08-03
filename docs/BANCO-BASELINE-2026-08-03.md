@@ -31,6 +31,15 @@ A migração `20260803234000_restringir_execucao_e_politicas.sql`:
 Os acessos públicos continuam passando por funções com parâmetros controlados
 e validações internas. O `service_role` permanece exclusivo do backend.
 
+## Aplicação e verificação
+
+- Migração aplicada em produção pelo `supabase db push` em 2026-08-03.
+- Versão remota registrada: `20260803234000`.
+- Resultado posterior: 8 funções executáveis por `anon`, 0 políticas destinadas
+  a `PUBLIC` e 73 políticas destinadas a `authenticated`.
+- `pagina_publica` respondeu HTTP 200 com chave anônima.
+- `mudar_papel` respondeu HTTP 401 e `permission denied` com chave anônima.
+
 ## Regra para próximas mudanças
 
 - Toda alteração estrutural deve ser um arquivo novo em `supabase/migrations`.
