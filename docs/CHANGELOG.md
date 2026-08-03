@@ -12,3 +12,6 @@ respectivamente.
 - Funcionamento de contingência para abrir a estrutura básica do aplicativo
   quando a conexão cair.
 - Início do versionamento formal do MODOX.
+- Validação automática de pull requests e publicações em `main`.
+- Cabeçalhos de segurança e política explícita para câmera e microfone.
+- Procedimento operacional e relação do backup compartilhado documentados.
