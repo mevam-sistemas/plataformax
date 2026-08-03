@@ -19,6 +19,8 @@ jobs:
     steps:
       - name: Obter código versionado
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Validar arquivos e referências do PWA
         shell: bash
@@ -47,4 +49,13 @@ jobs:
           fi
 
       - name: Validar integridade do diff
-        run: git diff --check HEAD~1 HEAD
+        shell: bash
+        env:
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -euo pipefail
+          if [[ -n "${PR_BASE_SHA:-}" ]]; then
+            git diff --check "$PR_BASE_SHA"...HEAD
+          else
+            git show --check --format= HEAD
+          fi
