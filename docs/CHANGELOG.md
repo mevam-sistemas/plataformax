@@ -15,3 +15,6 @@ respectivamente.
 - Validação automática de pull requests e publicações em `main`.
 - Cabeçalhos de segurança e política explícita para câmera e microfone.
 - Procedimento operacional e relação do backup compartilhado documentados.
+- Baseline do banco registrado e migrações Supabase iniciadas.
+- Execução anônima reduzida às oito jornadas públicas necessárias.
+- Políticas das tabelas do MODOX restritas a usuários autenticados.

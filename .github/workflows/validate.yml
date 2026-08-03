@@ -59,3 +59,18 @@ jobs:
           else
             git show --check --format= HEAD
           fi
+
+      - name: Validar convenções das migrações
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -d supabase/migrations ]]; then
+            find supabase/migrations -type f ! -name '[0-9]*_*.sql' -print -quit | grep -q . && {
+              echo 'Migração fora do padrão DATA_descricao.sql.' >&2
+              exit 1
+            }
+            if grep -RInE 'service_role[^;]*(=|:)[[:space:]]*[A-Za-z0-9._-]{20,}' supabase/migrations; then
+              echo 'Possível segredo em migração.' >&2
+              exit 1
+            fi
+          fi
