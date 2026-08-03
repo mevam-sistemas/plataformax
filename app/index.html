@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>MODOX — sua escola, do seu modo</title>
 <meta name="theme-color" content="#ffffff">
+<meta name="application-name" content="MODOX">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="MODOX">
+<link rel="manifest" href="/app/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/img/icon-192.png">
 <style>
 /* ============================================================
    PLATAFORMAX — sistema de design
@@ -4666,6 +4672,22 @@ if(ccod !== null) abrirCheckin(ccod);
 else if(vcod !== null) abrirValidacao(vcod);
 else if(fslug) carregarInscricao();
 else sb.auth.getSession().then(({data:{session}}) => { if(session) entrar(); });
+
+// PWA: a navegação continua priorizando a rede, e o cache serve apenas como
+// contingência. Quando uma versão nova assume o controle, recarrega uma única
+// vez para que o aplicativo instalado não fique preso em código antigo.
+if('serviceWorker' in navigator){
+  let atualizando = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if(atualizando) return;
+    atualizando = true;
+    location.reload();
+  });
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/app/sw.js', { scope:'/app/' })
+      .catch(err => console.error('[pwa] service worker', err));
+  });
+}
 </script>
 </body>
 </html>
