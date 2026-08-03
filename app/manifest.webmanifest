@@ -1,0 +1,29 @@
+{
+  "id": "/app/",
+  "name": "MODOX — sua escola, do seu modo",
+  "short_name": "MODOX",
+  "description": "Gestão escolar, aulas, presença e certificados em um só lugar.",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "start_url": "/app/",
+  "scope": "/app/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f6f5fb",
+  "theme_color": "#ffffff",
+  "categories": ["education", "productivity"],
+  "icons": [
+    {
+      "src": "/img/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/img/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
