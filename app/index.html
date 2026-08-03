@@ -786,6 +786,14 @@ h2 .ic,h3 .ic{width:.9em;height:.9em;margin-right:2px}
   </div>
 </section>
 
+<!-- ══════════ CHECK-IN DE PRESENÇA POR QR CODE ══════════ -->
+<section class="screen" id="s-checkin">
+  <div class="brand marca-g" style="font-size:22px;margin-bottom:24px"><svg class="marca-sig" style="width:32px;height:32px"><use href="#sig-modox"/></svg><span class="marca-nome" style="font-size:23px">MODO<i>X</i></span></div>
+  <div class="col" style="margin:0 auto">
+    <div id="ck-corpo"><div class="card"><div class="skel" style="width:60%"></div></div></div>
+  </div>
+</section>
+
 <!-- ══════════ INSCRIÇÃO PÚBLICA ══════════ -->
 <section class="screen" id="s-inscricao">
   <div class="brand marca-g" style="font-size:22px;margin-bottom:24px"><svg class="marca-sig" style="width:32px;height:32px"><use href="#sig-modox"/></svg><span class="marca-nome" style="font-size:23px">MODO<i>X</i></span></div>
@@ -2704,10 +2712,11 @@ async function painelEncontros(tid){
             : '<b style="color:var(--warn)">Presença ainda não registrada</b>'}</div>`:''}
         <div class="row" style="margin-top:10px;flex-wrap:wrap;gap:6px">
           ${!e.cancelado_em?`<button class="btn xs" onclick="listaPresenca('${e.id}','${tid}')">Lista de presença</button>`:''}
+          ${!e.cancelado_em?`<button class="btn xs ghost" onclick="abrirQrEncontro('${e.id}','${tid}')">QR de presença</button>`:''}
           <button class="btn xs ghost" onclick="formEncontro('${tid}','${e.id}')">Editar</button>
           <button class="btn xs ghost ${e.cancelado_em?'':'dgr'}" onclick="cancelarEncontro('${e.id}','${tid}',${e.cancelado_em?'false':'true'})">
             ${e.cancelado_em?'Reativar':'Cancelar'}</button></div>
-        <div id="lp-${e.id}"></div><div id="ff-${e.id}"></div>
+        <div id="lp-${e.id}"></div><div id="ff-${e.id}"></div><div id="qr-${e.id}"></div>
       </div></div>`;
   };
   slot.innerHTML = `<div class="inline">
@@ -2718,7 +2727,11 @@ async function painelEncontros(tid){
     ${pendentes?`<div class="dica" style="margin-top:12px">${ic('lapis')} <b>${pendentes} encontro${pendentes===1?'':'s'}</b>
       já ${pendentes===1?'aconteceu':'aconteceram'} e ${pendentes===1?'está':'estão'} sem lista de presença completa.</div>`:''}
     <div id="fe-novo-${tid}"></div>
-    <button class="btn sm" style="margin-top:14px" onclick="formEncontro('${tid}',null)">+ Marcar encontro</button>
+    <div class="row" style="margin-top:14px;flex-wrap:wrap;gap:6px">
+      <button class="btn sm" onclick="formEncontro('${tid}',null)">+ Marcar encontro</button>
+      <button class="btn sm ghost" onclick="montarFrequencia('${tid}')">Frequência da turma</button>
+    </div>
+    <div id="fq-${tid}"></div>
     ${futuros.length?`<h3 style="margin:20px 0 2px;font-size:14px">Próximos</h3>${futuros.map(e=>linha(e,false)).join('')}`:''}
     ${passados.length?`<h3 style="margin:20px 0 2px;font-size:14px">Já aconteceram</h3>${passados.map(e=>linha(e,true)).join('')}`:''}
     ${!(evs||[]).length?`<div style="font-size:13.5px;color:var(--sub);margin-top:14px">
@@ -2866,6 +2879,160 @@ async function salvarJust(eid, pid, tid){
     p_status: 'justificada', p_justificativa: txt });
   if(error) return $('m-jf').textContent = 'Ops: '+error.message;
   $('lp-'+eid).innerHTML = ''; await listaPresenca(eid, tid);
+}
+
+// ---------- frequência (%) da turma — fácil de consultar aqui dentro ----------
+async function montarFrequencia(tid){
+  const slot = $('fq-'+tid); if(!slot) return;
+  if(slot.innerHTML){ slot.innerHTML = ''; return; }
+  slot.innerHTML = `<div class="inline" style="margin-top:12px"><div class="skel" style="width:50%"></div></div>`;
+  const { data, error } = await sb.rpc('frequencia_turma', { p_turma: tid });
+  if(error) return slot.innerHTML = `<div class="hint">Não consegui abrir a frequência: ${esc(error.message)}</div>`;
+  const alunos = data || [];
+  if(!alunos.length) return slot.innerHTML = `<div class="hint" style="margin-top:10px">Nenhum aluno ativo nesta turma ainda.</div>`;
+  const cor = p => p===null?'mute':p>=75?'ok':p>=50?'warn':'dgr';
+  slot.innerHTML = `<div class="inline" style="margin-top:12px">
+    <b style="font-size:14px">Frequência da turma</b>
+    <div class="hint">Conta a partir dos encontros que já aconteceram. Falta justificada entra como presença.</div>
+    ${alunos.map(a => `<div class="row" style="justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)">
+      <div style="flex:1"><b style="font-size:13.5px">${esc(a.nome||'—')}</b>
+        <div style="font-size:12px;color:var(--sub);margin-top:2px">${a.esperados} encontro${a.esperados===1?'':'s'}
+          · ${a.presentes} presente${a.presentes===1?'':'s'}${a.justificadas?' · '+a.justificadas+' justificada'+(a.justificadas===1?'':'s'):''}${a.faltas?' · '+a.faltas+' falta'+(a.faltas===1?'':'s'):''}</div></div>
+      <span class="pill ${cor(a.percentual)}" style="flex:none">${a.percentual===null?'sem encontros':a.percentual+'%'}</span>
+    </div>`).join('')}
+  </div>`;
+}
+
+// ---------- QR code de presença — imprimir e colar na sala ----------
+async function abrirQrEncontro(eid, tid){
+  const slot = $('qr-'+eid); if(!slot) return;
+  if(slot.innerHTML){ slot.innerHTML = ''; return; }
+  slot.innerHTML = `<div class="inline" style="margin-top:10px"><div class="skel" style="width:40%"></div></div>`;
+  const { data: token, error } = await sb.rpc('qr_token_encontro', { p_evento: eid });
+  if(error) return slot.innerHTML = `<div class="hint">Não consegui gerar o QR: ${esc(error.message)}</div>`;
+  const url = location.origin + '/?c=' + token;
+  slot.innerHTML = `<div class="inline" style="margin-top:10px;align-items:center;text-align:center">
+    <b style="font-size:13.5px">QR de presença deste encontro</b>
+    <div class="hint" style="margin-bottom:8px">O aluno escaneia, digita o e-mail do cadastro e a presença é marcada na hora.
+      Vale só para este encontro.</div>
+    <canvas id="qrimg-${eid}" style="display:block;margin:8px auto"></canvas>
+    <button class="btn xs" onclick="baixarQrEncontro('${eid}','${tid}','${token}')">Baixar PNG para imprimir (A4)</button>
+  </div>`;
+  desenharQR($('qrimg-'+eid), url);
+}
+async function baixarQrEncontro(eid, tid, token){
+  const e = (ctx.encCache||{})[eid] || {};
+  const t = (ctx.turmasCache||[]).find(x => x.id === tid) || {};
+  const prof = (t.turma_professores||[])[0]?.pessoas?.nome || '';
+  const url = location.origin + '/?c=' + token;
+
+  // canvas do QR isolado (maior, pra ficar nítido impresso)
+  const qrCanvas = document.createElement('canvas');
+  try{
+    if(typeof QRCode === 'undefined') throw new Error('sem lib');
+    await QRCode.toCanvas(qrCanvas, url, { width:900, margin:1, color:{ dark:'#141416', light:'#ffffff' } });
+  }catch(_){
+    alert('Não consegui montar o QR code agora — tente de novo em alguns segundos.');
+    return;
+  }
+
+  // folha A4 em pé, ~150dpi (1240×1754), com QR grande centralizado e os dados pedidos
+  const cv = document.createElement('canvas');
+  cv.width = 1240; cv.height = 1754;
+  const g = cv.getContext('2d');
+  g.fillStyle = '#ffffff'; g.fillRect(0,0,cv.width,cv.height);
+  g.textAlign = 'center';
+  g.fillStyle = '#141416';
+  g.font = '700 40px -apple-system,Segoe UI,Roboto,Arial,sans-serif';
+  g.fillText('Confirme sua presença', cv.width/2, 130);
+  g.font = '400 26px -apple-system,Segoe UI,Roboto,Arial,sans-serif';
+  g.fillStyle = '#4b4b55';
+  g.fillText('Aponte a câmera do celular para o código abaixo', cv.width/2, 172);
+
+  const qs = 900, qx = (cv.width-qs)/2, qy = 230;
+  g.strokeStyle = '#ececf2'; g.lineWidth = 2; g.strokeRect(qx-2, qy-2, qs+4, qs+4);
+  g.drawImage(qrCanvas, qx, qy, qs, qs);
+
+  let y = qy + qs + 70;
+  g.fillStyle = '#141416';
+  g.font = '700 34px -apple-system,Segoe UI,Roboto,Arial,sans-serif';
+  g.fillText(t.nome || 'Turma', cv.width/2, y); y += 46;
+  g.font = '400 26px -apple-system,Segoe UI,Roboto,Arial,sans-serif';
+  g.fillStyle = '#4b4b55';
+  if(e.titulo){ g.fillText(e.titulo, cv.width/2, y); y += 38; }
+  if(e.inicio){ g.fillText(dataLonga(new Date(e.inicio)), cv.width/2, y); y += 38; }
+  if(prof){ g.fillText('Professor(a): ' + prof, cv.width/2, y); y += 38; }
+
+  g.font = '400 20px -apple-system,Segoe UI,Roboto,Arial,sans-serif';
+  g.fillStyle = '#8a8a94';
+  g.fillText('Este QR code vale só para este encontro — MODOX', cv.width/2, cv.height - 60);
+
+  cv.toBlob(blob => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'presenca-' + (t.nome||'turma').toLowerCase().replace(/[^a-z0-9]+/g,'-') + '.png';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  }, 'image/png');
+}
+
+// ---------- tela pública de check-in (chegou aqui pelo QR code) ----------
+async function abrirCheckin(token){
+  mundo('publico'); go('checkin');
+  ctx.ckToken = token;
+  const box = $('ck-corpo');
+  box.innerHTML = `<div class="card"><div class="skel" style="width:60%"></div></div>`;
+  const { data, error } = await sb.rpc('checkin_info', { p_token: token });
+  const info = Array.isArray(data) ? data[0] : data;
+  if(error || !info){
+    box.innerHTML = `<div class="card" style="border:1.5px solid #f6c9ca;background:#fdf3f3">
+      <div style="font-size:34px">${ic('alerta')}</div>
+      <h3 style="margin:8px 0 6px">QR code não reconhecido</h3>
+      <div style="font-size:14.5px;color:var(--sub);line-height:1.65">Confira se o link está completo, ou peça um novo QR ao seu professor.</div></div>`;
+    return;
+  }
+  if(!info.valido){
+    box.innerHTML = `<div class="card" style="border:1.5px solid #f6c9ca;background:#fdf3f3">
+      <div style="font-size:34px">${ic('relogio')}</div>
+      <h3 style="margin:8px 0 6px">${esc(info.motivo||'Este QR code não está mais valendo.')}</h3>
+      <div class="det" style="margin-top:14px;background:#fff">
+        ${info.turma?`<b>Turma:</b> ${esc(info.turma)}<br>`:''}
+        ${info.encontro?`<b>Encontro:</b> ${esc(info.encontro)}<br>`:''}
+        ${info.inicio?`<b>Quando:</b> ${dataLonga(new Date(info.inicio))}<br>`:''}
+      </div></div>`;
+    return;
+  }
+  box.innerHTML = `<div class="card">
+    ${info.escola_logo?`<img src="${capaUrl(info.escola_logo)}" alt="${esc(info.escola)}" style="width:48px;height:48px;border-radius:12px;object-fit:cover;border:1px solid var(--line);margin-bottom:14px">`:''}
+    <h1 style="font-size:21px;margin:0 0 4px">Confirmar presença</h1>
+    <p class="sub" style="margin-top:4px">${esc(info.escola||'')} · turma ${esc(info.turma||'')}</p>
+    <div class="det" style="margin-top:10px;background:#f8f8fb">
+      <b>${esc(info.encontro||'Encontro')}</b><br>
+      ${dataLonga(new Date(info.inicio))}${info.tipo?' · '+(info.tipo==='online'?'sala online':'presencial'):''}<br>
+      ${info.local?`${ic('pin')} ${esc(info.local)}<br>`:''}
+      ${info.professor?`${ic('professor')} ${esc(info.professor)}`:''}
+    </div>
+    <label style="margin-top:18px">Seu e-mail <span class="opt">— o mesmo do seu cadastro</span></label>
+    <input id="ck-email" type="email" placeholder="voce@email.com" autocomplete="email">
+    <button class="btn w" style="margin-top:12px" onclick="confirmarCheckin()">Confirmar minha presença</button>
+    <div class="msg" id="m-ck"></div>
+  </div>`;
+}
+async function confirmarCheckin(){
+  const email = ($('ck-email').value||'').trim();
+  const set = t => { const m = $('m-ck'); if(m) m.textContent = t; };
+  if(!email || !email.includes('@')) return set('Digite um e-mail válido.');
+  set('Confirmando…');
+  const btn = document.querySelector('#ck-corpo .btn.w'); if(btn) btn.disabled = true;
+  const { data, error } = await sb.rpc('confirmar_presenca_qr', { p_token: ctx.ckToken, p_email: email });
+  if(btn) btn.disabled = false;
+  const r = Array.isArray(data) ? data[0] : data;
+  if(error || !r){ set('Ops, algo deu errado. Tente de novo.'); return; }
+  if(!r.ok){ set(r.mensagem || 'Não consegui confirmar sua presença.'); return; }
+  $('ck-corpo').innerHTML = `<div class="card empty">
+    <div class="big">${ic('check')}</div>
+    <b>Presença registrada, ${esc((r.nome||'').split(' ')[0])}!</b>
+    <p>Bons estudos — a turma conta com você.</p></div>`;
 }
 
 // ═══════════════ PERGUNTAS NA AULA ═══════════════
@@ -4486,13 +4653,17 @@ if(pgRet){
 
 // ═══════════════ SESSÃO ═══════════════
 const vcod = new URLSearchParams(location.search).get('v');
+// ?c= vem do QR code de presença de um encontro — confirmar presença não
+// exige login (o aluno pode nem ter o celular logado durante a aula).
+const ccod = new URLSearchParams(location.search).get('c');
 // link de "esqueci minha senha" volta pra cá com esse evento — único jeito
 // de recuperar acesso agora que não existe mais código por e-mail (01/08/2026).
 sb.auth.onAuthStateChange((ev, session) => {
   if(ev === 'PASSWORD_RECOVERY'){ mundo('publico'); go('redefinir'); return; }
-  if(session && ev==='SIGNED_IN' && !me && !fslug && !vcod) entrar();
+  if(session && ev==='SIGNED_IN' && !me && !fslug && !vcod && !ccod) entrar();
 });
-if(vcod !== null) abrirValidacao(vcod);
+if(ccod !== null) abrirCheckin(ccod);
+else if(vcod !== null) abrirValidacao(vcod);
 else if(fslug) carregarInscricao();
 else sb.auth.getSession().then(({data:{session}}) => { if(session) entrar(); });
 </script>
