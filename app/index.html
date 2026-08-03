@@ -635,6 +635,7 @@ h2 .ic,h3 .ic{width:.9em;height:.9em;margin-right:2px}
   <div class="row" id="es-acoes" style="margin-top:24px;flex-wrap:wrap">
     <button class="btn ghost sm" id="b-painel" style="display:none"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4" width="19" height="13.5" rx="1.6"/><path d="M8.5 21h7M12 17.5v3.5"/></svg> Painel ao vivo</button>
     <button class="btn ghost sm" id="b-equipe" style="display:none">Equipe e acessos</button>
+    <button class="btn ghost sm" id="b-pagamentos" style="display:none">Pagamentos</button>
     <button class="btn ghost sm" id="b-assinaturas" style="display:none">Assinaturas do certificado</button>
     <button class="btn ghost sm" id="b-plano" style="display:none"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14.5" rx="1.8"/><path d="M2 10h20"/></svg> Plano da escola</button>
     <button class="btn ghost sm" id="b-historico" style="display:none">Histórico de alterações</button>
@@ -649,6 +650,25 @@ h2 .ic,h3 .ic{width:.9em;height:.9em;margin-right:2px}
   <p class="sub">Quem trabalha nesta escola, o que cada um pode fazer, e qual turma cada professor conduz.
     Ninguém precisa de senha: o acesso é por código enviado no e-mail cadastrado.</p>
   <div id="eq-corpo"><div class="card"><div class="skel" style="width:55%"></div></div></div>
+</section>
+
+<!-- ══════════ PAGAMENTOS DA ESCOLA ══════════ -->
+<section class="screen" id="s-pagamentos">
+  <button class="btn link" data-back="escola">‹ Voltar</button>
+  <div class="crumb" id="pg-crumb"></div>
+  <h1>Pagamentos</h1>
+  <p class="sub">A escola recebe direto na própria conta Asaas — a Arbor Labs é só o caminho, o dinheiro nunca passa por aqui.</p>
+  <div id="pg-conexao"><div class="card"><div class="skel" style="width:55%"></div></div></div>
+  <h2 style="margin-top:34px">Cobranças <span id="pg-cont"></span></h2>
+  <div id="pg-lista"></div>
+</section>
+
+<!-- ══════════ MEUS PAGAMENTOS (aluno) ══════════ -->
+<section class="screen" id="s-meus-pagamentos">
+  <button class="btn link" data-back="curso">‹ Curso</button>
+  <div class="crumb" id="mp-crumb"></div>
+  <h1>Meus pagamentos</h1>
+  <div id="mp-lista"></div>
 </section>
 
 <!-- ══════════ MINHA AGENDA ══════════ -->
@@ -685,7 +705,7 @@ h2 .ic,h3 .ic{width:.9em;height:.9em;margin-right:2px}
     <div id="cn-preco-box" style="display:none">
       <label>Preço em reais</label>
       <input id="cn-preco" inputmode="decimal" placeholder="Ex.: 49,90">
-      <div class="hint">O aluno paga por PIX ou cartão. O dinheiro cai direto na sua conta do Mercado Pago — sem comissão nossa.</div>
+      <div class="hint" id="cn-preco-hint">O aluno paga por PIX, boleto ou cartão. O dinheiro cai direto na conta Asaas da escola — sem comissão nossa. Conecte sua conta Asaas em <b>Pagamentos</b>, na página da escola, antes de abrir a inscrição.</div>
     </div>
     <label>Vagas da primeira turma <span class="opt">— opcional</span></label>
     <input id="cn-vagas" inputmode="numeric" placeholder="Deixe vazio para não limitar">
@@ -1260,6 +1280,7 @@ $('b-criar-escola').onclick = async () => {
 $('b-novo-curso').onclick = () => go('curso-novo', { mundo:'gestao', chip:'Novo curso' });
 $('b-historico').onclick = () => abrirHistorico();
 $('b-equipe').onclick = () => abrirEquipe();
+$('b-pagamentos').onclick = () => abrirPagamentos();
 $('b-assinaturas').onclick = () => formAssinaturas();
 $('b-plano').onclick = () => formPlanoEscola();
 $('b-painel').onclick = () => window.open('monitor.html', '_blank');
@@ -1302,6 +1323,7 @@ async function abrirEscola(eid){
     $('es-cursos-bloco').style.display = 'none';
     $('b-historico').style.display = 'none';
     $('b-equipe').style.display = 'none';
+    $('b-pagamentos').style.display = 'none';
     $('b-assinaturas').style.display = 'none';
     $('b-painel').style.display = 'none';
     $('b-plano').style.display = souAdminEscola ? '' : 'none';
@@ -1322,6 +1344,13 @@ async function abrirEscola(eid){
   }
   $('b-historico').style.display = podeGerir ? '' : 'none';
   $('b-equipe').style.display = podeGerir ? '' : 'none';
+  // pagamento é dinheiro — só admin vê e mexe, ou quem tiver a permissão extra "ver financeiro"
+  $('b-pagamentos').style.display = souAdminEscola ? '' : 'none';
+  if(!souAdminEscola && v){
+    sb.rpc('financeiro_permitido', { esc: eid }).then(({ data }) => {
+      if(data && ctx.escola === eid) $('b-pagamentos').style.display = '';
+    });
+  }
   $('b-assinaturas').style.display = podeGerir ? '' : 'none';
   // plano/cobrança é dinheiro — só admin vê e mexe (mesma regra do banco: iniciar_assinatura_escola)
   $('b-plano').style.display = souAdminEscola ? '' : 'none';
@@ -1657,6 +1686,7 @@ async function abrirCurso(cid, origem){
       <div class="row" style="margin-top:14px;flex-wrap:wrap">
         ${ctx.gamif && ctx.minhaTurma?`<button class="btn ghost sm" onclick="abrirRanking()">Ver ranking da turma</button>`:''}
         ${ctx.minhaModalidade !== 'online' || ctx.turmaTemEnc?`<button class="btn ghost sm" onclick="abrirAgenda()">Ver meus compromissos</button>`:''}
+        ${ctx.cursoValor?`<button class="btn ghost sm" onclick="abrirMeusPagamentos()">Meus pagamentos</button>`:''}
       </div></div>`;
     const prox = ctx.aulasSeq.find(a => !ctx.progresso[a.id]?.concluida_em);
     if(prox && prox.liberada) $('cu-continuar').innerHTML =
@@ -2121,12 +2151,14 @@ async function abrirEquipe(){
   $('eq-crumb').innerHTML = esc(v?.escola?.nome||'Escola') + ' › <b>Equipe e acessos</b>';
   $('eq-corpo').innerHTML = `<div class="card"><div class="skel" style="width:55%"></div></div>`;
   const souAdmin = RANK[papelEfetivo(eid)] >= RANK.admin;
-  const [{ data: equipe, error }, { data: turmas }] = await Promise.all([
+  const [{ data: equipe, error }, { data: turmas }, { data: fin }] = await Promise.all([
     sb.rpc('equipe_escola', { p_escola: eid }),
     sb.from('turmas').select('id,nome,arquivado_em,cursos!inner(id,titulo,escola_id),turma_professores(pessoa_id)')
-      .eq('cursos.escola_id', eid).is('arquivado_em', null).order('criado_em')
+      .eq('cursos.escola_id', eid).is('arquivado_em', null).order('criado_em'),
+    souAdmin ? sb.from('vinculos').select('pessoa_id,pode_ver_financeiro').eq('escola_id', eid).eq('ativo', true) : { data:[] },
   ]);
   if(error) return $('eq-corpo').innerHTML = `<div class="card"><div class="hint">Não consegui carregar: ${esc(error.message)}</div></div>`;
+  const finMap = {}; (fin||[]).forEach(v => finMap[v.pessoa_id] = v.pode_ver_financeiro);
   ctx.equipe = equipe || [];
   ctx.turmasEscola = turmas || [];
   const profs = ctx.equipe.filter(p => ['professor','gestor','admin'].includes(p.papel) && p.ativo);
@@ -2154,6 +2186,7 @@ async function abrirEquipe(){
       ${souAdmin ? `<div class="row" style="margin-top:14px;flex-wrap:wrap;gap:6px">
         <button class="btn xs ghost" onclick="formPapel('${p.pessoa_id}','${p.papel}')">Mudar papel</button>
         ${p.papel==='professor'?`<button class="btn xs ghost" onclick="formTurmaDoProf('${p.pessoa_id}','${esc(p.nome).replace(/'/g,'')}')">Turma que ele conduz</button>`:''}
+        ${p.papel!=='admin'?`<button class="btn xs ghost" id="fv-${p.pessoa_id}" onclick="alternarFinanceiro('${p.pessoa_id}',${!!finMap[p.pessoa_id]})">${finMap[p.pessoa_id]?'✓ Vê financeiro':'Ver financeiro'}</button>`:''}
         ${p.pessoa_id !== me.id ? `<button class="btn xs ghost dgr" onclick="tirarAcesso('${p.pessoa_id}','${esc(p.nome).replace(/'/g,'')}')">Tirar acesso</button>`:''}
         </div><div id="pp-${p.pessoa_id}"></div>` : ''}
     </div>`;
@@ -2261,6 +2294,12 @@ async function tirarAcesso(pid, nome){
   if(!confirm(`Tirar o acesso de ${nome} a esta escola?\n\nEle deixa de ver tudo na hora. Nada do que ele fez é apagado — o histórico continua.`)) return;
   const { error } = await sb.rpc('mudar_papel', { p_escola: ctx.escola, p_pessoa: pid, p_papel: 'professor', p_ativo: false });
   if(error) return alert('Ops: '+error.message);
+  abrirEquipe();
+}
+async function alternarFinanceiro(pid, estaAtivo){
+  const btn = $('fv-'+pid); if(btn) btn.disabled = true;
+  const { error } = await sb.rpc('definir_financeiro', { p_escola: ctx.escola, p_pessoa: pid, p_permitido: !estaAtivo });
+  if(error){ if(btn) btn.disabled = false; return alert('Ops: '+error.message); }
   abrirEquipe();
 }
 function formTurmaDoProf(pid, nome){
@@ -2418,6 +2457,146 @@ function esperarPlanoEscola(bloqueado, url){
       return; }
     m.textContent = n < 15 ? 'Verificando…' : 'Ainda verificando… ('+Math.floor(n*4/60)+' min)';
   }, 4000);
+}
+
+// ═══════════════ PAGAMENTOS DA ESCOLA (Asaas) ═══════════════ (02/08/2026)
+// Mensalidade da ESCOLA pra Arbor Labs continua só no Mercado Pago (acima).
+// Isto aqui é o aluno pagando a ESCOLA — cada escola com sua própria conta
+// Asaas, o dinheiro nunca passa pela Arbor Labs. Ver plano-pagamentos-asaas.md.
+const STATUS_COB_L = { pendente:'aguardando pagamento', pago:'pago', atrasado:'atrasado', cancelado:'cancelado', estornado:'estornado' };
+async function abrirPagamentos(){
+  const eid = ctx.escola;
+  go('pagamentos', { mundo:'gestao', chip:'Pagamentos' });
+  $('pg-crumb').innerHTML = esc(vincMap[eid]?.escola?.nome||'Escola') + ' › <b>Pagamentos</b>';
+  $('pg-conexao').innerHTML = `<div class="card"><div class="skel" style="width:55%"></div></div>`;
+  $('pg-lista').innerHTML = '';
+  const { data: st, error } = await sb.rpc('status_pagamento_escola', { p_escola: eid });
+  const status = Array.isArray(st) ? st[0] : st;
+  if(error){ $('pg-conexao').innerHTML = `<div class="card"><div class="hint">Não consegui carregar: ${esc(error.message)}</div></div>`; return; }
+  montarConexaoAsaas(eid, status);
+  const { data: cobs } = await sb.from('cobrancas').select('id,tipo,status,valor_cents,vencimento,pago_em,matricula_id,matriculas(pessoas!matriculas_pessoa_id_fkey(nome,telefone),turmas(cursos(titulo)))')
+    .eq('escola_id', eid).order('criado_em', { ascending:false }).limit(100);
+  $('pg-cont').textContent = cobs?.length ? `— ${cobs.length}` : '';
+  if(!cobs?.length){
+    $('pg-lista').innerHTML = `<div class="card empty"><div class="big">${ic('moeda')}</div>
+      <b>Nenhuma cobrança ainda</b><p>Assim que um aluno pagar uma matrícula por aqui, aparece nesta lista.</p></div>`;
+    return;
+  }
+  $('pg-lista').innerHTML = cobs.map(c => {
+    const p = c.matriculas?.pessoas;
+    const curso = c.matriculas?.turmas?.cursos?.titulo || (c.tipo==='mensalidade' ? 'Mensalidade' : '');
+    const tel = (p?.telefone||'').replace(/\D/g,'');
+    const zap = tel ? `https://wa.me/55${tel}?text=${encodeURIComponent('Oi '+(p?.nome||'')+'! Passando aqui sobre o pagamento de '+curso+'.')}` : '';
+    return `<div class="card">
+      <div class="row" style="justify-content:space-between;align-items:flex-start">
+        <div style="flex:1"><h3 style="font-size:15px">${esc(p?.nome||'—')}</h3>
+          <div style="font-size:12.5px;color:var(--sub);margin-top:3px">${esc(curso)}</div></div>
+        <span class="pill ${c.status==='pago'?'ok':c.status==='atrasado'?'dgr':c.status==='cancelado'||c.status==='estornado'?'mute':'warn'}" style="flex:none">${STATUS_COB_L[c.status]||c.status}</span>
+      </div>
+      <div style="font-size:13px;color:var(--sub);margin-top:10px">${money(c.valor_cents)} · vencimento ${fmtData(c.vencimento)}${c.pago_em?' · pago em '+fmtData(c.pago_em):''}</div>
+      <div class="row" style="margin-top:12px;flex-wrap:wrap">
+        ${zap?`<a class="btn xs ghost" href="${zap}" target="_blank" rel="noopener" style="text-decoration:none">${ic('caixaEntrada')} WhatsApp</a>`:''}
+        ${c.matricula_id?`<button class="btn xs ghost" onclick="verBloqueio('${c.matricula_id}')">Ver bloqueio</button>`:''}
+      </div>
+      <div id="bq-${c.matricula_id}"></div>
+    </div>`;
+  }).join('');
+}
+function montarConexaoAsaas(eid, status){
+  const slot = $('pg-conexao');
+  const conectado = status?.conectado;
+  slot.innerHTML = conectado
+    ? `<div class="card" style="border-color:#bfe9d1;background:#f2fbf6">
+        <div class="row" style="justify-content:space-between;align-items:center">
+          <div><b>${ic('check')} Asaas conectado</b>
+            <div style="font-size:12.5px;color:var(--sub);margin-top:4px">Ambiente: ${status.ambiente==='producao'?'produção':'sandbox (teste)'}${status.conectado_em?' · desde '+fmtData(status.conectado_em):''}</div></div>
+          <button class="btn xs ghost" onclick="formConectarAsaas(true)">Trocar chave</button>
+        </div>
+        <div id="pg-form"></div>
+      </div>`
+    : `<div class="dica">
+        ${ic('lampada')} <b>Conecte a conta Asaas da escola</b> pra poder cobrar matrícula e mensalidade.
+        A escola precisa ter (ou criar) uma conta no Asaas e gerar sua própria chave de API — o dinheiro
+        cai direto lá, a Arbor Labs não recebe nem vê o pagamento.
+        <div style="margin-top:10px"><button class="btn xs" onclick="formConectarAsaas(false)">Conectar Asaas</button></div>
+        <div id="pg-form"></div>
+      </div>`;
+}
+function formConectarAsaas(jaConectado){
+  const slot = $('pg-form');
+  if(slot.innerHTML){ slot.innerHTML=''; return; }
+  slot.innerHTML = `<div class="inline" style="margin-top:14px">
+    <label style="margin-top:0">Chave de API do Asaas</label>
+    <input id="asc-chave" type="password" placeholder="$aact_..." autocomplete="off">
+    <div class="hint">Gerada no painel do Asaas, em Integrações → API. Fica guardada de um jeito que nem
+      o MODOX mostra de volta depois — só confirma que está conectado.</div>
+    <label>Ambiente</label>
+    <select id="asc-ambiente"><option value="sandbox">Sandbox (teste)</option><option value="producao">Produção (dinheiro de verdade)</option></select>
+    <div class="row" style="margin-top:14px">
+      <button class="btn sm" onclick="conectarAsaas()">${jaConectado?'Salvar nova chave':'Conectar'}</button>
+      <button class="btn sm ghost" onclick="formConectarAsaas(${jaConectado})">Cancelar</button></div>
+    <div class="msg" id="m-asc"></div></div>`;
+}
+async function conectarAsaas(){
+  const chave = ($('asc-chave').value||'').trim();
+  const ambiente = $('asc-ambiente').value;
+  const m = $('m-asc');
+  if(chave.length < 10){ m.textContent = 'Cole a chave completa do Asaas.'; m.className='msg err'; return; }
+  m.textContent = 'Validando com o Asaas…'; m.className = 'msg';
+  try{
+    const { data, error } = await sb.functions.invoke('asaas-conectar', {
+      body: { escola_id: ctx.escola, api_key: chave, ambiente },
+    });
+    if(error) throw new Error(data?.error || error.message || 'não consegui conectar');
+    m.textContent = 'Conectado ✓'; m.className='msg';
+    abrirPagamentos();
+  }catch(e){
+    m.textContent = 'Ops: ' + e.message; m.className = 'msg err';
+  }
+}
+async function verBloqueio(matId){
+  const slot = $('bq-'+matId); if(!slot) return;
+  if(slot.innerHTML){ slot.innerHTML=''; return; }
+  const { data: bloqueada } = await sb.rpc('matricula_bloqueada', { p_matricula: matId });
+  slot.innerHTML = bloqueada
+    ? `<div class="dica" style="margin-top:12px">${ic('bloqueado')} Esta matrícula está <b>bloqueada</b> por atraso.
+        <div style="margin-top:8px"><textarea id="jz-${matId}" rows="2" placeholder="Por que está desbloqueando agora? (obrigatório)"></textarea>
+        <button class="btn xs" style="margin-top:8px" onclick="desbloquearPagamento('${matId}')">Desbloquear</button></div>
+        <div class="msg" id="m-jz-${matId}"></div></div>`
+    : `<div class="hint" style="margin-top:10px">Sem bloqueio ativo nesta matrícula.</div>`;
+}
+async function desbloquearPagamento(matId){
+  const just = ($('jz-'+matId).value||'').trim();
+  const m = $('m-jz-'+matId);
+  if(just.length < 5){ m.textContent = 'Escreva a justificativa antes de desbloquear.'; m.className='msg err'; return; }
+  const { error } = await sb.rpc('desbloquear_pagamento', { p_matricula: matId, p_justificativa: just });
+  if(error){ m.textContent = 'Ops: '+error.message; m.className='msg err'; return; }
+  m.textContent = 'Desbloqueado ✓'; m.className='msg';
+  setTimeout(() => verBloqueio(matId), 800);
+}
+
+// ---------- meus pagamentos (aluno) ----------
+async function abrirMeusPagamentos(){
+  go('meus-pagamentos', { mundo:'aluno', chip:'Meus pagamentos' });
+  $('mp-crumb').innerHTML = esc(ctx.cursoNome) + ' › <b>Meus pagamentos</b>';
+  $('mp-lista').innerHTML = `<div class="card"><div class="skel" style="width:55%"></div></div>`;
+  const { data: mats } = await sb.from('matriculas').select('id').eq('pessoa_id', me.id);
+  const idsMat = (mats||[]).map(m=>m.id);
+  const { data: reais } = idsMat.length
+    ? await sb.from('cobrancas').select('id,tipo,status,valor_cents,vencimento,pago_em,url_pagamento,matricula_id').in('matricula_id', idsMat).order('vencimento', { ascending:false })
+    : { data: [] };
+  if(!reais?.length){
+    $('mp-lista').innerHTML = `<div class="card empty"><div class="big">${ic('moeda')}</div>
+      <b>Nada por aqui</b><p>Quando houver uma cobrança da escola, ela aparece nesta tela.</p></div>`;
+    return;
+  }
+  $('mp-lista').innerHTML = reais.map(c => `<div class="card">
+    <div class="row" style="justify-content:space-between;align-items:center">
+      <b>${c.tipo==='mensalidade'?'Mensalidade':'Matrícula'}</b>
+      <span class="pill ${c.status==='pago'?'ok':c.status==='atrasado'?'dgr':'warn'}">${STATUS_COB_L[c.status]||c.status}</span></div>
+    <div style="font-size:13px;color:var(--sub);margin-top:8px">${money(c.valor_cents)} · vencimento ${fmtData(c.vencimento)}</div>
+    ${c.status!=='pago' && c.url_pagamento ? `<a class="btn sm" style="margin-top:12px;text-decoration:none" href="${c.url_pagamento}" target="_blank" rel="noopener">Pagar agora</a>` : ''}
+  </div>`).join('');
 }
 
 // ---------- excluir turma (só admin) ----------
