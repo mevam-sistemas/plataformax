@@ -915,7 +915,14 @@ function mundo(m, chip){
   if(chip) $('ctx-chip').textContent = chip;
   const el = $('modo-sel');
   if(el){
-    const real = vincMap[ctx.escola]?.papel;
+    // dentro de uma escola, "real" é o papel de verdade nela. Fora dela (ex:
+    // tela Início, que lista várias escolas de uma vez) não existe um "ctx.escola"
+    // único — mas o "ver como" é um estado global, não preso a uma escola
+    // específica, então usa "essa pessoa é admin de alguma escola?" nesse caso.
+    // Sem isso, o crachá "Vendo como Aluno" sumia (e ficava impossível voltar
+    // pelo próprio crachá) assim que a simulação de aluno levava pro Início.
+    const real = ctx.escola ? vincMap[ctx.escola]?.papel
+      : (Object.values(vincMap).some(v => v.papel === 'admin') ? 'admin' : undefined);
     if(real === 'admin' && viewAs){
       el.textContent = 'Vendo como ' + PAPEL_L[viewAs];
     }else{
@@ -955,7 +962,9 @@ document.addEventListener('click', e => {
 });
 $('modo-sel').onclick = e => {
   e.stopPropagation();
-  if((vincMap[ctx.escola]?.papel) !== 'admin') return;
+  const real = ctx.escola ? vincMap[ctx.escola]?.papel
+    : (Object.values(vincMap).some(v => v.papel === 'admin') ? 'admin' : undefined);
+  if(real !== 'admin') return;
   const mn = $('modo-menu');
   if(mn.style.display !== 'none' && mn.innerHTML) mn.style.display = 'none';
   else abrirMenuVisao();
@@ -1100,7 +1109,10 @@ async function entrar(){
   if(p && (!p.cpf || !p.telefone)) return abrirPerfil(p);
 
   ctx.escola = null; ctx.escolaLogo = '';   // home lista várias escolas — nenhuma logo única faz sentido aqui
-  go('home', { mundo:'gestao', chip:'Início' });
+  // "gestao" por padrão, mas se está simulando "aluno" (ver como), mantém
+  // o modo visual como aluno mesmo aqui no Início — senão a cor/crachá
+  // ficava com cara de tela de gestão dentro da própria simulação de aluno.
+  go('home', { mundo: viewAs === 'aluno' ? 'aluno' : 'gestao', chip:'Início' });
   const nome = (p?.nome||'').split(' ')[0];
   const h = new Date().getHours();
   $('ola').textContent = (h<12?'Bom dia':h<18?'Boa tarde':'Boa noite') + (nome? ', '+nome : '') + '!';
@@ -1380,7 +1392,7 @@ async function abrirEscola(eid){
       .in('status',['pendente','aguardando_pagamento']).eq('turmas.cursos.escola_id', eid)
   ]);
 
-  if(podeVerPendencias && pend?.length){
+  if(podeGerir && pend?.length){
     $('es-pendencias').innerHTML = `<div class="card alerta">
       <div class="row" style="justify-content:space-between;align-items:center">
         <h3>${ic('relogio')} Esperando sua decisão</h3><span class="pill warn">${pend.length}</span></div>
