@@ -58,6 +58,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Inter
 .marca-g{display:flex;align-items:center;gap:10px}
 .marca-nome{font-size:19px;font-weight:800;letter-spacing:-.025em}
 .marca-nome i{font-style:normal;color:var(--marca)}
+/* logo da escola do aluno/equipe — acompanha a pessoa pelas telas de dentro
+   de uma escola, ao lado da marca MODOX (que é só a plataforma por baixo) */
+.marca-escola{width:28px;height:28px;border-radius:8px;object-fit:cover;flex:none;
+  border:1px solid var(--line);background:#fff}
 /* o modo em que a pessoa está — a marca nomeando a própria interface */
 .modo{font-size:11.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;
   color:var(--marca-esc);background:var(--marca-clr);border-radius:100px;padding:5px 11px;
@@ -477,6 +481,7 @@ h2 .ic,h3 .ic{width:.9em;height:.9em;margin-right:2px}
 <div class="top" id="topbar" style="display:none">
   <div class="top-in">
     <button class="brand" id="b-marca" title="Início"><svg class="marca-sig"><use href="#sig-modox"/></svg><span class="marca-nome">MODO<i>X</i></span></button>
+    <img class="marca-escola" id="marca-escola" alt="" style="display:none">
     <div class="modo-wrap" style="position:relative;flex:none">
       <button class="modo" id="modo-sel" type="button">Modo Aluno</button>
       <div class="modo-menu" id="modo-menu" style="display:none"></div>
@@ -611,6 +616,7 @@ h2 .ic,h3 .ic{width:.9em;height:.9em;margin-right:2px}
   <div class="crumb" id="es-crumb"></div>
   <h1 id="es-nome">Escola</h1>
   <p class="sub" id="es-sub"></p>
+  <div id="es-marca"></div>
   <div id="es-bloqueio"></div>
   <div id="es-cursos-bloco">
     <div id="es-pendencias"></div>
@@ -903,6 +909,16 @@ function mundo(m, chip){
     el.classList.toggle('simulando', !!(real === 'admin' && viewAs));
   }
   const mn = $('modo-menu'); if(mn) mn.style.display = 'none';
+  // logo da escola ao lado da marca MODOX — acompanha a pessoa por dentro
+  // de uma escola (pedido do Israel: "a logo... deve acompanhar todas as
+  // telas para uma personificação e identificação que a pessoa estuda
+  // num determinado lugar. modox é a plataforma")
+  const logoEl = $('marca-escola');
+  if(logoEl){
+    const key = m === 'publico' ? '' : ctx.escolaLogo;
+    if(key){ logoEl.src = capaUrl(key); logoEl.alt = 'Logo da escola'; logoEl.style.display = ''; }
+    else logoEl.style.display = 'none';
+  }
 }
 // admin master pode "ver como" aluno/professor/gestor pra entender a experiência
 // e as dificuldades de cada papel — pedido do Israel (02/08/2026). Nunca muda
@@ -1054,13 +1070,14 @@ async function entrar(){
   me = p || null;
   if(p && (!p.cpf || !p.telefone)) return abrirPerfil(p);
 
+  ctx.escola = null; ctx.escolaLogo = '';   // home lista várias escolas — nenhuma logo única faz sentido aqui
   go('home', { mundo:'gestao', chip:'Início' });
   const nome = (p?.nome||'').split(' ')[0];
   const h = new Date().getHours();
   $('ola').textContent = (h<12?'Bom dia':h<18?'Boa tarde':'Boa noite') + (nome? ', '+nome : '') + '!';
 
   const [{ data: vinc }, { data: mats }] = await Promise.all([
-    sb.from('vinculos').select('papel, escolas(id,nome,slug)').eq('ativo', true),
+    sb.from('vinculos').select('papel, escolas(id,nome,slug,logo_url)').eq('ativo', true),
     sb.from('matriculas').select('id,status,observacao,turma_id,turmas(id,nome,curso_id,cursos(id,titulo,descricao))')
       .eq('pessoa_id', p?.id || '00000000-0000-0000-0000-000000000000')
   ]);
@@ -1255,6 +1272,7 @@ async function abrirEscola(eid){
   ctx.escola = eid;
   const v = vincMap[eid];
   const papelEf = v && papelEfetivo(eid);
+  ctx.escolaLogo = v?.escola?.logo_url || '';
   go('escola', { mundo:'gestao', chip: v ? v.escola.nome : 'Escola' });
   $('es-crumb').innerHTML = 'Minhas escolas';
   $('es-nome').textContent = v ? v.escola.nome : 'Escola';
@@ -1262,6 +1280,7 @@ async function abrirEscola(eid){
     <b>escola → cursos → turmas → alunos</b>. Toque num curso para abrir o conteúdo e as turmas.`;
   const podeGerir = v && RANK[papelEf] >= RANK.gestor;
   const souAdminEscola = v && RANK[papelEf] >= RANK.admin;
+  montarMarcaEscola(eid, souAdminEscola);
   $('es-assinaturas').innerHTML = '';
   $('es-plano').innerHTML = '';
   $('es-bloqueio').innerHTML = '';
@@ -1541,9 +1560,10 @@ async function abrirCurso(cid, origem){
   $('cu-modulos').innerHTML = '<div class="card"><div class="skel" style="width:55%"></div></div>';
 
   const { data: curso } = await sb.from('cursos')
-    .select('id,titulo,descricao,escola_id,valor_cents,arquivado_em,config').eq('id', cid).single();
+    .select('id,titulo,descricao,escola_id,valor_cents,arquivado_em,config,escolas(logo_url)').eq('id', cid).single();
   if(!curso){ $('cu-titulo').textContent='Curso indisponível'; $('cu-modulos').innerHTML=''; return; }
   ctx.escola = curso.escola_id; ctx.cursoValor = curso.valor_cents || 0; ctx.cursoNome = curso.titulo;
+  ctx.escolaLogo = curso.escolas?.logo_url || vincMap[curso.escola_id]?.escola?.logo_url || '';
   const papel = papelEfetivo(curso.escola_id) || 'aluno';
   const souStaff = RANK[papel] >= RANK.gestor;
   ctx.souStaff = souStaff; ctx.podeAula = RANK[papel] >= RANK.professor;
@@ -2901,6 +2921,87 @@ async function comprimirCapa(file){
 const capaUrl = k => /^(https?:)?\/\//.test(k) || k.startsWith('/')
   ? k : SB_URL + '/storage/v1/object/public/capas/' + encodeURI(k);
 let capaPend = {};   // turma → blob ainda não enviado
+
+// ═══════════════ LOGO DA ESCOLA ═══════════════ (02/08/2026 — pedido do
+// Israel: a logo acompanha a pessoa em todas as telas de dentro da escola,
+// então precisa ficar nítida em miniatura pequena — por isso "contain" num
+// quadrado com fundo branco, em vez do recorte 16:10 da capa de curso.)
+const LOGO_LADO = 512, LOGO_PESO = 260*1024;
+async function comprimirLogo(file){
+  if(!/^image\//.test(file.type)) throw new Error('escolha um arquivo de imagem (JPG, PNG ou WEBP)');
+  const url = URL.createObjectURL(file);
+  try{
+    const img = await new Promise((res, rej) => { const i = new Image();
+      i.onload = () => res(i); i.onerror = () => rej(new Error('não consegui abrir essa imagem')); i.src = url; });
+    const c = document.createElement('canvas');
+    c.width = LOGO_LADO; c.height = LOGO_LADO;
+    const g = c.getContext('2d');
+    g.fillStyle = '#fff'; g.fillRect(0, 0, LOGO_LADO, LOGO_LADO);
+    const fator = Math.min(LOGO_LADO / img.width, LOGO_LADO / img.height);
+    const w = Math.round(img.width * fator), h = Math.round(img.height * fator);
+    g.drawImage(img, (LOGO_LADO - w) / 2, (LOGO_LADO - h) / 2, w, h);
+    // PNG primeiro (mantém transparência); se não coube no peso, cai pra JPEG
+    // em qualidade decrescente (perde transparência, mas cabe)
+    let blob = await new Promise(r => c.toBlob(r, 'image/png'));
+    if(!blob || blob.size > LOGO_PESO){
+      for(const q of [0.9, 0.8, 0.7, 0.6]){
+        blob = await new Promise(r => c.toBlob(r, 'image/jpeg', q));
+        if(blob && blob.size <= LOGO_PESO) break;
+      }
+    }
+    if(!blob?.size) throw new Error('não consegui processar essa imagem');
+    return blob;
+  } finally { URL.revokeObjectURL(url); }
+}
+function montarMarcaEscola(eid, souAdminEscola){
+  const slot = $('es-marca'); if(!slot) return;
+  const logo = ctx.escolaLogo;
+  if(!souAdminEscola){
+    slot.innerHTML = '';
+    return;
+  }
+  slot.innerHTML = logo
+    ? `<div class="row" style="align-items:center;gap:12px;margin:4px 0 6px">
+        <img src="${capaUrl(logo)}" alt="Logo da escola" style="width:44px;height:44px;border-radius:10px;
+          object-fit:cover;border:1px solid var(--line);background:#fff;flex:none">
+        <button class="btn xs ghost" onclick="escolherLogoEscola('${eid}')">Trocar logo</button>
+        <input type="file" accept="image/*" id="lg-input" style="display:none" onchange="enviarLogoEscola('${eid}',this.files[0])">
+        <div class="msg" id="lg-msg" style="text-align:left"></div>
+      </div>`
+    : `<div class="dica" style="margin:4px 0 16px">
+        ${ic('lampada')} <b>Sua escola ainda não tem uma logo.</b> Ela é obrigatória: aparece em todas as
+        telas de quem estuda ou trabalha aqui, no certificado e na página de inscrição — é o que faz a
+        pessoa sentir que está na sua escola, não só "no MODOX". Adicione agora.
+        <div style="margin-top:10px">
+          <button class="btn xs" onclick="escolherLogoEscola('${eid}')">Adicionar logo</button>
+          <input type="file" accept="image/*" id="lg-input" style="display:none" onchange="enviarLogoEscola('${eid}',this.files[0])">
+        </div>
+        <div class="msg" id="lg-msg" style="text-align:left"></div>
+      </div>`;
+}
+function escolherLogoEscola(eid){ $('lg-input').click(); }
+async function enviarLogoEscola(eid, file){
+  if(!file) return;
+  const msg = $('lg-msg');
+  msg.textContent = 'Processando imagem…'; msg.className = 'msg';
+  try{
+    const blob = await comprimirLogo(file);
+    const ext = blob.type === 'image/png' ? 'png' : 'jpg';
+    const key = `escolas/${eid}/logo-${Date.now().toString(36)}.${ext}`;
+    msg.textContent = 'Enviando…';
+    const { error } = await sb.storage.from('capas').upload(key, blob, { contentType: blob.type });
+    if(error) throw error;
+    const { error: eUpd } = await sb.from('escolas').update({ logo_url: key }).eq('id', eid);
+    if(eUpd) throw eUpd;
+    if(vincMap[eid]) vincMap[eid].escola.logo_url = key;
+    ctx.escolaLogo = key;
+    msg.textContent = 'Logo atualizada ✓'; msg.className = 'msg';
+    montarMarcaEscola(eid, true);
+    mundo(document.body.dataset.mundo);
+  }catch(e){
+    msg.textContent = 'Ops: ' + (e.message || 'não consegui salvar a logo agora'); msg.className = 'msg err';
+  }
+}
 
 async function formPagina(tid){
   const slot = $('fp-'+tid); if(!slot) return;
