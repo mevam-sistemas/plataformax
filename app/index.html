@@ -953,10 +953,19 @@ function abrirMenuVisao(){
 function definirVisao(p){
   viewAs = p === 'admin' ? null : p;
   $('modo-menu').style.display = 'none';
-  if(ctx.aula && $('s-aula')?.classList.contains('on')) abrirAula(ctx.aula);
-  else if(ctx.curso && $('s-curso')?.classList.contains('on')) abrirCurso(ctx.curso, ctx.origem);
-  else if(ctx.escola) abrirEscola(ctx.escola);   // cobre tanto a escola quanto telas só-de-gestão
-                                                    // (equipe, turmas etc.) que não fariam sentido no papel simulado
+  // se está numa aula/curso, mantém a pessoa ali — é o caso de uso principal
+  // ("como fica esta aula pros olhos de um aluno?") — abrirAula/abrirCurso já
+  // respeitam papelEfetivo() e escondem o que é só de staff corretamente.
+  if(ctx.aula && $('s-aula')?.classList.contains('on')) return abrirAula(ctx.aula);
+  if(ctx.curso && $('s-curso')?.classList.contains('on')) return abrirCurso(ctx.curso, ctx.origem);
+  // fora de uma aula/curso: "aluno" nunca vê tela de gestão (escola/equipe/
+  // turmas nem existem pra ele de verdade) — manda pro início, igual um aluno
+  // de verdade veria. Corrige o vazamento que o Israel pegou: pendências de
+  // aprovação e perguntas dos alunos apareciam mesmo "vendo como Aluno" na
+  // tela da escola.
+  if(p === 'aluno'){ entrar(); return; }
+  if(ctx.escola) abrirEscola(ctx.escola);   // cobre tanto a escola quanto telas só-de-gestão
+                                               // (equipe, turmas etc.) que não fariam sentido no papel simulado
   else mundo(document.body.dataset.mundo);
 }
 function go(s, opts){
@@ -1085,7 +1094,10 @@ async function entrar(){
   (vinc||[]).forEach(v => { const e = v.escolas; if(!e) return;
     if(!(e.id in vincMap) || RANK[v.papel] > RANK[vincMap[e.id].papel]) vincMap[e.id] = {papel:v.papel, escola:e}; });
 
-  const gestao = Object.values(vincMap).filter(v => RANK[v.papel] >= RANK.professor);
+  // usa papelEfetivo (não v.papel puro) pra "vendo como Aluno" também esconder
+  // esta seção — sem isso um admin simulando aluno via ainda via "Minhas escolas"
+  // com pendências de aprovação, o que o Israel pegou no ar.
+  const gestao = Object.values(vincMap).filter(v => RANK[papelEfetivo(v.escola.id)] >= RANK.professor);
   // quem foi desligado deixa de ver o curso aqui — o histórico continua guardado na escola
   const estudos = (mats||[]).filter(m => m.turmas?.cursos && m.status !== 'desligada');
   $('ola-sub').textContent = estudos.length && gestao.length
@@ -1280,6 +1292,7 @@ async function abrirEscola(eid){
     <b>escola → cursos → turmas → alunos</b>. Toque num curso para abrir o conteúdo e as turmas.`;
   const podeGerir = v && RANK[papelEf] >= RANK.gestor;
   const souAdminEscola = v && RANK[papelEf] >= RANK.admin;
+  const podeVerPendencias = v && RANK[papelEf] >= RANK.professor;
   montarMarcaEscola(eid, souAdminEscola);
   $('es-assinaturas').innerHTML = '';
   $('es-plano').innerHTML = '';
@@ -1338,7 +1351,7 @@ async function abrirEscola(eid){
       .in('status',['pendente','aguardando_pagamento']).eq('turmas.cursos.escola_id', eid)
   ]);
 
-  if(pend?.length){
+  if(podeVerPendencias && pend?.length){
     $('es-pendencias').innerHTML = `<div class="card alerta">
       <div class="row" style="justify-content:space-between;align-items:center">
         <h3>${ic('relogio')} Esperando sua decisão</h3><span class="pill warn">${pend.length}</span></div>
@@ -1356,8 +1369,8 @@ async function abrirEscola(eid){
     carregarFotos();
   }
 
-  // ---- perguntas de aluno esperando resposta
-  const { data: perg } = await sb.rpc('perguntas_pendentes', { p_escola: eid });
+  // ---- perguntas de aluno esperando resposta (só quem responde: professor+)
+  const { data: perg } = podeVerPendencias ? await sb.rpc('perguntas_pendentes', { p_escola: eid }) : { data:null };
   if(perg?.length){
     $('es-pendencias').innerHTML += `<div class="card alerta">
       <div class="row" style="justify-content:space-between;align-items:center">
