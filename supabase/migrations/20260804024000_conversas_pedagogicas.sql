@@ -71,11 +71,22 @@ returns boolean language sql immutable set search_path=public as $function$
   select coalesce(p_texto,'') ~* '([[:alnum:]._%+-]+@[[:alnum:].-]+\.[[:alpha:]]{2,}|https?://|www\.|wa\.me|whats(app)?|telegram|instagram|(^|[^0-9])([0-9][ ()+.-]*){8,}([^0-9]|$))'
 $function$;
 
+create or replace function public.pode_ver_foto_perfil(caminho text)
+returns boolean language sql stable security definer set search_path=public as $function$
+  select exists(select 1 from pessoas alvo where alvo.foto_url=caminho and(
+    alvo.id=pessoa_atual()
+    or exists(select 1 from vinculos va join vinculos leitor on leitor.escola_id=va.escola_id
+      where va.pessoa_id=alvo.id and va.ativo and leitor.pessoa_id=pessoa_atual() and leitor.ativo and leitor.papel in('professor','gestor','admin'))
+    or exists(select 1 from matriculas ma join matriculas ml on ml.turma_id=ma.turma_id
+      where ma.pessoa_id=alvo.id and ma.status in('ativa','concluida') and ml.pessoa_id=pessoa_atual() and ml.status in('ativa','concluida'))
+  ))
+$function$;
+
 create or replace function public.ranking_turma(p_turma uuid)
 returns table(nome text,foto_url text,pontos integer,aulas integer,eu boolean)
 language sql stable security definer set search_path=public as $function$
   select case when p.id=pessoa_atual() then p.nome else nome_colega(p.nome) end,
-    case when na_turma(p_turma) and p.id<>pessoa_atual() then null else p.foto_url end,
+    p.foto_url,
     coalesce(g.pontos,0),
     (select count(*)::int from progresso pr join aulas a on a.id=pr.aula_id join modulos mo on mo.id=a.modulo_id join turmas t2 on t2.curso_id=mo.curso_id
       where pr.pessoa_id=p.id and pr.concluida_em is not null and t2.id=p_turma),p.id=pessoa_atual()
@@ -207,9 +218,10 @@ select coalesce(jsonb_agg(jsonb_build_object('id',id,'turma_id',turma_id,'aula_i
   'minha',criada_por=(select pid from eu),'nao_lida',nao_lida,'criado_em',criado_em,'ultima_em',ultima_em,'mensagens',coalesce(mensagens,'[]'::jsonb)) order by ultima_em desc),'[]'::jsonb) from dados
 $function$;
 
+drop function if exists public.colegas_turma(uuid);
 create or replace function public.colegas_turma(p_turma uuid)
-returns table(nome text) language sql stable security definer set search_path=public as $function$
-  select nome_colega(p.nome) from matriculas m join pessoas p on p.id=m.pessoa_id
+returns table(nome text,foto_url text) language sql stable security definer set search_path=public as $function$
+  select nome_colega(p.nome),p.foto_url from matriculas m join pessoas p on p.id=m.pessoa_id
   where m.turma_id=p_turma and m.status in ('ativa','concluida')
     and exists(select 1 from matriculas eu where eu.turma_id=p_turma and eu.pessoa_id=pessoa_atual() and eu.status in ('ativa','concluida'))
   order by p.nome

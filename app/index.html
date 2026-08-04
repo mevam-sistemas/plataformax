@@ -431,7 +431,8 @@ h2 .ic,h3 .ic{width:.9em;height:.9em;margin-right:2px}
 .conversa-msgs{padding:14px 16px}.conversa-msg{max-width:78%;margin:8px 0;padding:10px 12px;border-radius:14px;background:var(--bg)}
 .conversa-msg.minha{margin-left:auto;background:var(--accent-soft)}.conversa-msg b{font-size:12px;display:block;margin-bottom:3px}
 .conversa-msg small{display:block;color:var(--sub);font-size:11.5px;margin-top:5px}.conversa-msg audio{width:100%;margin-top:7px}
-.colegas{display:flex;gap:7px;flex-wrap:wrap}.colega{padding:6px 10px;border-radius:100px;background:var(--bg);font-size:12.5px;font-weight:650}
+.colegas{display:flex;gap:7px;flex-wrap:wrap}.colega{padding:5px 10px 5px 5px;border-radius:100px;background:var(--bg);font-size:12.5px;font-weight:650;display:inline-flex;align-items:center;gap:7px}
+.colega img,.colega .mini-av{width:25px;height:25px;border-radius:50%;object-fit:cover;background:var(--accent-soft);display:inline-flex;align-items:center;justify-content:center}
 /* ---------- rodapé: Brasil + Arbor Labs ---------- */
 .pe-pagina{max-width:1180px;margin:56px auto 0;padding:26px 22px 40px;border-top:1px solid var(--line);
   display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
@@ -890,7 +891,9 @@ h2 .ic,h3 .ic{width:.9em;height:.9em;margin-right:2px}
   <button class="btn link" data-back="home">‹ Voltar</button>
   <div class="crumb">Atualizações do software</div><h1>O que mudou no MODOX</h1>
   <p class="sub">As versões registram melhorias, correções e novas funcionalidades publicadas.</p>
-  <div class="card"><span class="pill marca">Versão 1.3.0</span><h3 style="margin-top:12px">Comunicação e acompanhamento das turmas</h3>
+  <div class="card"><span class="pill marca">Versão 1.3.1</span><h3 style="margin-top:12px">Identidade dos colegas da turma</h3>
+    <p style="font-size:14px;color:var(--sub);line-height:1.7">Alunos da mesma turma podem ver as fotos de perfil uns dos outros; nomes continuam abreviados e dados de contato permanecem privados.</p></div>
+  <div class="card"><span class="pill mute">Versão 1.3.0</span><h3 style="margin-top:12px">Comunicação e acompanhamento das turmas</h3>
     <p style="font-size:14px;color:var(--sub);line-height:1.7">Painéis por papel, participação dos alunos, perguntas públicas e privadas, conversas com professor ou gestão, áudio, anexos, pendências e identidade visual da instituição.</p></div>
   <div class="card"><span class="pill mute">Versão 1.2.0</span><h3 style="margin-top:12px">Painel direto da instituição</h3>
     <p style="font-size:14px;color:var(--sub);line-height:1.7">Entrada direta na escola, resumo operacional, pendências reais de logo, professor e matrículas, além de melhorias responsivas.</p></div>
@@ -3384,12 +3387,13 @@ async function montarResumoComunidade(turmaId){
     <div class="row" style="justify-content:space-between;align-items:flex-start">
       <div><h3>${ic('pessoas')} Minha turma</h3><div style="font-size:13px;color:var(--sub)">${esc(ctx.minhaTurmaNome||'Turma')} · somente nomes são mostrados aos alunos</div></div>
       ${naoLidas?`<span class="pill warn">${naoLidas} nova${naoLidas===1?'':'s'}</span>`:''}</div>
-    <div class="colegas" style="margin-top:13px">${(colegas||[]).map(c=>`<span class="colega">${esc(c.nome)}</span>`).join('')}</div>
+    <div class="colegas" style="margin-top:13px">${(colegas||[]).map(renderColega).join('')}</div>
     <div class="row" style="margin-top:16px;flex-wrap:wrap">
       <button class="btn sm" onclick="abrirConversas('${turmaId}',null,'curso')">Perguntas e conversas</button>
       <button class="btn sm ghost" onclick="abrirConversas('${turmaId}',null,'curso','gestao')">Perguntar à gestão</button></div>
     <div class="hint" style="margin-top:12px">Perguntas públicas podem ser acompanhadas pela turma. Perguntas privadas aparecem apenas para você e o destinatário.</div>
   </div>`;
+  carregarFotos();
 }
 
 async function montarConversasAula(aid){
@@ -3417,11 +3421,13 @@ async function abrirConversas(turmaId,foco,origem,destino,aulaId){
   $('cv-colegas').innerHTML='';
   if(souAluno&&turmaId){
     const {data:colegas}=await sb.rpc('colegas_turma',{p_turma:turmaId});
-    $('cv-colegas').innerHTML=`<div class="card"><b>Quem está na sua turma</b><div class="colegas" style="margin-top:10px">${(colegas||[]).map(c=>`<span class="colega">${esc(c.nome)}</span>`).join('')}</div>
-      <div class="hint" style="margin-top:10px">Por privacidade, alunos veem somente o primeiro nome e a inicial seguinte.</div></div>`;
+    $('cv-colegas').innerHTML=`<div class="card"><b>Quem está na sua turma</b><div class="colegas" style="margin-top:10px">${(colegas||[]).map(renderColega).join('')}</div>
+      <div class="hint" style="margin-top:10px">Alunos veem a foto, o primeiro nome e a inicial seguinte — nenhum dado de contato.</div></div>`;
+    carregarFotos();
   }
   await carregarConversas();
 }
+function renderColega(c){return `<span class="colega">${c.foto_url?`<img data-foto="${esc(c.foto_url)}" alt="">`:`<span class="mini-av">${esc((c.nome||'A')[0])}</span>`}${esc(c.nome)}</span>`;}
 function formNovaConversa(){
   return `<div class="card" style="margin:16px 0"><h3>Fazer uma pergunta</h3>
     <label>Para quem</label><div class="seg" id="cv-dest">

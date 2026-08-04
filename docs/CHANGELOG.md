@@ -4,6 +4,12 @@ Este arquivo registra mudanças publicadas no produto. A versão segue o formato
 `MAIOR.MENOR.CORREÇÃO`: incompatibilidade, funcionalidade e correção,
 respectivamente.
 
+## 1.3.1 — 2026-08-04
+
+- Alunos da mesma turma podem ver as fotos de perfil uns dos outros.
+- Nomes continuam abreviados e nenhum dado de contato é compartilhado entre alunos.
+- Política do Storage autoriza a foto somente para colegas com matrícula ativa na mesma turma.
+
 ## 1.3.0 — 2026-08-04
 
 - Painéis de turma com alunos interagindo, sem interação, progresso e último contato.
