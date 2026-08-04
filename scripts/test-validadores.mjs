@@ -41,3 +41,11 @@ for (const contrato of [
   if (!headers.includes(contrato)) throw new Error(`Cabeçalho de segurança ausente: ${contrato}`);
 }
 console.log('✓ cabeçalhos de segurança obrigatórios presentes');
+
+for (const caminho of ['/app/sw.js', '/app/version.js']) {
+  const bloco = headers.match(new RegExp(`${caminho.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\n([\\s\\S]*?)(?=\\n\\S|$)`))?.[1] || '';
+  if (!bloco.includes('Cache-Control: no-cache, no-store, must-revalidate')) {
+    throw new Error(`Cache de atualização não desativado em ${caminho}`);
+  }
+}
+console.log('✓ service worker e versão não ficam presos no cache da CDN');

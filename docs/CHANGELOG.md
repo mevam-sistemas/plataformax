@@ -4,6 +4,11 @@ Este arquivo registra mudanças publicadas no produto. A versão segue o formato
 `MAIOR.MENOR.CORREÇÃO`: incompatibilidade, funcionalidade e correção,
 respectivamente.
 
+## 1.4.3 — 2026-08-04
+
+- O arquivo canônico de versão deixa de permanecer no cache da CDN, permitindo que o PWA reconheça a publicação nova imediatamente.
+- A validação do release passa a exigir cache desativado tanto no service worker quanto na fonte de versão.
+
 ## 1.4.2 — 2026-08-04
 
 - Política de Segurança de Conteúdo passa a limitar scripts, conexões, imagens, mídias, quadros e formulários aos serviços usados pelo MODOX.
