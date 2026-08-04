@@ -17,9 +17,29 @@ Deno.serve(async req=>{
     admin.from('escolas').select('nome').eq('id',escola_id).single()
   ]);
   if(!pessoa?.email)return json({error:'cadastro sem e-mail'},400);
-  const tipo=pessoa.auth_user_id?'recovery':'invite';
+  let authUid=pessoa.auth_user_id as string|null;
+  if(!authUid){
+    const {data:usuarios,error:erroUsuarios}=await admin.auth.admin.listUsers({page:1,perPage:1000});
+    if(erroUsuarios)return json({error:'não foi possível conferir o acesso existente'},502);
+    const existente=(usuarios?.users||[]).find((u:any)=>String(u.email||'').toLowerCase()===String(pessoa.email).toLowerCase());
+    if(existente){
+      authUid=existente.id;
+      const {error:erroVinculo}=await admin.from('pessoas').update({auth_user_id:authUid}).eq('id',pessoa.id).is('auth_user_id',null);
+      if(erroVinculo)return json({error:'não foi possível vincular o acesso ao cadastro'},502);
+    }
+  }
+  const tipo=authUid?'recovery':'invite';
   const {data:link,error}=await admin.auth.admin.generateLink({type:tipo,email:pessoa.email,options:{redirectTo:'https://modox.com.br/app/',data:{nome:pessoa.nome,origem:'equipe_modox',papel}}});
   if(error||!link?.properties?.action_link)return json({error:error?.message||'não foi possível criar o acesso'},400);
+  if(tipo==='invite'){
+    const novoUid=link.user?.id;
+    if(!novoUid)return json({error:'o acesso foi criado sem identificação'},502);
+    const {error:erroVinculo}=await admin.from('pessoas').update({auth_user_id:novoUid}).eq('id',pessoa.id).is('auth_user_id',null);
+    if(erroVinculo){
+      await admin.auth.admin.deleteUser(novoUid).catch(()=>{});
+      return json({error:'não foi possível vincular o acesso ao cadastro'},502);
+    }
+  }
   const professor=papel==='professor';
   const titulo=professor?`Professor(a) ${esc(pessoa.nome.split(/\s+/)[0])}, sua sala no MODOX está pronta`:`Seu acesso à gestão de ${esc(escola?.nome||'sua instituição')} está pronto`;
   const texto=professor

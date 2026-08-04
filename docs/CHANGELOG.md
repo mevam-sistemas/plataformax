@@ -4,6 +4,13 @@ Este arquivo registra mudanças publicadas no produto. A versão segue o formato
 `MAIOR.MENOR.CORREÇÃO`: incompatibilidade, funcionalidade e correção,
 respectivamente.
 
+## 1.4.1 — 2026-08-04
+
+- Convite de professor, gestor ou administrador passa a vincular o UID criado no Supabase ao cadastro da pessoa antes do primeiro acesso.
+- Contas de autenticação já existentes são localizadas pelo e-mail e ligadas ao cadastro correto.
+- Em caso de falha no vínculo de um convite novo, o usuário órfão é removido e nenhum e-mail quebrado é enviado.
+- Textos da equipe passam a descrever corretamente o acesso por e-mail e senha.
+
 ## 1.4.0 — 2026-08-04
 
 - Instituição e módulos podem ser renomeados; cursos, aulas e turmas mantêm seus editores.

@@ -716,7 +716,7 @@ h2 .ic,h3 .ic{width:.9em;height:.9em;margin-right:2px}
   <div class="crumb" id="eq-crumb"></div>
   <h1>Equipe e acessos</h1>
   <p class="sub">Quem trabalha nesta escola, o que cada um pode fazer, e qual turma cada professor conduz.
-    Ninguém precisa de senha: o acesso é por código enviado no e-mail cadastrado.</p>
+    Cada pessoa recebe um link pessoal para criar a senha e entrar com o e-mail cadastrado.</p>
   <div id="eq-corpo"><div class="card"><div class="skel" style="width:55%"></div></div></div>
 </section>
 
@@ -2523,8 +2523,8 @@ async function abrirEquipe(){
         <div style="font-size:13.5px;color:var(--sub);line-height:1.65;margin-top:8px">${PAPEL_EXPL[k]}</div>
       </div>`).join('')}
     </div>
-    <div class="dica" style="margin-top:20px">${ic('cadeado')} O acesso é sempre pelo e-mail cadastrado, com código de
-      uso único. Não existe senha para vazar. Se alguém sair da escola, tire o acesso aqui e no mesmo
+    <div class="dica" style="margin-top:20px">${ic('cadeado')} O acesso é sempre pelo e-mail cadastrado e uma senha pessoal.
+      Se alguém sair da escola, tire o acesso aqui e no mesmo
       instante ele deixa de ver qualquer coisa — o histórico do que ele fez continua registrado.</div>`;
 }
 function formEquipe(){
@@ -2533,8 +2533,8 @@ function formEquipe(){
   slot.innerHTML = `<div class="inline" style="margin-top:14px">
     <b style="font-size:14.5px">Cadastrar alguém na equipe</b>
     <div style="font-size:13px;color:var(--sub);margin:6px 0 2px;line-height:1.6">
-      Você só precisa do nome e do e-mail. Ele entra na plataforma pedindo um código nesse e-mail —
-      sem senha, sem convite para aceitar.</div>
+      Você só precisa do nome e do e-mail. A pessoa recebe um link pessoal para criar a senha e
+      entrar diretamente no painel adequado ao papel dela.</div>
     <label>Nome</label>
     <input id="eqf-nome" placeholder="Ex.: Maria Fernandes">
     <label>E-mail</label>
