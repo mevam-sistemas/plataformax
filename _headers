@@ -9,5 +9,8 @@
 /app/sw.js
   Cache-Control: no-cache, no-store, must-revalidate
 
+/app/version.js
+  Cache-Control: no-cache, no-store, must-revalidate
+
 /app/manifest.webmanifest
   Cache-Control: no-cache, must-revalidate
