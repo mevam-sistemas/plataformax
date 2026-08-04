@@ -4,6 +4,17 @@ Este arquivo registra mudanças publicadas no produto. A versão segue o formato
 `MAIOR.MENOR.CORREÇÃO`: incompatibilidade, funcionalidade e correção,
 respectivamente.
 
+## 1.1.0 — 2026-08-04
+
+- Primeiro acesso direcionado a diretores e responsáveis pela contratação.
+- Alunos passam a entrar exclusivamente por convite ou link de inscrição.
+- Cadastro da escola com escolha PF/PJ, validação de CPF/CNPJ e logo obrigatória.
+- Foto privada de perfil para direção, professores, secretaria e alunos, com
+  captura pelo celular, limite de 12 MB e compressão para aproximadamente 320 KB.
+- Permissões do Storage corrigidas para o dono e a equipe autorizada da escola.
+- Interface de gestão atualizada para uma identidade mais sóbria, quente e
+  alinhada ao laranja da marca, reduzindo o azul e refinando botões e destaques.
+
 ## 1.0.0 — 2026-08-03
 
 - Aplicativo instalável como PWA em celular, tablet e computador.

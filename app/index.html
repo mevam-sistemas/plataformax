@@ -16,8 +16,8 @@
    PLATAFORMAX — sistema de design
    3 mundos com identidade própria, pra você sempre saber onde está:
    • aluno    → verde esmeralda  (estudar: calmo, acolhedor)
-   • gestao   → azul             (administrar: claro, objetivo)
-   • publico  → violeta          (inscrição: convite, boas-vindas)
+   • gestao   → terracota        (administrar: sóbrio, humano)
+   • publico  → laranja          (inscrição: convite, boas-vindas)
    ============================================================ */
 :root{
   --ink:#141416; --sub:#6b6b73; --line:#e7e7ee; --card:#fff;
@@ -25,22 +25,22 @@
   --r-sm:12px; --r-md:16px; --r-lg:22px; --r-xl:28px;
   --sh-1:0 1px 2px rgba(20,20,30,.05), 0 1px 3px rgba(20,20,30,.04);
   --sh-2:0 4px 16px rgba(20,20,40,.07);
-  --accent:#0066f5; --accent-soft:#eaf1ff; --accent-ink:#0047ad;
+  --accent:#c8500c; --accent-soft:#fff1e6; --accent-ink:#8f3907;
   --bg:#f5f6f8; --tint:#ffffff;
   /* laranja da marca — o fio condutor que atravessa os três mundos */
   --marca:#f26a1b; --marca-esc:#c8500c; --marca-clr:#fff1e6;
 }
 body[data-mundo="aluno"]{ --accent:#0d9668; --accent-soft:#e4f6ee; --accent-ink:#046646;
   --bg:#f4f7f5; --tint:#f9fdfa; }
-body[data-mundo="gestao"]{ --accent:#0f62e6; --accent-soft:#e8f0ff; --accent-ink:#0a409c;
-  --bg:#f4f6fa; --tint:#fafbff; }
+body[data-mundo="gestao"]{ --accent:#a94712; --accent-soft:#fff0e6; --accent-ink:#71300d;
+  --bg:#f7f5f2; --tint:#fcfaf7; }
 /* O mundo "público" é a porta de entrada e as páginas que o candidato vê antes
    de existir conta: é onde a marca precisa aparecer. Por isso ele usa o laranja,
    e não uma cor de mundo. O tom é o escuro da marca (#c8500c) porque o laranja
    vivo com texto branco fica em 3:1 de contraste — bonito no monitor, ruim no
    celular no sol. Este passa em 4,5:1. */
 body[data-mundo="publico"]{ --accent:#c8500c; --accent-soft:#fff1e6; --accent-ink:#8f3907;
-  --bg:#f6f5fb; --tint:#fbfaff; }
+  --bg:#faf8f5; --tint:#fffdf9; }
 
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{-webkit-text-size-adjust:100%}
@@ -156,16 +156,16 @@ input[type=date]::-webkit-calendar-picker-indicator:hover{opacity:1}
 
 /* ---------- botões ---------- */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--accent);color:#fff;
-  border:0;border-radius:100px;padding:14px 22px;font-size:15.5px;font-weight:650;cursor:pointer;
-  font-family:inherit;transition:transform .12s,filter .15s;box-shadow:var(--sh-1)}
-.btn:hover{filter:brightness(1.07)}
+  border:0;border-radius:12px;padding:13px 20px;font-size:15px;font-weight:720;cursor:pointer;
+  font-family:inherit;transition:transform .12s,filter .15s,box-shadow .15s;box-shadow:0 2px 7px rgba(75,42,24,.12)}
+.btn:hover{filter:brightness(1.04);box-shadow:0 4px 12px rgba(75,42,24,.16)}
 .btn:active{transform:scale(.985)}
 .btn[disabled]{opacity:.5;cursor:default}
 .btn.w{width:100%;margin-top:22px}
 .btn.ghost{background:transparent;color:var(--accent);box-shadow:none;border:1.5px solid var(--line)}
 .btn.ghost:hover{border-color:var(--accent);background:var(--accent-soft)}
 .btn.link{background:none;color:var(--accent);box-shadow:none;padding:10px 4px}
-.btn.sm{padding:8px 15px;font-size:13.5px}
+.btn.sm{padding:9px 14px;font-size:13.5px}
 .btn.xs{padding:6px 11px;font-size:12.5px;border-radius:9px}
 .btn.dgr{color:var(--danger)}
 .btn.dgr:hover{background:#fdeeee;border-color:#f6c9ca}
@@ -178,7 +178,7 @@ input[type=date]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .card.tap:hover{box-shadow:var(--sh-2);border-color:#d9d9e6;transform:translateY(-1px)}
 .card.alerta{border:1.5px solid #ffdca8;background:var(--warn-bg)}
 .card.arq{opacity:.7;background:#fbfbfc}
-.hero{background:linear-gradient(135deg,var(--accent-ink),var(--accent) 78%);color:#fff;
+.hero{background:linear-gradient(135deg,#292623,#3c352f 72%,var(--accent));color:#fff;
   border-radius:var(--r-xl);padding:26px;box-shadow:var(--sh-2);position:relative;overflow:hidden}
 .hero>*{position:relative;z-index:1}
 .hero .e{font-size:11.5px;font-weight:800;letter-spacing:.09em;color:#ffd0ad}
@@ -191,6 +191,17 @@ input[type=date]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .empty b{font-size:17px;display:block;margin-bottom:7px}
 .empty p{font-size:14px;color:var(--sub);line-height:1.65;max-width:44ch;margin:0 auto}
 .empty .btn{margin-top:20px}
+
+/* foto e identidade: o mesmo padrão serve para gestor, professor, secretaria
+   e aluno; muda o contexto, não o componente. */
+.foto-campo{display:flex;align-items:center;gap:14px;padding:14px;border:1px solid var(--line);
+  border-radius:var(--r-lg);background:var(--tint);margin-top:6px}
+.foto-preview{width:76px;height:76px;border-radius:20px;object-fit:cover;flex:none;background:#fff;
+  border:1px solid var(--line);display:grid;place-items:center;color:var(--sub)}
+.foto-preview .ic{width:30px;height:30px}
+.foto-campo .foto-acoes{min-width:0;flex:1}
+.foto-campo input[type=file]{margin-top:7px}
+@media(max-width:520px){.foto-campo{align-items:flex-start}.foto-preview{width:64px;height:64px;border-radius:18px}}
 
 /* ---------- ícones (substituem os emojis) ---------- */
 .ic{width:1em;height:1em;flex:none;vertical-align:-0.14em;stroke:currentColor}
@@ -530,7 +541,7 @@ h2 .ic,h3 .ic{width:.9em;height:.9em;margin-right:2px}
     <button class="btn link" data-back="email-login">‹ Já tenho conta</button>
     <div class="brand marca-g" style="font-size:22px;margin-bottom:26px"><svg class="marca-sig" style="width:32px;height:32px"><use href="#sig-modox"/></svg><span class="marca-nome" style="font-size:23px">MODO<i>X</i></span></div>
     <h1>Criar sua conta</h1>
-    <p class="sub">Sete dias grátis pra testar de verdade. Depois de criar a conta, você preenche seu cadastro completo (é o seu prontuário — vale pra sempre, em qualquer escola ou curso).</p>
+    <p class="sub">Crie seu acesso de diretor ou responsável. Depois você cadastra a escola, a empresa ou o curso e começa sete dias grátis — sem cartão.</p>
     <label>Seu nome</label>
     <input id="cc-nome" type="text" autocomplete="name" placeholder="Como você quer ser chamado?">
     <label>Seu e-mail</label>
@@ -560,7 +571,16 @@ h2 .ic,h3 .ic{width:.9em;height:.9em;margin-right:2px}
   <div class="col">
     <div class="crumb">Seu prontuário</div>
     <h1>Complete seu cadastro</h1>
-    <p class="sub">Preenche uma vez e vale pra sempre, em qualquer escola ou curso da plataforma.</p>
+    <p class="sub">Esses são os seus dados pessoais de acesso. Depois você cadastra separadamente a escola ou empresa, como pessoa física ou jurídica.</p>
+    <label>Sua foto</label>
+    <div class="foto-campo">
+      <div class="foto-preview" id="pf-foto-preview"></div>
+      <div class="foto-acoes">
+        <b>Foto de perfil</b>
+        <div class="hint" style="margin:2px 0 0">Vale para diretores, professores, secretaria e alunos. No celular, você pode tirar a foto na hora.</div>
+        <input id="pf-foto" type="file" accept="image/*" capture="user">
+      </div>
+    </div>
     <label>Nome completo</label>
     <input id="pf-nome" autocomplete="name">
     <label>CPF</label>
@@ -605,13 +625,22 @@ h2 .ic,h3 .ic{width:.9em;height:.9em;margin-right:2px}
     <label>Nome da escola</label>
     <input id="en-nome" placeholder="Ex.: Escola de Música Villa">
     <div class="hint">É esse nome que seus alunos vão ver no convite de inscrição e no certificado.</div>
+    <label>Logo da escola</label>
+    <div class="foto-campo">
+      <div class="foto-preview" id="en-logo-preview"><span style="font-size:12px;font-weight:700">LOGO</span></div>
+      <div class="foto-acoes">
+        <b>Identidade da instituição</b>
+        <div class="hint" style="margin:2px 0 0">JPG, PNG ou WEBP. A imagem será reduzida e compactada automaticamente.</div>
+        <input id="en-logo" type="file" accept="image/*">
+      </div>
+    </div>
     <div class="abas" id="en-tipo">
       <button class="on" data-t="pj">Pessoa jurídica</button>
       <button data-t="pf">Pessoa física</button>
     </div>
     <label id="en-doc-label">CNPJ</label>
     <input id="en-doc" inputmode="numeric" placeholder="Só números">
-    <button class="btn w" id="b-criar-escola">Criar escola</button>
+    <button class="btn w" id="b-criar-escola">Criar minha escola</button>
     <div class="msg c" id="m-en"></div>
   </div>
 </section>
@@ -1067,7 +1096,7 @@ $('b-criar-conta').onclick = async () => {
   if(senha.length < 6){ erro('m-cc','A senha precisa de pelo menos 6 caracteres.'); return; }
   $('b-criar-conta').disabled = true; info('m-cc','Criando sua conta…');
   const { data, error } = await sb.auth.signUp({ email, password: senha,
-    options: { data: { nome }, emailRedirectTo: location.origin + location.pathname } });
+    options: { data: { nome, origem:'cliente_gestor' }, emailRedirectTo: location.origin + location.pathname } });
   $('b-criar-conta').disabled = false;
   if(error){ erro('m-cc', error.message?.includes('already registered') || error.code === 'user_already_exists'
     ? 'Esse e-mail já tem conta — toque em "Já tenho conta" ali em cima.' : 'Ops: '+error.message); return; }
@@ -1095,7 +1124,7 @@ $('t-sair').onclick = async () => { await sb.auth.signOut(); me=null; mundo('pub
 $('t-inicio').onclick = () => entrar();
 $('b-marca').onclick = () => entrar();
 $('t-cadastro').onclick = async () => {
-  const { data: p } = await sb.from('pessoas').select('id,nome,cpf,telefone,nascimento,endereco').eq('id', me.id).single();
+  const { data: p } = await sb.from('pessoas').select('id,nome,cpf,telefone,nascimento,endereco,foto_url').eq('id', me.id).single();
   abrirPerfil(p || me);
 };
 document.querySelectorAll('[data-back]').forEach(b => b.onclick = () => {
@@ -1118,7 +1147,7 @@ async function entrar(){
     go('email'); erro('m1','Confirme seu e-mail antes de entrar — veja o link que te mandamos.'); return;
   }
   const { data: p } = await sb.from('pessoas')
-    .select('id,nome,cpf,telefone,nascimento,endereco').eq('auth_user_id', user.id).single();
+    .select('id,nome,cpf,telefone,nascimento,endereco,foto_url').eq('auth_user_id', user.id).single();
   me = p || null;
   if(p && (!p.cpf || !p.telefone)) return abrirPerfil(p);
 
@@ -1149,7 +1178,7 @@ async function entrar(){
   $('ola-sub').textContent = estudos.length && gestao.length
     ? 'Aqui embaixo: o que você estuda e o que você administra — separados, pra não confundir.'
     : estudos.length ? 'Seus cursos estão aqui. Bons estudos!'
-    : 'Comece criando sua escola, ou espere o convite de uma.';
+    : 'Configure sua escola para começar os sete dias gratuitos.';
 
   let html = '';
   // ---- próximos compromissos (só se a escola marcou encontros)
@@ -1227,15 +1256,18 @@ async function entrar(){
   }
 
   if(!estudos.length && !gestao.length){
-    html = `<div class="hero"><div class="e">SEU PRONTUÁRIO ESTÁ ATIVO</div>
-      <h3>Bem-vindo ao MODOX</h3>
-      <p>Cadastro único e permanente: tudo que você estudar aqui fica registrado pra sempre — cursos, certificados, conquistas.</p></div>
-      <div class="grid g2" style="margin-top:16px">
-      <div class="card empty"><div class="big">${ic('escola')}</div><b>Vou ensinar</b>
-        <p>Crie sua escola, monte o primeiro curso e receba inscrições por um link. Leva menos de dois minutos.</p>
-        <button class="btn" onclick="go('escola-nova',{mundo:'gestao',chip:'Nova escola'})">Criar minha escola</button></div>
-      <div class="card empty"><div class="big">${ic('mochila')}</div><b>Vim estudar</b>
-        <p>Quando uma escola te matricular — ou você se inscrever por um link — seus cursos aparecem aqui automaticamente.</p></div></div>`;
+    html = `<div class="hero"><div class="e">PRIMEIRO PASSO</div>
+      <h3>Vamos colocar sua escola no MODOX</h3>
+      <p>Você está entrando como diretor ou responsável pela contratação. Cadastre a instituição e comece os sete dias gratuitos.</p></div>
+      <div class="card" style="margin-top:16px;padding:26px">
+        <div class="row" style="align-items:center;gap:18px">
+          <div style="color:var(--marca);font-size:38px;line-height:1">${ic('escola')}</div>
+          <div style="flex:1"><h3>Configurar minha escola</h3>
+            <p style="font-size:14px;color:var(--sub);margin-top:5px">Informe PF ou PJ, documento e logo. Depois você cria cursos, convida a equipe e recebe alunos.</p></div>
+        </div>
+        <button class="btn marca w" onclick="go('escola-nova',{mundo:'gestao',chip:'Configurar escola'})">Começar configuração</button>
+        <div class="hint" style="text-align:center;margin-top:10px">Alunos entram pelo convite ou link de inscrição enviado pela instituição.</div>
+      </div>`;
   }
   $('home-corpo').innerHTML = html;
 }
@@ -1250,14 +1282,36 @@ function cpfValido(c){
   }
   return true;
 }
-function abrirPerfil(p){
+function cnpjValido(c){
+  c = String(c||'').replace(/\D/g,'');
+  if(c.length !== 14 || /^(\d)\1{13}$/.test(c)) return false;
+  const digito = tamanho => {
+    let soma = 0, peso = tamanho - 7;
+    for(let i=0;i<tamanho;i++){
+      soma += Number(c[i]) * peso--;
+      if(peso < 2) peso = 9;
+    }
+    const resto = soma % 11;
+    return resto < 2 ? 0 : 11 - resto;
+  };
+  return digito(12) === Number(c[12]) && digito(13) === Number(c[13]);
+}
+async function abrirPerfil(p){
   go('perfil', { mundo:'gestao', chip:'Meu cadastro' });
   const e = p?.endereco || {};
   $('pf-nome').value = p?.nome||''; $('pf-cpf').value = p?.cpf||''; $('pf-tel').value = p?.telefone||'';
   $('pf-nasc').value = p?.nascimento||''; $('pf-cep').value = e.cep||''; $('pf-num').value = e.numero||'';
   $('pf-rua').value = e.rua||''; $('pf-cidade').value = e.cidade||''; $('pf-uf').value = e.uf||'';
   $('pf-empresa').value = e.empresa||'';
+  $('pf-foto').value = '';
+  const preview = $('pf-foto-preview');
+  preview.innerHTML = ic('pessoas');
+  if(p?.foto_url){
+    const { data } = await sb.storage.from('fotos').createSignedUrl(p.foto_url, 3600);
+    if(data?.signedUrl) preview.innerHTML = `<img src="${esc(data.signedUrl)}" alt="Sua foto" style="width:100%;height:100%;object-fit:cover;border-radius:inherit">`;
+  }
 }
+$('pf-foto').onchange = ev => mostrarPreviewArquivo(ev.target.files[0], $('pf-foto-preview'));
 $('pf-cpf').oninput = ev => { let v = ev.target.value.replace(/\D/g,'').slice(0,11);
   ev.target.value = v.replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})\.(\d{3})(\d)/,'$1.$2.$3').replace(/\.(\d{3})(\d{1,2})$/,'.$1-$2'); };
 $('pf-cep').oninput = ev => { let v = ev.target.value.replace(/\D/g,'').slice(0,8);
@@ -1269,13 +1323,35 @@ $('b-salvar-perfil').onclick = async () => {
   if(tel.replace(/\D/g,'').length < 10) return erro('m-pf','Coloque seu WhatsApp com DDD.');
   if(!$('pf-cidade').value.trim()) return erro('m-pf','Falta a cidade.');
   $('b-salvar-perfil').disabled = true; info('m-pf','Salvando…');
-  const { error } = await sb.from('pessoas').update({ nome, cpf, telefone: tel,
+  let fotoUrl = me?.foto_url || null;
+  const fotoAnterior = fotoUrl;
+  const foto = $('pf-foto').files[0] || null;
+  if(!fotoUrl && !foto){
+    $('b-salvar-perfil').disabled = false;
+    return erro('m-pf','Adicione uma foto de perfil — no celular você pode tirar na hora.');
+  }
+  if(foto){
+    try{
+      info('m-pf','Otimizando sua foto…');
+      const blob = await comprimirFoto(foto);
+      const key = `perfis/${me.id}/foto-${Date.now().toString(36)}.jpg`;
+      const { error: eFoto } = await sb.storage.from('fotos').upload(key, blob, { contentType:'image/jpeg' });
+      if(eFoto) throw eFoto;
+      fotoUrl = key;
+    }catch(e){
+      $('b-salvar-perfil').disabled = false;
+      return erro('m-pf','Não consegui salvar a foto: '+(e.message||'tente outra imagem.'));
+    }
+  }
+  const { error } = await sb.from('pessoas').update({ nome, cpf, telefone: tel, foto_url: fotoUrl,
     nascimento: $('pf-nasc').value || null,
     endereco: { cep:$('pf-cep').value.trim(), rua:$('pf-rua').value.trim(), numero:$('pf-num').value.trim(),
       cidade:$('pf-cidade').value.trim(), uf:$('pf-uf').value.trim().toUpperCase(),
       empresa:$('pf-empresa').value.trim()||null } }).eq('id', me.id);
   $('b-salvar-perfil').disabled = false;
   if(error) return erro('m-pf', error.code==='23505' ? 'Esse CPF já está em outra conta. Fale com o suporte da escola.' : 'Ops: '+error.message);
+  if(fotoAnterior && fotoAnterior !== fotoUrl) sb.storage.from('fotos').remove([fotoAnterior]).catch(()=>{});
+  if(me) me.foto_url = fotoUrl;
   entrar();
 };
 
@@ -1299,20 +1375,37 @@ $('en-doc').oninput = ev => {
       .replace(/\.(\d{3})(\d{1,2})$/,'.$1-$2'); }
   ev.target.value = v;
 };
+$('en-logo').onchange = ev => mostrarPreviewArquivo(ev.target.files[0], $('en-logo-preview'), true);
 $('b-criar-escola').onclick = async () => {
   const nome = $('en-nome').value.trim();
   const doc = $('en-doc').value.replace(/\D/g,'');
+  const logo = $('en-logo').files[0] || null;
   if(nome.length < 3) return erro('m-en','Dê um nome com pelo menos 3 letras.');
-  if(EN_TIPO === 'pj' && doc.length !== 14) return erro('m-en','Esse CNPJ precisa ter 14 números.');
-  if(EN_TIPO === 'pf' && doc.length !== 11) return erro('m-en','Esse CPF precisa ter 11 números.');
+  if(EN_TIPO === 'pj' && !cnpjValido(doc)) return erro('m-en','Esse CNPJ não confere. Revise os números.');
+  if(EN_TIPO === 'pf' && !cpfValido(doc)) return erro('m-en','Esse CPF não confere. Revise os números.');
+  if(!logo) return erro('m-en','Adicione a logo da escola para continuar.');
+  let logoBlob;
+  try{
+    info('m-en','Otimizando a logo…');
+    logoBlob = await comprimirLogo(logo);
+  }catch(e){ return erro('m-en','Não consegui usar essa logo: '+e.message); }
   $('b-criar-escola').disabled = true; info('m-en','Criando sua escola…');
   const { data, error } = await sb.rpc('criar_escola_completa',
     { p_nome: nome, p_slug: slugify(nome) + '-' + Math.random().toString(36).slice(2,6),
       p_tipo_pessoa: EN_TIPO, p_documento: doc });
+  if(error){ $('b-criar-escola').disabled = false; return erro('m-en','Ops: '+error.message); }
+  info('m-en','Salvando a identidade da escola…');
+  const ext = logoBlob.type === 'image/png' ? 'png' : 'jpg';
+  const logoKey = `escolas/${data}/logo-${Date.now().toString(36)}.${ext}`;
+  const { error: eLogo } = await sb.storage.from('capas').upload(logoKey, logoBlob, { contentType:logoBlob.type });
+  if(!eLogo){
+    const { error: eLogoDb } = await sb.from('escolas').update({ logo_url:logoKey }).eq('id',data);
+    if(eLogoDb){ $('b-criar-escola').disabled = false; return erro('m-en','A escola foi criada, mas a logo não foi vinculada. Abra a escola e tente novamente.'); }
+  }else{ $('b-criar-escola').disabled = false; return erro('m-en','A escola foi criada, mas não consegui enviar a logo. Abra a escola e tente novamente.'); }
+  $('en-nome').value=''; $('en-doc').value=''; $('en-logo').value=''; info('m-en','');
+  $('en-logo-preview').innerHTML = '<span style="font-size:12px;font-weight:700">LOGO</span>';
+  vincMap[data] = { papel:'admin', escola:{ id:data, nome, logo_url:logoKey } };
   $('b-criar-escola').disabled = false;
-  if(error) return erro('m-en','Ops: '+error.message);
-  $('en-nome').value=''; $('en-doc').value=''; info('m-en','');
-  vincMap[data] = { papel:'admin', escola:{ id:data, nome } };
   abrirEscola(data);
 };
 $('b-novo-curso').onclick = () => go('curso-novo', { mundo:'gestao', chip:'Novo curso' });
@@ -3303,9 +3396,10 @@ let capaPend = {};   // turma → blob ainda não enviado
 // Israel: a logo acompanha a pessoa em todas as telas de dentro da escola,
 // então precisa ficar nítida em miniatura pequena — por isso "contain" num
 // quadrado com fundo branco, em vez do recorte 16:10 da capa de curso.)
-const LOGO_LADO = 512, LOGO_PESO = 260*1024;
+const LOGO_LADO = 512, LOGO_PESO = 260*1024, LOGO_MAX_ORIGINAL = 12*1024*1024;
 async function comprimirLogo(file){
   if(!/^image\//.test(file.type)) throw new Error('escolha um arquivo de imagem (JPG, PNG ou WEBP)');
+  if(file.size > LOGO_MAX_ORIGINAL) throw new Error('a imagem original pode ter no máximo 12 MB');
   const url = URL.createObjectURL(file);
   try{
     const img = await new Promise((res, rej) => { const i = new Image();
@@ -4486,9 +4580,9 @@ async function carregarInscricao(){
       <div style="flex:2"><label>Cidade</label><input id="in-cidade"></div>
       <div><label>UF</label><input id="in-uf" maxlength="2" style="text-transform:uppercase"></div>
     </div>
-    <label>Sua foto</label>
-    <input id="in-foto" type="file" accept="image/*">
-    <div class="hint">Pode ser uma selfie. A gente otimiza a imagem automaticamente — não precisa se preocupar com tamanho.</div>
+    <label>Sua foto <span class="opt">— pode adicionar agora ou no primeiro acesso</span></label>
+    <input id="in-foto" type="file" accept="image/*" capture="user">
+    <div class="hint">Pode tirar uma selfie no celular. A imagem original aceita até 12 MB e será reduzida para cerca de 320 KB.</div>
     ${extras.map((c,i) => `<label>${esc(c.nome||('Pergunta '+(i+1)))}</label><input id="in-extra-${i}">`).join('')}
     <label>Conte um pouco sobre você</label>
     <textarea id="in-sobre" rows="4" placeholder="Sua história, o que te trouxe até aqui, o que você espera do curso…"></textarea>
@@ -4501,7 +4595,24 @@ async function carregarInscricao(){
     ev.target.value = v.length>5 ? v.slice(0,5)+'-'+v.slice(5) : v; };
 }
 
+function mostrarPreviewArquivo(file, alvo, conter=false){
+  if(!file || !alvo) return;
+  if(!/^image\//.test(file.type)){
+    alvo.innerHTML = '<span style="font-size:11px">Arquivo inválido</span>';
+    return;
+  }
+  const url = URL.createObjectURL(file);
+  alvo.innerHTML = `<img src="${url}" alt="Prévia da imagem" style="width:100%;height:100%;object-fit:${conter?'contain':'cover'};border-radius:inherit">`;
+  const img = alvo.querySelector('img');
+  img.onload = () => URL.revokeObjectURL(url);
+  img.onerror = () => URL.revokeObjectURL(url);
+}
+
+const FOTO_MAX_ORIGINAL = 12 * 1024 * 1024;
+const FOTO_MAX_SAIDA = 320 * 1024;
 async function comprimirFoto(file){
+  if(!/^image\//.test(file.type)) throw new Error('escolha uma imagem JPG, PNG ou WEBP');
+  if(file.size > FOTO_MAX_ORIGINAL) throw new Error('a imagem original pode ter no máximo 12 MB');
   const url = URL.createObjectURL(file);
   try{
     const img = await new Promise((res, rej) => { const i = new Image();
@@ -4509,9 +4620,16 @@ async function comprimirFoto(file){
     const max = 800, f = Math.min(1, max/Math.max(img.width, img.height));
     const c = document.createElement('canvas');
     c.width = Math.max(1, Math.round(img.width*f)); c.height = Math.max(1, Math.round(img.height*f));
-    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-    const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.82));
+    const g = c.getContext('2d');
+    g.fillStyle = '#fff'; g.fillRect(0,0,c.width,c.height);
+    g.drawImage(img, 0, 0, c.width, c.height);
+    let blob = null;
+    for(const q of [0.84,0.76,0.68,0.60,0.52]){
+      blob = await new Promise(r => c.toBlob(r, 'image/jpeg', q));
+      if(blob && blob.size <= FOTO_MAX_SAIDA) break;
+    }
     if(!blob?.size) throw new Error('não consegui processar a foto');
+    if(blob.size > FOTO_MAX_SAIDA) throw new Error('a foto continuou muito grande mesmo após a otimização');
     return blob;
   } finally { URL.revokeObjectURL(url); }
 }
@@ -4527,7 +4645,6 @@ async function enviarInscricao(){
   if(zap.replace(/\D/g,'').length < 10) return setErr('Coloque seu WhatsApp com DDD.');
   if(!$('in-rua').value.trim()) return setErr('Falta o endereço.');
   if(!$('in-cidade').value.trim()) return setErr('Falta a cidade.');
-  if(!foto) return setErr('A foto é obrigatória — pode ser uma selfie.');
   if(!$('in-aceite').checked) return setErr('Marque a caixinha de concordância para continuar.');
 
   $('b-inscrever').disabled = true; info('m-in','Criando seu acesso…');
@@ -4536,8 +4653,8 @@ async function enviarInscricao(){
   // e-mail, então a matrícula cai na mesma conta que acabou de ser criada aqui.
   // "Já registrado" não é erro — é gente se inscrevendo num 2º curso com a mesma conta.
   let novaConta = true;
-  const { error: eSignup } = await sb.auth.signUp({ email, password: senha,
-    options: { data: { nome }, emailRedirectTo: location.origin + location.pathname } });
+  const { data: signupData, error: eSignup } = await sb.auth.signUp({ email, password: senha,
+    options: { data: { nome, origem:'aluno_inscricao' }, emailRedirectTo: location.origin + location.pathname } });
   if(eSignup){
     if(/already registered|already exists/i.test(eSignup.message)) novaConta = false;
     else { $('b-inscrever').disabled = false; return setErr('Não consegui criar seu acesso: '+eSignup.message); }
@@ -4551,16 +4668,19 @@ async function enviarInscricao(){
   respostas['CEP'] = $('in-cep').value.trim();
   respostas['Cidade'] = $('in-cidade').value.trim() + ' - ' + $('in-uf').value.trim().toUpperCase();
 
-  info('m-in','Otimizando sua foto…');
   let fotoKey = null;
-  try{
-    const blob = await comprimirFoto(foto);
-    info('m-in','Enviando sua inscrição…');
-    const key = 'inscricoes/' + Date.now().toString(36) + Math.random().toString(36).slice(2,6) + '.jpg';
-    const { error } = await sb.storage.from('fotos').upload(key, blob, { contentType:'image/jpeg' });
-    if(error) throw new Error(error.message);
-    fotoKey = key;
-  } catch(e){ $('b-inscrever').disabled = false; return setErr('Falha na foto: '+e.message); }
+  const usuarioFoto = signupData?.user;
+  if(foto && signupData?.session && usuarioFoto){
+    try{
+      info('m-in','Otimizando sua foto…');
+      const blob = await comprimirFoto(foto);
+      info('m-in','Enviando sua inscrição…');
+      const key = `inscricoes/${usuarioFoto.id}/foto-${Date.now().toString(36)}.jpg`;
+      const { error } = await sb.storage.from('fotos').upload(key, blob, { contentType:'image/jpeg' });
+      if(error) throw new Error(error.message);
+      fotoKey = key;
+    } catch(e){ $('b-inscrever').disabled = false; return setErr('Falha na foto: '+e.message); }
+  }
 
   const { data: insc, error } = await sb.rpc('inscrever_publico', {
     p_slug: fslug, p_nome: nome, p_email: email, p_whatsapp: zap,
