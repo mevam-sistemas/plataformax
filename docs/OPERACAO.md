@@ -17,8 +17,9 @@
 3. Testar na prévia os fluxos alterados.
 4. Fazer merge somente depois das duas validações.
 5. Confirmar a produção e registrar a mudança em `CHANGELOG.md`.
-6. Para uma nova versão, atualizar `VERSION` em `app/sw.js`; isso faz o PWA
-   instalado substituir o cache anterior.
+6. Para uma nova versão, atualizar somente `MODOX_VERSION` em `app/version.js`.
+   O rodapé e o service worker leem essa mesma fonte; o PWA instalado substitui
+   o cache anterior automaticamente.
 
 O Cloudflare atualmente publica `main` automaticamente. Por isso não se deve
 fazer commit direto em `main`.
