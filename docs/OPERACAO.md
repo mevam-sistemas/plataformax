@@ -61,3 +61,9 @@ não considerar a recuperação do MODOX integralmente comprovada.
 3. Conter o problema com correção progressiva; evitar remoções destrutivas.
 4. Validar com conta controlada antes de envolver um usuário real.
 5. Documentar causa, correção, teste e pendências no histórico da versão.
+## Rotina diária de aniversários
+
+- A função `aniversarios` roda diariamente às 09h (horário de São Paulo) por `pg_cron`.
+- A chave `BIRTHDAY_CRON_SECRET` da Edge Function deve ter o mesmo valor do segredo `birthday_cron_secret` no Vault do banco.
+- `aniversarios_enviados` impede um segundo envio para a mesma pessoa no mesmo ano.
+- O teste de produção deve consultar os candidatos primeiro; nunca invoque manualmente a função quando houver aniversariantes reais.

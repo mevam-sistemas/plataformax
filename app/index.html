@@ -681,7 +681,9 @@ h2 .ic,h3 .ic{width:.9em;height:.9em;margin-right:2px}
 <section class="screen" id="s-escola">
   <button class="btn link" id="es-voltar-home" data-back="home">‹ Minhas escolas</button>
   <div class="escola-hero"><div><div class="crumb" id="es-crumb"></div>
-    <h1 id="es-nome">Escola</h1><p class="sub" id="es-sub"></p></div><div id="es-marca"></div></div>
+    <h1 id="es-nome">Escola</h1><p class="sub" id="es-sub"></p>
+    <button class="btn xs ghost" id="b-editar-escola" style="margin-top:10px;display:none">Editar nome</button>
+    <div id="es-editor-nome"></div></div><div id="es-marca"></div></div>
   <div id="es-bloqueio"></div>
   <div id="es-cursos-bloco">
     <div id="es-resumo"></div>
@@ -891,6 +893,8 @@ h2 .ic,h3 .ic{width:.9em;height:.9em;margin-right:2px}
   <button class="btn link" data-back="home">‹ Voltar</button>
   <div class="crumb">Atualizações do software</div><h1>O que mudou no MODOX</h1>
   <p class="sub">As versões registram melhorias, correções e novas funcionalidades publicadas.</p>
+  <div class="card"><span class="pill marca">Versão 1.4.0</span><h3 style="margin-top:12px">Mais cuidado em cada etapa</h3>
+    <p style="font-size:14px;color:var(--sub);line-height:1.7">Correções de edição e convites, comunicação própria para direção, professores e alunos, pendência de foto e felicitação cristã de aniversário.</p></div>
   <div class="card"><span class="pill marca">Versão 1.3.1</span><h3 style="margin-top:12px">Identidade dos colegas da turma</h3>
     <p style="font-size:14px;color:var(--sub);line-height:1.7">Alunos da mesma turma podem ver as fotos de perfil uns dos outros; nomes continuam abreviados e dados de contato permanecem privados.</p></div>
   <div class="card"><span class="pill mute">Versão 1.3.0</span><h3 style="margin-top:12px">Comunicação e acompanhamento das turmas</h3>
@@ -1254,6 +1258,13 @@ async function entrar(){
     : 'Configure sua escola para começar os sete dias gratuitos.';
 
   let html = '';
+  if(estudos.length && !p?.foto_url){
+    html += `<section class="central-pend"><div class="pend-card">
+      <h3>${ic('imagem')} Complete sua foto de perfil</h3>
+      <p>Sua foto ajuda professores e colegas da turma a reconhecer você. Seus dados de contato continuam privados.</p>
+      <button class="btn xs" onclick="abrirPerfil(me)">Adicionar minha foto</button>
+    </div></section>`;
+  }
   // ---- próximos compromissos (só se a escola marcou encontros)
   if(estudos.some(m => ['ativa','concluida'].includes(m.status))){
     const { data: ag } = await sb.rpc('minha_agenda', { p_dias: 30 });
@@ -1431,6 +1442,22 @@ $('b-salvar-perfil').onclick = async () => {
 // ═══════════════ ESCOLA ═══════════════
 const slugify = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
   .replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'').slice(0,40);
+function formEditarEscola(){
+  const slot=$('es-editor-nome'); if(!slot)return;
+  if(slot.innerHTML){slot.innerHTML='';return;}
+  const atual=vincMap[ctx.escola]?.escola?.nome||'';
+  slot.innerHTML=`<div class="inline" style="margin-top:12px;max-width:520px">
+    <label>Novo nome da instituição</label><input id="ee-nome" value="${esc(atual)}">
+    <div class="row" style="margin-top:12px"><button class="btn sm" onclick="salvarNomeEscola()">Salvar</button>
+      <button class="btn sm ghost" onclick="formEditarEscola()">Cancelar</button></div><div class="msg" id="ee-msg"></div></div>`;
+}
+async function salvarNomeEscola(){
+  const nome=($('ee-nome')?.value||'').trim();
+  if(nome.length<3){$('ee-msg').textContent='Escreva um nome com pelo menos 3 letras.';return;}
+  const {error}=await sb.from('escolas').update({nome}).eq('id',ctx.escola);
+  if(error){$('ee-msg').textContent='Ops: '+error.message;return;}
+  vincMap[ctx.escola].escola.nome=nome; abrirEscola(ctx.escola);
+}
 // cadastro completo PJ/PF da escola nova (01/08/2026) — mesmo padrão do
 // 360social: quem abre a escola escolhe pessoa jurídica ou física, e a
 // escola já nasce com 7 dias de teste de verdade (ver criar_escola_completa).
@@ -1488,6 +1515,7 @@ $('b-pagamentos').onclick = () => abrirPagamentos();
 $('b-assinaturas').onclick = () => formAssinaturas();
 $('b-plano').onclick = () => formPlanoEscola();
 $('b-painel').onclick = () => window.open('monitor.html', '_blank');
+$('b-editar-escola').onclick = () => formEditarEscola();
 document.querySelectorAll('#es-abas button').forEach(b => b.onclick = () => {
   document.querySelectorAll('#es-abas button').forEach(x => x.classList.remove('on'));
   b.classList.add('on'); ctx.filtroCursos = b.dataset.f; abrirEscola(ctx.escola);
@@ -1509,6 +1537,8 @@ async function abrirEscola(eid){
   const souAdminEscola = v && RANK[papelEf] >= RANK.admin;
   const podeVerPendencias = v && RANK[papelEf] >= RANK.professor;
   montarMarcaEscola(eid, souAdminEscola);
+  $('b-editar-escola').style.display = souAdminEscola ? '' : 'none';
+  $('es-editor-nome').innerHTML = '';
   $('es-assinaturas').innerHTML = '';
   $('es-plano').innerHTML = '';
   $('es-bloqueio').innerHTML = '';
@@ -1943,6 +1973,7 @@ async function abrirCurso(cid, origem){
   }
 
   let html = '';
+  ctx.modulosCache = mods || [];
   (mods||[]).forEach(m => {
     const libM = m.libera_em ? new Date(m.libera_em) : null;
     html += `<div class="card"><div class="row" style="justify-content:space-between;align-items:center">
@@ -1950,9 +1981,10 @@ async function abrirCurso(cid, origem){
         ${libM ? `<div style="font-size:12.5px;color:${libM.getTime()>agora?'var(--warn)':'var(--sub)'};margin-top:3px">
           ${libM.getTime()>agora?`${ic('cadeado')} abre`:'aberto desde'} ${libM.toLocaleDateString('pt-BR')} às ${libM.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</div>`:''}</div>
       ${ctx.podeAula? `<div style="display:flex;gap:6px;flex:none">
+        <button class="btn xs ghost" onclick="formEditarModulo('${m.id}')">Editar</button>
         <button class="btn xs ghost" onclick="formLancamento('${m.id}','${m.libera_em||''}')">Data</button>
         <button class="btn xs ghost" onclick="formAula('${m.id}')">+ aula</button></div>`:''}</div>
-      <div id="dl-${m.id}"></div>`;
+      <div id="dm-${m.id}"></div><div id="dl-${m.id}"></div>`;
     if(!(m.aulas||[]).length) html += `<div style="font-size:13.5px;color:var(--sub);padding:10px 0 2px">
       ${ctx.podeAula?'Nenhuma aula aqui ainda — toque em “+ aula” para subir vídeo, texto ou PDF.':'Conteúdo em preparação.'}</div>`;
     (m.aulas||[]).forEach(a0 => {
@@ -2317,6 +2349,23 @@ async function salvarModulo(){
   if(error){ $('nm-msg').textContent = 'Ops: '+error.message; return; }
   abrirCurso(ctx.curso, ctx.origem);
 }
+function formEditarModulo(mid){
+  const slot = $('dm-'+mid); if(!slot) return;
+  if(slot.innerHTML){ slot.innerHTML=''; return; }
+  const titulo=(ctx.modulosCache||[]).find(m=>m.id===mid)?.titulo||'';
+  slot.innerHTML = `<div class="inline" style="margin-top:8px">
+    <label>Novo nome do módulo</label><input id="dm-input-${mid}" value="${esc(titulo)}">
+    <div class="row" style="margin-top:12px"><button class="btn sm" onclick="salvarNomeModulo('${mid}')">Salvar</button>
+      <button class="btn sm ghost" onclick="formEditarModulo('${mid}')">Cancelar</button></div>
+    <div class="msg" id="dm-msg-${mid}"></div></div>`;
+}
+async function salvarNomeModulo(mid){
+  const titulo = ($('dm-input-'+mid)?.value||'').trim();
+  if(titulo.length < 2){ $('dm-msg-'+mid).textContent='Escreva um nome com pelo menos 2 letras.'; return; }
+  const { error } = await sb.from('modulos').update({ titulo }).eq('id',mid).eq('curso_id',ctx.curso);
+  if(error){ $('dm-msg-'+mid).textContent='Ops: '+error.message; return; }
+  abrirCurso(ctx.curso,ctx.origem);
+}
 // ---------- criar / editar turma (com modalidade) ----------
 const MODAL_TXT = {
   online: `Tudo acontece pela plataforma, no ritmo de cada aluno. Sem hora marcada — ninguém precisa
@@ -2519,8 +2568,14 @@ async function salvarEquipe(){
     { p_escola: ctx.escola, p_email: email, p_nome: nome, p_papel: papelNovo });
   if(error) return set('Ops: '+error.message);
   const r = (data||[])[0];
-  set(r?.ja_existia ? 'Pronto! Essa pessoa já tinha cadastro na plataforma e agora tem acesso a esta escola.'
-    : 'Pronto! Cadastrado. Avise que é só entrar com esse e-mail — a plataforma manda o código.');
+  const {data:convite,error:erroConvite}=await sb.functions.invoke('convidar-equipe-modox',{
+    body:{pessoa_id:r?.pessoa_id,escola_id:ctx.escola,papel:papelNovo}
+  });
+  if(erroConvite||convite?.error){
+    set('O cadastro e o acesso foram salvos, mas o e-mail não saiu. Tente salvar novamente em instantes.'); return;
+  }
+  set(papelNovo==='professor'?'Pronto! O professor recebeu um convite próprio, com acesso direto às turmas e pendências pedagógicas.'
+    : 'Pronto! A pessoa recebeu um convite de gestão adequado ao papel dela.');
   setTimeout(abrirEquipe, 1400);
 }
 function formPapel(pid, atual){
@@ -4126,7 +4181,7 @@ function textoAula(t){
   for(const bruta of linhas){
     const l = bruta.trim();
     if(!l){ fechaPar(); fechaLista(); continue; }
-    const mLi = l.match(/^[-*•]\s+(.*)$/), mNu = l.match(/^\d+[.)]\s+(.*)$/);
+    const mLi = l.match(/^[-*•]\s+(.*)$/), mNu = l.match(/^(\d+)[.)]\s+(.*)$/);
     const mH  = l.match(/^#{1,3}\s+(.*)$/), mCit = l.match(/^>\s?(.*)$/);
     if(/^-{3,}$/.test(l)){ fechaPar(); fechaLista(); h += '<hr>'; continue; }
     if(mH){  fechaPar(); fechaLista(); h += '<h3>' + enfase(mH[1]) + '</h3>'; continue; }
@@ -4135,7 +4190,8 @@ function textoAula(t){
       fechaPar();
       const alvo = mLi ? 'ul' : 'ol';
       if(lista !== alvo){ fechaLista(); h += '<' + alvo + '>'; lista = alvo; }
-      h += '<li>' + enfase((mLi||mNu)[1]) + '</li>';
+      h += mLi ? '<li>' + enfase(mLi[1]) + '</li>'
+        : '<li value="' + Number(mNu[1]) + '">' + enfase(mNu[2]) + '</li>';
       continue;
     }
     fechaLista(); par.push(l);

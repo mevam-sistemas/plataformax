@@ -1,0 +1,18 @@
+<div style="background:#faf9f7;padding:34px 16px;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">
+  <div style="max-width:500px;margin:auto;background:#fff;border:1px solid #ececf2;border-radius:20px;padding:34px 30px;color:#141416">
+    <div style="height:4px;background:linear-gradient(90deg,#f26a1b,#ffb26b);margin:-34px -30px 28px;border-radius:20px 20px 0 0"></div>
+    <div style="font-size:22px;font-weight:800;margin-bottom:28px">MODO<span style="color:#f26a1b">X</span></div>
+    {{ if eq .Data.origem "cliente_gestor" }}
+      <h1 style="font-size:25px;margin:0 0 12px">Sua instituição está prestes a ganhar vida no MODOX.</h1>
+      <p style="color:#62626b;line-height:1.65">Confirme seu e-mail para entrar como responsável pela instituição, organizar cursos, equipe e alunos. Os sete dias de avaliação pertencem à instituição contratante — não ao aluno.</p>
+    {{ else if eq .Data.origem "aluno_inscricao" }}
+      <h1 style="font-size:25px;margin:0 0 12px">Que alegria ter você por aqui!</h1>
+      <p style="color:#62626b;line-height:1.65">Confirme seu e-mail para concluir seu acesso de aluno e acompanhar sua turma, aulas, orientações e conversas com o professor.</p>
+    {{ else }}
+      <h1 style="font-size:25px;margin:0 0 12px">Bem-vindo ao MODOX!</h1>
+      <p style="color:#62626b;line-height:1.65">Confirme seu e-mail para ativar seu acesso. Ao entrar, você verá somente as ferramentas correspondentes ao seu papel.</p>
+    {{ end }}
+    <a href="{{ .ConfirmationURL }}" style="display:block;text-align:center;background:#f26a1b;color:#fff;text-decoration:none;border-radius:999px;padding:15px;margin-top:24px;font-weight:700">Confirmar meu e-mail</a>
+    <p style="color:#8a8a94;font-size:12.5px;line-height:1.55;margin-top:22px">Se você não iniciou este cadastro, ignore esta mensagem. O link é pessoal e não deve ser compartilhado.</p>
+  </div>
+</div>
