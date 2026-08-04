@@ -3,6 +3,7 @@ import vm from 'node:vm';
 
 const html = fs.readFileSync('app/index.html', 'utf8');
 const convite = fs.readFileSync('supabase/functions/convidar-equipe-modox/index.ts', 'utf8');
+const headers = fs.readFileSync('_headers', 'utf8');
 const bloco = html.match(/function cpfValido\(c\)[\s\S]*?\nasync function abrirPerfil/);
 if (!bloco) throw new Error('Validadores de CPF/CNPJ não encontrados');
 
@@ -29,3 +30,14 @@ for (const contrato of ['listUsers({page:1,perPage:1000})', 'auth_user_id:novoUi
   if (!convite.includes(contrato)) throw new Error(`Contrato de vínculo do convite ausente: ${contrato}`);
 }
 console.log('✓ convite vincula o usuário autenticado ao cadastro da equipe');
+
+for (const contrato of [
+  "Content-Security-Policy: default-src 'self'",
+  "object-src 'none'",
+  "frame-ancestors 'none'",
+  'Strict-Transport-Security:',
+  'X-Frame-Options: DENY'
+]) {
+  if (!headers.includes(contrato)) throw new Error(`Cabeçalho de segurança ausente: ${contrato}`);
+}
+console.log('✓ cabeçalhos de segurança obrigatórios presentes');

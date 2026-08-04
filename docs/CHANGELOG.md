@@ -4,6 +4,12 @@ Este arquivo registra mudanças publicadas no produto. A versão segue o formato
 `MAIOR.MENOR.CORREÇÃO`: incompatibilidade, funcionalidade e correção,
 respectivamente.
 
+## 1.4.2 — 2026-08-04
+
+- Política de Segurança de Conteúdo passa a limitar scripts, conexões, imagens, mídias, quadros e formulários aos serviços usados pelo MODOX.
+- Incorporação por outros sites, plugins legados e conteúdo misto passam a ser bloqueados também pelo navegador.
+- Validação do release passa a impedir a publicação sem CSP, HSTS e proteção contra iframe.
+
 ## 1.4.1 — 2026-08-04
 
 - Convite de professor, gestor ou administrador passa a vincular o UID criado no Supabase ao cadastro da pessoa antes do primeiro acesso.
