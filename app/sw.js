@@ -1,4 +1,4 @@
-const VERSION = 'modox-1.0.0';
+const VERSION = 'modox-1.1.0';
 const SHELL = [
   '/app/',
   '/app/index.html',
