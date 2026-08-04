@@ -46,7 +46,7 @@ body[data-mundo="publico"]{ --accent:#c8500c; --accent-soft:#fff1e6; --accent-in
 html{-webkit-text-size-adjust:100%}
 body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
   background:var(--bg);color:var(--ink);min-height:100vh;font-size:16px;line-height:1.5;
-  transition:background .35s ease}
+  transition:background .35s ease;display:flex;flex-direction:column}
 
 /* ---------- barra superior ---------- */
 .top{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.82);
@@ -94,13 +94,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Inter
 .tlink:hover{color:var(--ink)}
 
 /* ---------- layout ---------- */
-.wrap{max-width:1180px;margin:0 auto;padding:26px 22px 90px}
+.wrap{width:100%;max-width:1180px;margin:0 auto;padding:30px 22px 72px;flex:1}
 .screen{display:none;animation:fade .3s ease}
 .screen.on{display:block}
 @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 .col{max-width:620px}
 .grid{display:grid;gap:14px;grid-template-columns:1fr}
-@media (min-width:720px){ .grid.g2{grid-template-columns:repeat(auto-fill,minmax(320px,1fr))} }
+@media (min-width:720px){ .grid.g2{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))} }
 @media (min-width:1000px){ .split{display:grid;grid-template-columns:minmax(320px,420px) 1fr;gap:44px;align-items:start} }
 
 /* ---------- tipografia ---------- */
@@ -178,6 +178,21 @@ input[type=date]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .card.tap:hover{box-shadow:var(--sh-2);border-color:#d9d9e6;transform:translateY(-1px)}
 .card.alerta{border:1.5px solid #ffdca8;background:var(--warn-bg)}
 .card.arq{opacity:.7;background:#fbfbfc}
+.escola-hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px;align-items:start;
+  background:linear-gradient(135deg,#fff,var(--tint));border:1px solid var(--line);border-radius:var(--r-xl);
+  padding:24px 26px;box-shadow:var(--sh-1);margin-bottom:18px}
+.escola-hero h1{margin:3px 0 7px}.escola-hero .sub{margin-bottom:0}
+.resumo-escola{display:grid;grid-template-columns:repeat(4,minmax(92px,1fr));gap:9px;margin:14px 0 24px}
+.resumo-escola>div{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);padding:13px 14px;min-width:0}
+.resumo-escola b{display:block;font-size:21px;line-height:1.1;letter-spacing:-.025em}
+.resumo-escola small{display:block;font-size:11.5px;color:var(--sub);margin-top:4px;font-weight:650}
+.central-pend{margin:8px 0 24px}.central-pend-cab{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;margin-bottom:10px}
+.central-pend-cab h2{margin:0}.central-pend-cab p{font-size:12.5px;color:var(--sub)}
+.pend-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+.pend-card{background:var(--card);border:1px solid #f0d5a6;border-left:4px solid var(--warn);border-radius:var(--r-md);padding:16px}
+.pend-card.ok{border-color:#b8e3cc;border-left-color:var(--ok)}
+.pend-card h3{font-size:15px;display:flex;align-items:center;gap:7px}.pend-card p{font-size:13px;color:var(--sub);line-height:1.55;margin:7px 0 12px}
+.pend-card .btn{min-height:38px}
 .hero{background:linear-gradient(135deg,#292623,#3c352f 72%,var(--accent));color:#fff;
   border-radius:var(--r-xl);padding:26px;box-shadow:var(--sh-2);position:relative;overflow:hidden}
 .hero>*{position:relative;z-index:1}
@@ -420,6 +435,15 @@ h2 .ic,h3 .ic{width:.9em;height:.9em;margin-right:2px}
 .pe-pagina-arbor span{font-size:11px;font-weight:750;letter-spacing:.14em;text-transform:uppercase;color:var(--sub)}
 .pe-pagina-arbor span em{font-style:normal;color:var(--marca)}
 @media(max-width:560px){ .pe-pagina{flex-direction:column;align-items:flex-start;gap:16px} }
+@media(max-width:720px){
+  .top-in{padding:10px 14px;gap:9px}.marca-nome{display:none}.top #t-inicio{display:none}
+  .ctx{max-width:36vw;font-size:11.5px;padding:5px 9px}.tlink{font-size:12.5px;padding:8px 3px}
+  .wrap{padding:20px 14px 56px}.card{padding:17px;border-radius:var(--r-md)}
+  .escola-hero{grid-template-columns:1fr;padding:19px 18px;gap:10px;border-radius:var(--r-lg)}
+  .resumo-escola{grid-template-columns:repeat(2,1fr)}.central-pend-cab{align-items:flex-start;flex-direction:column;gap:3px}
+  .btn:not(.xs){min-height:44px}.abas button{min-height:42px}
+}
+@media(max-width:390px){.ctx{display:none}.top-in{gap:8px}.top-sp{min-width:4px}.tlink{font-size:12px}}
 /* ---------- encontros, presença e agenda ---------- */
 .seg{display:flex;gap:6px;background:#eeeef4;border-radius:var(--r-md);padding:4px;margin:6px 0 2px}
 .seg button{flex:1;border:0;background:none;font-family:inherit;font-size:13px;font-weight:650;
@@ -647,13 +671,12 @@ h2 .ic,h3 .ic{width:.9em;height:.9em;margin-right:2px}
 
 <!-- ══════════ PAINEL DA ESCOLA ══════════ -->
 <section class="screen" id="s-escola">
-  <button class="btn link" data-back="home">‹ Início</button>
-  <div class="crumb" id="es-crumb"></div>
-  <h1 id="es-nome">Escola</h1>
-  <p class="sub" id="es-sub"></p>
-  <div id="es-marca"></div>
+  <button class="btn link" id="es-voltar-home" data-back="home">‹ Minhas escolas</button>
+  <div class="escola-hero"><div><div class="crumb" id="es-crumb"></div>
+    <h1 id="es-nome">Escola</h1><p class="sub" id="es-sub"></p></div><div id="es-marca"></div></div>
   <div id="es-bloqueio"></div>
   <div id="es-cursos-bloco">
+    <div id="es-resumo"></div>
     <div id="es-pendencias"></div>
     <div class="row" style="align-items:center;justify-content:space-between;margin-top:28px">
       <h2 style="margin:0">Cursos <span id="es-cont"></span></h2>
@@ -1175,9 +1198,16 @@ async function entrar(){
   const gestao = Object.values(vincMap).filter(v => RANK[papelEfetivo(v.escola.id)] >= RANK.professor);
   // quem foi desligado deixa de ver o curso aqui — o histórico continua guardado na escola
   const estudos = (mats||[]).filter(m => m.turmas?.cursos && m.status !== 'desligada');
+  // Um contrato corresponde a uma escola. Quem administra uma única escola
+  // não precisa atravessar uma tela seletora a cada login: entra no painel.
+  if(viewAs !== 'aluno' && gestao.length === 1){
+    await abrirEscola(gestao[0].escola.id);
+    return;
+  }
   $('ola-sub').textContent = estudos.length && gestao.length
     ? 'Aqui embaixo: o que você estuda e o que você administra — separados, pra não confundir.'
     : estudos.length ? 'Seus cursos estão aqui. Bons estudos!'
+    : gestao.length ? 'Acompanhe sua instituição e veja o que precisa de atenção.'
     : 'Configure sua escola para começar os sete dias gratuitos.';
 
   let html = '';
@@ -1240,7 +1270,7 @@ async function entrar(){
         ${n? `<div style="font-size:13.5px;color:var(--warn);font-weight:600;margin-top:12px">
           ${n} inscriç${n===1?'ão espera':'ões esperam'} sua decisão →</div>`:''}</div>`;
     }).join('') + `</div>`;
-    html += `<button class="btn ghost" style="margin-top:18px" onclick="go('escola-nova',{mundo:'gestao',chip:'Nova escola'})">+ Criar outra escola</button>`;
+    html += `<div class="hint" style="margin-top:18px">Cada contrato do MODOX corresponde a uma única instituição.</div>`;
   }
   // ---- meus certificados
   const { data: certs } = await sb.rpc('meus_certificados');
@@ -1426,10 +1456,12 @@ async function abrirEscola(eid){
   const papelEf = v && papelEfetivo(eid);
   ctx.escolaLogo = v?.escola?.logo_url || '';
   go('escola', { mundo:'gestao', chip: v ? v.escola.nome : 'Escola' });
-  $('es-crumb').innerHTML = 'Minhas escolas';
+  const escolaUnica = Object.values(vincMap).filter(x=>RANK[papelEfetivo(x.escola.id)]>=RANK.professor).length===1;
+  $('es-voltar-home').style.display = escolaUnica ? 'none' : '';
+  $('es-crumb').innerHTML = escolaUnica ? 'Painel da instituição' : 'Minhas escolas › Painel';
   $('es-nome').textContent = v ? v.escola.nome : 'Escola';
-  $('es-sub').innerHTML = `Você é <b>${v?PAPEL_L[papelEf]:'…'}</b> aqui. A organização é simples:
-    <b>escola → cursos → turmas → alunos</b>. Toque num curso para abrir o conteúdo e as turmas.`;
+  $('es-sub').innerHTML = `Boa gestão, <b>${esc((me?.nome||'').split(' ')[0]||'')}</b>. Você está como
+    <b>${v?PAPEL_L[papelEf]:'…'}</b>. Veja primeiro o que precisa de atenção e depois acompanhe cursos e turmas.`;
   const podeGerir = v && RANK[papelEf] >= RANK.gestor;
   const souAdminEscola = v && RANK[papelEf] >= RANK.admin;
   const podeVerPendencias = v && RANK[papelEf] >= RANK.professor;
@@ -1439,6 +1471,7 @@ async function abrirEscola(eid){
   $('es-bloqueio').innerHTML = '';
   $('es-cursos').innerHTML = '<div class="card"><div class="skel" style="width:55%"></div></div>';
   $('es-pendencias').innerHTML = '';
+  $('es-resumo').innerHTML = '';
 
   // teste de 7 dias vencido sem assinatura ativa — trava só a GESTÃO desta
   // escola (não a conta inteira: a mesma pessoa pode ter outras escolas ou
@@ -1489,7 +1522,7 @@ async function abrirEscola(eid){
   $('b-painel').style.display = podeGerir ? '' : 'none';
 
   const arq = ctx.filtroCursos === 'arquivados';
-  let qc = sb.from('cursos').select('id,titulo,descricao,valor_cents,arquivado_em,turmas(id,nome,arquivado_em,matriculas(id,status))')
+  let qc = sb.from('cursos').select('id,titulo,descricao,valor_cents,arquivado_em,turmas(id,nome,arquivado_em,turma_professores(pessoa_id),matriculas(id,status))')
     .eq('escola_id', eid).order('criado_em');
   qc = arq ? qc.not('arquivado_em','is',null) : qc.is('arquivado_em',null);
 
@@ -1499,8 +1532,39 @@ async function abrirEscola(eid){
       .in('status',['pendente','aguardando_pagamento']).eq('turmas.cursos.escola_id', eid)
   ]);
 
+  const turmasAtivas=(cursos||[]).flatMap(c=>(c.turmas||[]).filter(t=>!t.arquivado_em)
+    .map(t=>({...t,curso:c.titulo})));
+  const semProfessor=turmasAtivas.filter(t=>!(t.turma_professores||[]).length);
+  const alunosAtivos=turmasAtivas.reduce((s,t)=>s+(t.matriculas||[]).filter(m=>m.status==='ativa').length,0);
+  const pendenciasConfig=[];
+  if(souAdminEscola && !ctx.escolaLogo)pendenciasConfig.push({tipo:'logo',titulo:'Adicionar logo da instituição',
+    texto:'A logo identifica a escola nas telas, inscrições e certificados.',acao:'Adicionar logo'});
+  if(podeGerir && semProfessor.length)pendenciasConfig.push({tipo:'professor',
+    titulo:`${semProfessor.length} turma${semProfessor.length===1?' está':'s estão'} sem professor`,
+    texto:semProfessor.slice(0,3).map(t=>`${t.curso} · ${t.nome}`).join(' · '),acao:'Definir professor'});
+  if(podeGerir && !(cursos||[]).length)pendenciasConfig.push({tipo:'curso',titulo:'Criar o primeiro curso',
+    texto:'Crie o curso e a primeira turma para começar a organizar alunos e conteúdos.',acao:'Criar curso'});
+
+  $('es-resumo').innerHTML=`<div class="resumo-escola">
+    <div><b>${(cursos||[]).length}</b><small>curso${(cursos||[]).length===1?'':'s'} ativo${(cursos||[]).length===1?'':'s'}</small></div>
+    <div><b>${turmasAtivas.length}</b><small>turma${turmasAtivas.length===1?'':'s'}</small></div>
+    <div><b>${alunosAtivos}</b><small>aluno${alunosAtivos===1?'':'s'} ativo${alunosAtivos===1?'':'s'}</small></div>
+    <div><b>${pendenciasConfig.length+(pend?.length||0)}</b><small>pendência${pendenciasConfig.length+(pend?.length||0)===1?'':'s'}</small></div>
+  </div>`;
+  if(pendenciasConfig.length){
+    $('es-pendencias').innerHTML=`<section class="central-pend"><div class="central-pend-cab">
+      <h2>Precisa da sua atenção</h2><p>Resolva estes pontos para a escola funcionar plenamente.</p></div>
+      <div class="pend-grid">${pendenciasConfig.map(p=>`<div class="pend-card">
+        <h3>${p.tipo==='logo'?ic('imagem'):p.tipo==='professor'?ic('professor'):ic('livroAberto')} ${esc(p.titulo)}</h3>
+        <p>${esc(p.texto)}</p><button class="btn xs" onclick="${p.tipo==='logo'?`escolherLogoEscola('${eid}')`:p.tipo==='professor'?'abrirEquipe()':`go('curso-novo',{mundo:'gestao',chip:'Novo curso'})`}">${esc(p.acao)}</button>
+      </div>`).join('')}</div></section>`;
+  }else if(souAdminEscola){
+    $('es-pendencias').innerHTML=`<section class="central-pend"><div class="pend-card ok">
+      <h3>${ic('check')} Configuração em ordem</h3><p>Logo, cursos e responsáveis essenciais estão configurados.</p></div></section>`;
+  }
+
   if(podeGerir && pend?.length){
-    $('es-pendencias').innerHTML = `<div class="card alerta">
+    $('es-pendencias').innerHTML += `<div class="card alerta">
       <div class="row" style="justify-content:space-between;align-items:center">
         <h3>${ic('relogio')} Esperando sua decisão</h3><span class="pill warn">${pend.length}</span></div>
       <div style="font-size:13.5px;color:var(--sub);margin:8px 0 4px;line-height:1.6">
@@ -3432,23 +3496,15 @@ function montarMarcaEscola(eid, souAdminEscola){
     return;
   }
   slot.innerHTML = logo
-    ? `<div class="row" style="align-items:center;gap:12px;margin:4px 0 6px">
-        <img src="${capaUrl(logo)}" alt="Logo da escola" style="width:44px;height:44px;border-radius:10px;
+    ? `<div class="row" style="align-items:center;justify-content:flex-end;gap:10px">
+        <img src="${capaUrl(logo)}" alt="Logo da escola" style="width:68px;height:68px;border-radius:14px;
           object-fit:cover;border:1px solid var(--line);background:#fff;flex:none">
         <button class="btn xs ghost" onclick="escolherLogoEscola('${eid}')">Trocar logo</button>
         <input type="file" accept="image/*" id="lg-input" style="display:none" onchange="enviarLogoEscola('${eid}',this.files[0])">
         <div class="msg" id="lg-msg" style="text-align:left"></div>
       </div>`
-    : `<div class="dica" style="margin:4px 0 16px">
-        ${ic('lampada')} <b>Sua escola ainda não tem uma logo.</b> Ela é obrigatória: aparece em todas as
-        telas de quem estuda ou trabalha aqui, no certificado e na página de inscrição — é o que faz a
-        pessoa sentir que está na sua escola, não só "no MODOX". Adicione agora.
-        <div style="margin-top:10px">
-          <button class="btn xs" onclick="escolherLogoEscola('${eid}')">Adicionar logo</button>
-          <input type="file" accept="image/*" id="lg-input" style="display:none" onchange="enviarLogoEscola('${eid}',this.files[0])">
-        </div>
-        <div class="msg" id="lg-msg" style="text-align:left"></div>
-      </div>`;
+    : `<input type="file" accept="image/*" id="lg-input" style="display:none" onchange="enviarLogoEscola('${eid}',this.files[0])">
+       <div class="msg" id="lg-msg" style="text-align:left"></div>`;
 }
 function escolherLogoEscola(eid){ $('lg-input').click(); }
 async function enviarLogoEscola(eid, file){
@@ -3467,8 +3523,7 @@ async function enviarLogoEscola(eid, file){
     if(vincMap[eid]) vincMap[eid].escola.logo_url = key;
     ctx.escolaLogo = key;
     msg.textContent = 'Logo atualizada ✓'; msg.className = 'msg';
-    montarMarcaEscola(eid, true);
-    mundo(document.body.dataset.mundo);
+    await abrirEscola(eid);
   }catch(e){
     msg.textContent = 'Ops: ' + (e.message || 'não consegui salvar a logo agora'); msg.className = 'msg err';
   }
