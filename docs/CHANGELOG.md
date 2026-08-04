@@ -4,6 +4,15 @@ Este arquivo registra mudanças publicadas no produto. A versão segue o formato
 `MAIOR.MENOR.CORREÇÃO`: incompatibilidade, funcionalidade e correção,
 respectivamente.
 
+## 1.4.0 — 2026-08-04
+
+- Instituição e módulos podem ser renomeados; cursos, aulas e turmas mantêm seus editores.
+- Listas numeradas preservam 1, 2, 3 mesmo com linhas em branco entre os itens.
+- Cadastro de professor, gestor ou administrador deixa de falhar por ambiguidade da coluna de e-mail.
+- Aluno sem foto recebe uma pendência com atalho para completar o perfil.
+- E-mail de confirmação passa a servir corretamente a contratantes, equipe e alunos, sem tratar todos como estudantes.
+- Felicitação cristã de aniversário por e-mail, com linguagem própria para direção, professor e aluno, controle anual contra duplicidade e sem envio quando a data não foi informada.
+
 ## 1.3.1 — 2026-08-04
 
 - Alunos da mesma turma podem ver as fotos de perfil uns dos outros.
