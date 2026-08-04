@@ -62,11 +62,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Inter
 /* marca: o sinal em laranja + a palavra. O X é o mesmo sinal, em texto. */
 .marca-sig{width:26px;height:26px;flex:none;display:block}
 .marca-g{display:flex;align-items:center;gap:10px}
+.marca-plataforma{display:flex;align-items:center;gap:9px}
 .marca-nome{font-size:19px;font-weight:800;letter-spacing:-.025em}
 .marca-nome i{font-style:normal;color:var(--marca)}
 /* logo da escola do aluno/equipe — acompanha a pessoa pelas telas de dentro
    de uma escola, ao lado da marca MODOX (que é só a plataforma por baixo) */
-.marca-escola{width:28px;height:28px;border-radius:8px;object-fit:cover;flex:none;
+.marca-escola{width:34px;height:34px;border-radius:9px;object-fit:contain;flex:none;
   border:1px solid var(--line);background:#fff}
 /* o modo em que a pessoa está — a marca nomeando a própria interface */
 .modo{font-size:11.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;
@@ -424,6 +425,13 @@ h2 .ic,h3 .ic{width:.9em;height:.9em;margin-right:2px}
 .perg-resp{margin-top:12px;padding:12px 14px;background:var(--accent-soft);border-radius:var(--r-sm)}
 .perg-resp b{font-size:12.5px;color:var(--accent-ink);display:block;margin-bottom:5px}
 .perg-resp div{font-size:14px;line-height:1.65}
+.conversa{border:1px solid var(--line);border-radius:var(--r-lg);background:var(--card);margin:12px 0;overflow:hidden}
+.conversa.nao-lida{border-left:4px solid var(--marca)}
+.conversa-cab{padding:14px 16px;background:var(--tint);display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.conversa-msgs{padding:14px 16px}.conversa-msg{max-width:78%;margin:8px 0;padding:10px 12px;border-radius:14px;background:var(--bg)}
+.conversa-msg.minha{margin-left:auto;background:var(--accent-soft)}.conversa-msg b{font-size:12px;display:block;margin-bottom:3px}
+.conversa-msg small{display:block;color:var(--sub);font-size:11.5px;margin-top:5px}.conversa-msg audio{width:100%;margin-top:7px}
+.colegas{display:flex;gap:7px;flex-wrap:wrap}.colega{padding:6px 10px;border-radius:100px;background:var(--bg);font-size:12.5px;font-weight:650}
 /* ---------- rodapé: Brasil + Arbor Labs ---------- */
 .pe-pagina{max-width:1180px;margin:56px auto 0;padding:26px 22px 40px;border-top:1px solid var(--line);
   display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
@@ -521,8 +529,7 @@ h2 .ic,h3 .ic{width:.9em;height:.9em;margin-right:2px}
 
 <div class="top" id="topbar" style="display:none">
   <div class="top-in">
-    <button class="brand" id="b-marca" title="Início"><svg class="marca-sig"><use href="#sig-modox"/></svg><span class="marca-nome">MODO<i>X</i></span></button>
-    <img class="marca-escola" id="marca-escola" alt="" style="display:none">
+    <button class="brand" id="b-marca" title="Início"><span class="marca-plataforma"><svg class="marca-sig"><use href="#sig-modox"/></svg><span class="marca-nome">MODO<i>X</i></span></span><img class="marca-escola" id="marca-escola" alt="" style="display:none"></button>
     <div class="modo-wrap" style="position:relative;flex:none">
       <button class="modo" id="modo-sel" type="button">Modo Aluno</button>
       <div class="modo-menu" id="modo-menu" style="display:none"></div>
@@ -792,8 +799,20 @@ h2 .ic,h3 .ic{width:.9em;height:.9em;margin-right:2px}
   <div id="cu-editor"></div>
   <div id="cu-progresso" class="col"></div>
   <div id="cu-continuar" class="col"></div>
+  <div id="cu-comunidade" class="col"></div>
   <div id="cu-modulos"></div>
   <div id="cu-staff"></div>
+</section>
+
+<!-- ══════════ CONVERSAS DA TURMA ══════════ -->
+<section class="screen" id="s-conversas">
+  <button class="btn link" data-back="conversas-voltar">‹ Voltar</button>
+  <div class="crumb" id="cv-crumb">Comunicação da turma</div>
+  <h1>Conversas da turma</h1>
+  <p class="sub" id="cv-sub">Perguntas públicas ajudam a turma; perguntas privadas ficam com o destinatário escolhido.</p>
+  <div id="cv-colegas"></div>
+  <div id="cv-nova"></div>
+  <div id="cv-lista"></div>
 </section>
 
 <!-- ══════════ AULA ══════════ -->
@@ -867,6 +886,16 @@ h2 .ic,h3 .ic{width:.9em;height:.9em;margin-right:2px}
   <div class="col" style="margin:0 auto"><div id="in-resultado"></div></div>
 </section>
 
+<section class="screen" id="s-novidades">
+  <button class="btn link" data-back="home">‹ Voltar</button>
+  <div class="crumb">Atualizações do software</div><h1>O que mudou no MODOX</h1>
+  <p class="sub">As versões registram melhorias, correções e novas funcionalidades publicadas.</p>
+  <div class="card"><span class="pill marca">Versão 1.3.0</span><h3 style="margin-top:12px">Comunicação e acompanhamento das turmas</h3>
+    <p style="font-size:14px;color:var(--sub);line-height:1.7">Painéis por papel, participação dos alunos, perguntas públicas e privadas, conversas com professor ou gestão, áudio, anexos, pendências e identidade visual da instituição.</p></div>
+  <div class="card"><span class="pill mute">Versão 1.2.0</span><h3 style="margin-top:12px">Painel direto da instituição</h3>
+    <p style="font-size:14px;color:var(--sub);line-height:1.7">Entrada direta na escola, resumo operacional, pendências reais de logo, professor e matrículas, além de melhorias responsivas.</p></div>
+</section>
+
 </div>
 
 <!-- ══════════ RODAPÉ — em todas as páginas ══════════ -->
@@ -878,7 +907,7 @@ h2 .ic,h3 .ic{width:.9em;height:.9em;margin-right:2px}
       <circle cx="14" cy="10" r="4.35" fill="#002776"/>
       <path d="M9.75 8.5a11 11 0 0 1 8.5 2.35" stroke="#fff" stroke-width="1.15" fill="none"/>
     </svg>
-    Desenvolvido orgulhosamente no Brasil
+    Desenvolvido orgulhosamente no Brasil · <button class="btn link" style="font-size:12px;padding:0" onclick="mostrarNovidades()">MODOX · versão <span id="app-versao"></span></button>
   </div>
   <a class="pe-pagina-arbor" href="https://arborlabs.com.br" target="_blank" rel="noopener" title="Arbor Labs">
     <svg width="20" height="20" viewBox="0 0 32 32" aria-hidden="true">
@@ -891,7 +920,9 @@ h2 .ic,h3 .ic{width:.9em;height:.9em;margin-right:2px}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+<script src="/app/version.js"></script>
 <script>
+const APP_VERSION=self.MODOX_VERSION;
 /* ═══════════════ BANCO ═══════════════
    Ambiente único: produção.
 
@@ -909,6 +940,7 @@ const SB_URL = 'https://lshjtlzlywipxtfwbxxe.supabase.co';
 const SB_KEY = 'sb_publishable_7-sR87eV6b4I8nx-k6Hriw_DEVprjfz';
 const sb = supabase.createClient(SB_URL, SB_KEY);
 const $ = id => document.getElementById(id);
+$('app-versao').textContent=APP_VERSION;
 // avisa por e-mail (nunca travar a tela por causa disso)
 function notificar(tipo, matricula_id){
   if(!matricula_id) return;
@@ -1009,10 +1041,16 @@ function mundo(m, chip){
   const logoEl = $('marca-escola');
   if(logoEl){
     const key = m === 'publico' ? '' : ctx.escolaLogo;
-    if(key){ logoEl.src = capaUrl(key); logoEl.alt = 'Logo da escola'; logoEl.style.display = ''; }
-    else logoEl.style.display = 'none';
+    const papelVisual=ctx.escola?papelEfetivo(ctx.escola):null;
+    const marcaInstitucional=m==='aluno'||papelVisual==='professor';
+    const modox=$('b-marca')?.querySelector('.marca-plataforma');
+    if(key){logoEl.src=capaUrl(key);logoEl.alt='Logo da instituição';logoEl.style.display='';}
+    else logoEl.style.display='none';
+    if(modox)modox.style.display=marcaInstitucional&&key?'none':'flex';
+    if(!marcaInstitucional&&key)logoEl.style.display='';
   }
 }
+function mostrarNovidades(){go('novidades',{mundo:document.body.dataset.mundo||'gestao',chip:'Versão '+APP_VERSION});}
 // admin master pode "ver como" aluno/professor/gestor pra entender a experiência
 // e as dificuldades de cada papel — pedido do Israel (02/08/2026). Nunca muda
 // permissão real no banco (RLS continua valendo o papel de verdade); só filtra
@@ -1152,6 +1190,8 @@ $('t-cadastro').onclick = async () => {
 };
 document.querySelectorAll('[data-back]').forEach(b => b.onclick = () => {
   const a = b.dataset.back;
+  if(a === 'conversas-voltar') return ctx.conversasOrigem==='aula' && ctx.aula ? abrirAula(ctx.aula)
+    : ctx.curso ? abrirCurso(ctx.curso,ctx.origem) : ctx.escola ? abrirEscola(ctx.escola) : entrar();
   if(a === 'curso-origem') return ctx.origem === 'escola' ? abrirEscola(ctx.escola) : entrar();
   if(a === 'curso' && !ctx.curso) return entrar();
   if(a === 'escola' && ctx.escola) return abrirEscola(ctx.escola);
@@ -1582,16 +1622,16 @@ async function abrirEscola(eid){
   }
 
   // ---- perguntas de aluno esperando resposta (só quem responde: professor+)
-  const { data: perg } = podeVerPendencias ? await sb.rpc('perguntas_pendentes', { p_escola: eid }) : { data:null };
+  const { data: perg } = podeVerPendencias ? await sb.rpc('pendencias_conversas', { p_escola: eid }) : { data:null };
   if(perg?.length){
     $('es-pendencias').innerHTML += `<div class="card alerta">
       <div class="row" style="justify-content:space-between;align-items:center">
         <h3>${ic('mensagem')} Alunos esperando resposta</h3><span class="pill warn">${perg.length}</span></div>
       <div style="font-size:13.5px;color:var(--sub);margin:8px 0 10px;line-height:1.6">
-        Cada pergunta vai para o professor da turma. Responder rápido é o que faz o aluno voltar.</div>
-      ${perg.slice(0,6).map(p => `<div class="item" style="cursor:pointer" onclick="abrirAula('${p.aula_id}')">
+        As perguntas chegam ao professor ou à gestão, conforme a escolha do aluno.</div>
+      ${perg.slice(0,6).map(p => `<div class="item" style="cursor:pointer" onclick="abrirConversas('${p.turma_id}','${p.id}','escola')">
         <div class="t">${esc(p.texto.slice(0,120))}${p.texto.length>120?'…':''}
-          <small>${esc(p.autor)} · ${esc(p.curso)} › ${esc(p.aula)} · turma ${esc(p.turma)}
+          <small>${esc(p.autor)} · ${esc(p.curso)} · turma ${esc(p.turma)}
             · ${p.publica?`${ic('pessoas')} pública`:`${ic('cadeado')} privada`}</small></div>
         <span style="color:var(--sub)">›</span></div>`).join('')}
       ${perg.length>6?`<div class="hint" style="margin-top:10px">e mais ${perg.length-6} esperando.</div>`:''}
@@ -1781,7 +1821,7 @@ $('b-criar-curso').onclick = async () => {
 async function abrirCurso(cid, origem){
   ctx.curso = cid; ctx.origem = origem || ctx.origem || 'home';
   $('cu-titulo').textContent = '…'; $('cu-desc').textContent = '';
-  ['cu-modulos','cu-staff','cu-progresso','cu-continuar','cu-editor','cu-acoes'].forEach(i => $(i).innerHTML='');
+  ['cu-modulos','cu-staff','cu-progresso','cu-continuar','cu-comunidade','cu-editor','cu-acoes'].forEach(i => $(i).innerHTML='');
   $('cu-modulos').innerHTML = '<div class="card"><div class="skel" style="width:55%"></div></div>';
 
   const { data: curso } = await sb.from('cursos')
@@ -1859,6 +1899,7 @@ async function abrirCurso(cid, origem){
     ctx.turmaTemEnc = !!minhaMat?.turmas?.tem_encontros;
     ctx.minhaTurmaNome = minhaMat?.turmas?.nome || '';
     ctx.professorNome = minhaMat?.turmas?.turma_professores?.[0]?.pessoas?.nome || '';
+    if(ctx.minhaTurma) montarResumoComunidade(ctx.minhaTurma);
     const RITMO = { imediata:'Você avança no seu ritmo, sem espera.',
       por_conclusao:'Cada aula abre quando você conclui a anterior.',
       diaria:'Uma aula por dia — a próxima abre 24h depois da anterior.',
@@ -2162,6 +2203,10 @@ async function montarTurmas(cid, souStaff){
     .select('id,nome,max_inscricoes,arquivado_em,modalidade,local_padrao,tem_encontros,turma_professores(pessoa_id,pessoas(nome)),matriculas(id,status,respostas,criado_em,observacao,pessoas!matriculas_pessoa_id_fkey(nome,email,telefone,foto_url))')
     .eq('curso_id', cid).order('criado_em');
   ctx.turmasCache = turmas || [];
+  const engMap={};
+  await Promise.all((turmas||[]).filter(t=>!t.arquivado_em).map(async t=>{
+    const {data}=await sb.rpc('painel_engajamento_turma',{p_turma:t.id});engMap[t.id]=data||[];
+  }));
   const ABAS = [['ativos','Alunos'],['pendentes','Em análise'],['recusados','Não aprovados'],
                 ['ex','Ex-alunos'],['arquivadas','Turmas arquivadas']];
   let h = `<h2>Turmas e pessoas</h2>
@@ -2181,6 +2226,7 @@ async function montarTurmas(cid, souStaff){
     const pendentes = mats.filter(m => ['pendente','aguardando_pagamento'].includes(m.status));
     const recusados = mats.filter(m => m.status==='cancelada');
     const exAlunos = mats.filter(m => m.status==='desligada');
+    const engs=engMap[t.id]||[],comInteracao=engs.filter(e=>e.aulas_iniciadas>0||new Date(e.ultima_interacao).getTime()>0).length;
     const ocup = ativos.length + pendentes.length;
     const sel = ctx.abaMat==='pendentes' ? pendentes : ctx.abaMat==='recusados' ? recusados
               : ctx.abaMat==='ex' ? exAlunos : ativos;
@@ -2191,6 +2237,7 @@ async function montarTurmas(cid, souStaff){
         <div style="flex:1"><h3>${esc(t.nome)}</h3>
           <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:8px">
             <span class="pill ok">${ativos.length} aluno${ativos.length===1?'':'s'}</span>
+            ${ativos.length?`<span class="pill ${comInteracao===ativos.length?'ok':'warn'}">${comInteracao} interagindo · ${ativos.length-comInteracao} sem interação</span>`:''}
             ${pendentes.length?`<span class="pill warn">${pendentes.length} em análise</span>`:''}
             ${recusados.length?`<span class="pill mute">${recusados.length} não aprovado${recusados.length===1?'':'s'}</span>`:''}
             ${t.max_inscricoes?`<span class="pill ${lotada?'dgr':'mute'}">${ocup}/${t.max_inscricoes} vagas${lotada?' · lotada':''}</span>`:''}
@@ -2205,6 +2252,7 @@ async function montarTurmas(cid, souStaff){
         <button class="btn xs" onclick="formLink('${t.id}')">Link de inscrição</button>
         <button class="btn xs ghost" onclick="formPagina('${t.id}')">Página de divulgação</button>
         <button class="btn xs ghost" onclick="painelEncontros('${t.id}')">Calendário e presença</button>
+        <button class="btn xs ghost" onclick="abrirConversas('${t.id}',null,'curso')">Conversas da turma</button>
         <button class="btn xs ghost" onclick="formMatricula('${t.id}')">Matricular alguém</button>
         <button class="btn xs ghost" onclick="formTurma('${t.id}')">Editar</button>
         <button class="btn xs ghost" onclick="arquivarTurma('${t.id}',true)">Arquivar</button>
@@ -2212,6 +2260,9 @@ async function montarTurmas(cid, souStaff){
           ? `<button class="btn xs ghost dgr" onclick="formExcluirTurma('${t.id}','${esc(t.nome).replace(/'/g,'')}')">Excluir</button>`:''}
         </div>`
       : souStaff ? `<div style="margin-top:14px"><button class="btn xs ghost" onclick="arquivarTurma('${t.id}',false)">Reativar turma</button></div>` : ''}
+      ${!souStaff && ctx.podeAula && !t.arquivado_em?`<div class="row" style="margin-top:14px;flex-wrap:wrap">
+        <button class="btn xs" onclick="abrirConversas('${t.id}',null,'curso')">Perguntas e conversas</button>
+        <button class="btn xs ghost" onclick="painelEncontros('${t.id}')">Calendário e presença</button></div>`:''}
       <div id="fl-${t.id}"></div><div id="fe-${t.id}"></div><div id="fm-${t.id}"></div>
       <div id="ft-${t.id}"></div><div id="fx-${t.id}"></div><div id="fp-${t.id}"></div>
       ${sel.length ? `<div style="margin-top:8px">${sel.map(m => {
@@ -2221,7 +2272,9 @@ async function montarTurmas(cid, souStaff){
           : ctx.abaMat==='recusados' ? `<button class="btn xs ghost" onclick="formDecisao('${m.id}','ativa')">Reconsiderar</button>`
           : ctx.abaMat==='ex' ? (mando ? `<button class="btn xs ghost" onclick="religarAluno('${m.id}','${cid}')">Readmitir</button>` : '')
           : (mando ? `<button class="btn xs ghost dgr" onclick="formDesligar('${m.id}','${esc(m.pessoas?.nome||'este aluno').replace(/'/g,'')}','${cid}')">Desligar</button>` : '');
-        return pessoaItem(m, acoes);
+        const en=engs.find(e=>e.matricula_id===m.id);
+        const atividade=en ? `${en.aulas_concluidas||0} de ${ctx.aulasSeq.length} aulas concluídas${new Date(en.ultima_interacao).getTime()>0?' · última interação '+dataHora(en.ultima_interacao):' · ainda não interagiu'}` : '';
+        return pessoaItem(m, acoes, atividade);
       }).join('')}</div>`
       : `<div style="font-size:13.5px;color:var(--sub);margin-top:14px">${
           ctx.abaMat==='pendentes'?`Ninguém aguardando análise nesta turma. ${ic('check')}` :
@@ -3318,6 +3371,122 @@ async function enviarResposta(pid, eraPublica){
   await montarPerguntas(ctx.aula);
 }
 
+// ═══════════════ CONVERSAS PEDAGÓGICAS ═══════════════
+// Pergunta pública = mural da turma. Privadas ficam com professor ou gestão.
+// Não há conversa direta entre dois alunos; o servidor também recusa contatos.
+async function montarResumoComunidade(turmaId){
+  const slot=$('cu-comunidade'); if(!slot) return;
+  const [{data:colegas},{data:conversas}]=await Promise.all([
+    sb.rpc('colegas_turma',{p_turma:turmaId}),sb.rpc('conversas_turma',{p_turma:turmaId,p_aula:null})
+  ]);
+  const naoLidas=(conversas||[]).filter(c=>c.nao_lida).length;
+  slot.innerHTML=`<div class="card" style="margin-top:18px">
+    <div class="row" style="justify-content:space-between;align-items:flex-start">
+      <div><h3>${ic('pessoas')} Minha turma</h3><div style="font-size:13px;color:var(--sub)">${esc(ctx.minhaTurmaNome||'Turma')} · somente nomes são mostrados aos alunos</div></div>
+      ${naoLidas?`<span class="pill warn">${naoLidas} nova${naoLidas===1?'':'s'}</span>`:''}</div>
+    <div class="colegas" style="margin-top:13px">${(colegas||[]).map(c=>`<span class="colega">${esc(c.nome)}</span>`).join('')}</div>
+    <div class="row" style="margin-top:16px;flex-wrap:wrap">
+      <button class="btn sm" onclick="abrirConversas('${turmaId}',null,'curso')">Perguntas e conversas</button>
+      <button class="btn sm ghost" onclick="abrirConversas('${turmaId}',null,'curso','gestao')">Perguntar à gestão</button></div>
+    <div class="hint" style="margin-top:12px">Perguntas públicas podem ser acompanhadas pela turma. Perguntas privadas aparecem apenas para você e o destinatário.</div>
+  </div>`;
+}
+
+async function montarConversasAula(aid){
+  const slot=$('au-perguntas'); if(!slot) return;
+  const turma=ctx.minhaTurma||null;
+  const {data}=await sb.rpc('conversas_turma',{p_turma:turma,p_aula:aid});
+  const cs=data||[], novas=cs.filter(c=>c.nao_lida).length;
+  slot.innerHTML=`<div class="card" style="margin-top:24px">
+    <div class="row" style="justify-content:space-between;align-items:center"><h3 style="margin:0">${ic('mensagem')} Conversas sobre esta aula</h3>
+      ${novas?`<span class="pill warn">${novas} nova${novas===1?'':'s'}</span>`:''}</div>
+    <p style="font-size:13.5px;color:var(--sub);line-height:1.6;margin-top:8px">Perguntas públicas viram conhecimento da turma; perguntas privadas ficam com o professor.</p>
+    <button class="btn sm" style="margin-top:12px" onclick="abrirConversas(${turma?`'${turma}'`:'null'},null,'aula','professor','${aid}')">${ctx.podeAula?'Abrir perguntas da aula':'Fazer pergunta ou acompanhar'}</button>
+  </div>`;
+}
+
+let cvDestino='professor',cvPublica=false;
+async function abrirConversas(turmaId,foco,origem,destino,aulaId){
+  ctx.conversasTurma=turmaId||null;ctx.conversaFoco=foco||null;ctx.conversasOrigem=origem||'curso';
+  if(aulaId)ctx.aula=aulaId;
+  cvDestino=destino||'professor';cvPublica=false;
+  go('conversas',{mundo:ctx.podeAula?'gestao':'aluno',chip:'Conversas'});
+  $('cv-lista').innerHTML='<div class="card"><div class="skel" style="width:55%"></div></div>';
+  const souAluno=!ctx.podeAula;
+  $('cv-nova').innerHTML=turmaId?(souAluno?formNovaConversa():formNovaOrientacao()):'';
+  $('cv-colegas').innerHTML='';
+  if(souAluno&&turmaId){
+    const {data:colegas}=await sb.rpc('colegas_turma',{p_turma:turmaId});
+    $('cv-colegas').innerHTML=`<div class="card"><b>Quem está na sua turma</b><div class="colegas" style="margin-top:10px">${(colegas||[]).map(c=>`<span class="colega">${esc(c.nome)}</span>`).join('')}</div>
+      <div class="hint" style="margin-top:10px">Por privacidade, alunos veem somente o primeiro nome e a inicial seguinte.</div></div>`;
+  }
+  await carregarConversas();
+}
+function formNovaConversa(){
+  return `<div class="card" style="margin:16px 0"><h3>Fazer uma pergunta</h3>
+    <label>Para quem</label><div class="seg" id="cv-dest">
+      <button class="${cvDestino==='professor'?'on':''}" onclick="setCvDestino('professor')">Professor</button>
+      <button class="${cvDestino==='gestao'?'on':''}" onclick="setCvDestino('gestao')">Gestão do curso</button></div>
+    <label>Sua pergunta</label><textarea id="cv-texto" rows="3" maxlength="1000" placeholder="Escreva sua dúvida com clareza…"></textarea>
+    <div id="cv-vis-box">${formVisibilidade()}</div>
+    <label>Áudio <span class="opt">— opcional</span></label>${montarGravador('cv-nova',false)}
+    <label>Imagem ou anexo <span class="opt">— opcional</span></label><input id="cv-arq-nova" type="file" accept="image/*">
+    <button class="btn sm" style="margin-top:14px" onclick="enviarNovaConversa()">Enviar pergunta</button><div class="msg" id="m-cv-nova"></div>
+    <div class="hint" style="margin-top:10px">O sistema não permite enviar telefone, e-mail, rede social ou links de contato.</div></div>`;
+}
+function formVisibilidade(){return cvDestino==='gestao'
+  ? `<div class="hint">Perguntas para a gestão são sempre privadas.</div>`
+  : `<label>Visibilidade</label><div class="seg" id="cv-vis"><button class="${!cvPublica?'on':''}" onclick="setCvPublica(0)">${ic('cadeado')} Privada</button><button class="${cvPublica?'on':''}" onclick="setCvPublica(1)">${ic('pessoas')} Pública na turma</button></div>`;}
+function setCvDestino(v){cvDestino=v;cvPublica=false;document.querySelectorAll('#cv-dest button').forEach((b,i)=>b.classList.toggle('on',(i===0)===(v==='professor')));$('cv-vis-box').innerHTML=formVisibilidade();}
+function setCvPublica(v){cvPublica=!!Number(v);document.querySelectorAll('#cv-vis button').forEach((b,i)=>b.classList.toggle('on',(i===1)===cvPublica));}
+
+async function enviarNovaConversa(){
+  const txt=($('cv-texto')?.value||'').trim(),msg=$('m-cv-nova'),audio=recs['cv-nova']?.blob,anexo=$('cv-arq-nova')?.files?.[0];
+  if(txt.length<5){msg.textContent='Escreva sua pergunta com um pouco mais de detalhe.';return;}
+  msg.textContent='Enviando…';
+  const {data,error}=await sb.rpc('criar_conversa',{p_turma:ctx.conversasTurma,p_aula:ctx.conversasOrigem==='aula'?ctx.aula:null,p_destino:cvDestino,p_publica:cvPublica,p_texto:txt});
+  if(error){msg.textContent='Ops: '+error.message;return;}
+  if(audio)await subirAudioConversa(data.conversa_id,data.mensagem_id,audio);
+  if(anexo)await subirImagemConversa(data.conversa_id,data.mensagem_id,anexo);
+  delete recs['cv-nova'];ctx.conversaFoco=data.conversa_id;$('cv-nova').innerHTML=formNovaConversa();await carregarConversas();
+}
+
+async function carregarConversas(){
+  const {data,error}=await sb.rpc('conversas_turma',{p_turma:ctx.conversasTurma,p_aula:ctx.conversasOrigem==='aula'?ctx.aula:null});
+  if(error){$('cv-lista').innerHTML=`<div class="card"><div class="hint">Não consegui abrir as conversas: ${esc(error.message)}</div></div>`;return;}
+  let cs=data||[];if(ctx.conversaFoco)cs=cs.filter(c=>c.id===ctx.conversaFoco);
+  $('cv-lista').innerHTML=cs.length?cs.map(renderConversa).join(''):`<div class="card empty"><div class="big">${ic('mensagem')}</div><b>Nenhuma conversa ainda</b><p>A primeira dúvida pode começar por você.</p></div>`;
+  for(const c of cs){sb.rpc('marcar_conversa_lida',{p_conversa:c.id});for(const m of c.mensagens||[]){
+    if(m.audio_url&&m.audio_url!=='enviando'){const {data:s}=await sb.storage.from('conversas').createSignedUrl(m.audio_url,3600);const a=$('cv-audio-'+m.id);if(a&&s?.signedUrl)a.src=s.signedUrl;}
+    if(m.anexo_url&&m.anexo_url!=='enviando'){const {data:s}=await sb.storage.from('conversas').createSignedUrl(m.anexo_url,3600);const a=$('cv-img-'+m.id);if(a&&s?.signedUrl)a.src=s.signedUrl;}
+  }}
+}
+function renderConversa(c){
+  const titulo=c.destino==='turma'?`${ic('caixaEntrada')} Orientação da equipe`:c.publica?`${ic('pessoas')} Pergunta pública da turma`:c.destino==='gestao'?`${ic('cadeado')} Pergunta privada para a gestão`:`${ic('cadeado')} Pergunta privada para o professor`;
+  const podeResponder=ctx.podeAula||(!c.publica&&c.minha)||(c.publica&&(c.mensagens||[]).some(m=>m.autor_tipo==='equipe'));
+  return `<article class="conversa ${c.nao_lida?'nao-lida':''}"><div class="conversa-cab"><div><b>${titulo}</b><div style="font-size:12px;color:var(--sub);margin-top:3px">${esc(c.autor)} · ${dataHora(c.criado_em)}</div></div>${c.nao_lida?'<span class="pill warn">nova</span>':''}</div>
+    <div class="conversa-msgs">${(c.mensagens||[]).map(m=>`<div class="conversa-msg ${m.minha?'minha':''}"><b>${m.minha?'Você':esc(m.autor)}</b>${m.texto?`<div>${esc(m.texto)}</div>`:''}${m.audio_url&&m.audio_url!=='enviando'?`<audio id="cv-audio-${m.id}" controls preload="metadata"></audio>`:''}${m.anexo_url&&m.anexo_url!=='enviando'?`<img id="cv-img-${m.id}" alt="Anexo da conversa" style="display:block;max-width:100%;border-radius:10px;margin-top:8px">`:''}<small>${dataHora(m.criado_em)}</small></div>`).join('')}
+      <div id="cv-resp-${c.id}"></div>${podeResponder?`<button class="btn xs ghost" onclick="formResponderConversa('${c.id}')">Responder</button>`:`<div class="hint">A conversa da turma abre depois da primeira resposta do professor.</div>`}</div></article>`;
+}
+function dataHora(v){const d=new Date(v);return d.toLocaleDateString('pt-BR')+' às '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});}
+function formResponderConversa(cid){const s=$('cv-resp-'+cid);if(s.innerHTML){s.innerHTML='';return;}s.innerHTML=`<div class="inline"><textarea id="cv-r-${cid}" rows="2" maxlength="1000" placeholder="Escreva sua resposta…"></textarea><label>Áudio <span class="opt">— opcional</span></label>${montarGravador('cv-'+cid,false)}<label>Imagem ou anexo <span class="opt">— opcional</span></label><input id="cv-arq-${cid}" type="file" accept="image/*"><div class="row" style="margin-top:12px"><button class="btn xs" onclick="enviarMensagemConversa('${cid}')">Enviar</button><button class="btn xs ghost" onclick="formResponderConversa('${cid}')">Cancelar</button></div><div class="msg" id="m-cv-${cid}"></div></div>`;}
+async function enviarMensagemConversa(cid){
+  const txt=($('cv-r-'+cid)?.value||'').trim(),audio=recs['cv-'+cid]?.blob,anexo=$('cv-arq-'+cid)?.files?.[0],msg=$('m-cv-'+cid);if(!txt&&!audio&&!anexo){msg.textContent='Escreva uma mensagem, grave um áudio ou envie uma imagem.';return;}msg.textContent='Enviando…';
+  const {data,error}=await sb.rpc('adicionar_mensagem_conversa',{p_conversa:cid,p_texto:txt||null,p_tem_audio:!!audio,p_tem_anexo:!!anexo});if(error){msg.textContent='Ops: '+error.message;return;}
+  if(audio){const e=await subirAudioConversa(cid,data.mensagem_id,audio);if(e){msg.textContent=e;return;}}delete recs['cv-'+cid];await carregarConversas();
+  if(anexo){const e=await subirImagemConversa(cid,data.mensagem_id,anexo);if(e){msg.textContent=e;return;}}delete recs['cv-'+cid];await carregarConversas();
+}
+async function subirAudioConversa(cid,mid,blob){
+  const tipo=blob.type||'audio/webm',ext=tipo.includes('mp4')?'m4a':tipo.includes('ogg')?'ogg':tipo.includes('mpeg')?'mp3':'webm';
+  const key=`conversas/${cid}/${mid}.${ext}`;const {error}=await sb.storage.from('conversas').upload(key,blob,{contentType:tipo});if(error)return 'Falha no envio do áudio: '+error.message;
+  const {error:e}=await sb.rpc('anexar_audio_conversa',{p_mensagem:mid,p_caminho:key});return e?'Falha ao registrar o áudio: '+e.message:null;
+}
+async function subirImagemConversa(cid,mid,file){
+  try{const blob=await comprimirImagem(file),key=`conversas/${cid}/${mid}.jpg`;const {error}=await sb.storage.from('conversas').upload(key,blob,{contentType:'image/jpeg'});if(error)return 'Falha no envio da imagem: '+error.message;const {error:e}=await sb.rpc('anexar_imagem_conversa',{p_mensagem:mid,p_caminho:key});return e?'Falha ao registrar a imagem: '+e.message:null;}catch(e){return 'Falha na imagem: '+e.message;}
+}
+function formNovaOrientacao(){return `<div class="card" style="margin:16px 0"><h3>${ic('caixaEntrada')} Publicar orientação para a turma</h3><textarea id="cv-orientacao" rows="3" maxlength="1000" placeholder="Escreva a orientação da equipe…"></textarea><label>Áudio <span class="opt">— opcional</span></label>${montarGravador('cv-orientacao',false)}<label>Imagem ou anexo <span class="opt">— opcional</span></label><input id="cv-arq-orientacao" type="file" accept="image/*"><button class="btn sm" style="margin-top:14px" onclick="enviarOrientacao()">Publicar para a turma</button><div class="msg" id="m-cv-orientacao"></div></div>`;}
+async function enviarOrientacao(){const txt=($('cv-orientacao')?.value||'').trim(),audio=recs['cv-orientacao']?.blob,anexo=$('cv-arq-orientacao')?.files?.[0],msg=$('m-cv-orientacao');if(txt.length<2){msg.textContent='Escreva a orientação.';return;}msg.textContent='Publicando…';const {data,error}=await sb.rpc('publicar_orientacao',{p_turma:ctx.conversasTurma,p_texto:txt});if(error){msg.textContent='Ops: '+error.message;return;}if(audio)await subirAudioConversa(data.conversa_id,data.mensagem_id,audio);if(anexo)await subirImagemConversa(data.conversa_id,data.mensagem_id,anexo);delete recs['cv-orientacao'];$('cv-nova').innerHTML=formNovaOrientacao();await carregarConversas();}
+
 // ═══════════════ AGENDA DO ALUNO ═══════════════
 async function abrirAgenda(){
   go('agenda', { mundo:'aluno', chip:'Meus compromissos' });
@@ -4234,7 +4403,7 @@ async function abrirAula(aid){
   ligarCapas($('au-conteudo'));
   $('au-quiz').innerHTML = '';
   await montarQuiz(aid);
-  montarPerguntas(aid);
+  montarConversasAula(aid);
   atualizaBotaoConcluir();
   const i = ctx.aulasSeq.findIndex(x=>x.id===aid);
   $('b-aula-ant').style.visibility = i>0?'visible':'hidden';

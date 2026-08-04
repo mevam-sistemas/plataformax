@@ -27,13 +27,15 @@ jobs:
         run: |
           set -euo pipefail
           node --check app/sw.js
+          node --check app/version.js
           awk 'BEGIN{inside=0} /^<script>$/{inside=1;next} /^<\/script>$/{if(inside){exit}} inside{print}' app/index.html | node --check
           node -e "JSON.parse(require('fs').readFileSync('app/manifest.webmanifest', 'utf8'))"
           test -f img/icon-192.png
           test -f img/icon-512.png
           grep -Fq '<link rel="manifest" href="/app/manifest.webmanifest">' app/index.html
           grep -Fq "navigator.serviceWorker.register('/app/sw.js'" app/index.html
-          grep -Fq "const VERSION = 'modox-" app/sw.js
+          grep -Fq "self.MODOX_VERSION = '" app/version.js
+          grep -Fq "const VERSION = 'modox-' + self.MODOX_VERSION" app/sw.js
           node scripts/test-validadores.mjs
 
       - name: Impedir conflitos e segredos conhecidos

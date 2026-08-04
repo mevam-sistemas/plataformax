@@ -4,6 +4,25 @@ Este arquivo registra mudanças publicadas no produto. A versão segue o formato
 `MAIOR.MENOR.CORREÇÃO`: incompatibilidade, funcionalidade e correção,
 respectivamente.
 
+## 1.3.0 — 2026-08-04
+
+- Painéis de turma com alunos interagindo, sem interação, progresso e último contato.
+- Perguntas públicas da turma e perguntas privadas para professor ou gestão.
+- Conversas contínuas depois da primeira resposta da equipe, com texto, áudio,
+  imagem, autor, data, hora e controle de leitura.
+- Orientações do professor, gestão ou direção para a turma.
+- Bloqueio no servidor para telefone, e-mail, rede social e links enviados por alunos.
+- Alunos veem colegas apenas pelo primeiro nome e inicial seguinte; WhatsApp continua
+  restrito a professor, gestão e direção.
+- Cabeçalho de aluno e professor usa a logo da instituição, com MODOX como substituta.
+- Versão única compartilhada pelo rodapé e pelo cache do PWA.
+
+## 1.2.0 — 2026-08-04
+
+- Entrada direta no painel para contratos com uma instituição.
+- Resumo operacional e pendências reais de logo, professor e matrículas.
+- Melhorias gerais de responsividade, espaçamento e hierarquia visual.
+
 ## 1.1.0 — 2026-08-04
 
 - Primeiro acesso direcionado a diretores e responsáveis pela contratação.

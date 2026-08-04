@@ -1,8 +1,10 @@
-const VERSION = 'modox-1.2.0';
+importScripts('/app/version.js');
+const VERSION = 'modox-' + self.MODOX_VERSION;
 const SHELL = [
   '/app/',
   '/app/index.html',
   '/app/manifest.webmanifest',
+  '/app/version.js',
   '/img/icon-192.png',
   '/img/icon-512.png',
   '/img/modox-x.svg'
