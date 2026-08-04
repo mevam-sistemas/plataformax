@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 
 const html = fs.readFileSync('app/index.html', 'utf8');
+const convite = fs.readFileSync('supabase/functions/convidar-equipe-modox/index.ts', 'utf8');
 const bloco = html.match(/function cpfValido\(c\)[\s\S]*?\nasync function abrirPerfil/);
 if (!bloco) throw new Error('Validadores de CPF/CNPJ não encontrados');
 
@@ -20,3 +21,11 @@ for (const [nome, atual, esperado] of casos) {
   if (atual !== esperado) throw new Error(`${nome}: esperado ${esperado}, recebido ${atual}`);
   console.log(`✓ ${nome}`);
 }
+
+for (const obsoleto of ['Ninguém precisa de senha', 'Não existe senha para vazar', 'sem senha, sem convite']) {
+  if (html.includes(obsoleto)) throw new Error(`Texto de acesso obsoleto encontrado: ${obsoleto}`);
+}
+for (const contrato of ['listUsers({page:1,perPage:1000})', 'auth_user_id:novoUid', "deleteUser(novoUid)"]) {
+  if (!convite.includes(contrato)) throw new Error(`Contrato de vínculo do convite ausente: ${contrato}`);
+}
+console.log('✓ convite vincula o usuário autenticado ao cadastro da equipe');
