@@ -42,7 +42,10 @@ e validações internas. O `service_role` permanece exclusivo do backend.
 
 ## Regra para próximas mudanças
 
-- Toda alteração estrutural deve ser um arquivo novo em `supabase/migrations`.
+- Toda alteração estrutural deve ser um arquivo novo na fonte canônica
+  `mevam-sistemas/ct360/supabase/migrations`; os arquivos locais permanecem
+  somente como histórico do release que os criou.
+- Nunca executar `supabase db push` a partir deste repositório.
 - Nunca editar uma migração que já foi aplicada em produção.
 - Função nova começa sem acesso público e recebe `GRANT EXECUTE` somente para o
   papel necessário.

@@ -4,6 +4,12 @@ Este arquivo registra mudanças publicadas no produto. A versão segue o formato
 `MAIOR.MENOR.CORREÇÃO`: incompatibilidade, funcionalidade e correção,
 respectivamente.
 
+## 1.4.4 — 2026-08-04
+
+- A governança do banco compartilhado passa a apontar o CT360 como fonte canônica das 44 migrações alinhadas.
+- Este repositório deixa de ser origem autorizada para `supabase db push`, reduzindo o risco de históricos divergentes.
+- A documentação de restauração registra a cobertura comprovada dos schemas `public` e `social`.
+
 ## 1.4.3 — 2026-08-04
 
 - O arquivo canônico de versão deixa de permanecer no cache da CDN, permitindo que o PWA reconheça a publicação nova imediatamente.

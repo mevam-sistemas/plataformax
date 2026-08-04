@@ -4,6 +4,9 @@
 
 - O site e o aplicativo são arquivos estáticos publicados pelo Cloudflare Pages.
 - A aplicação usa o projeto Supabase compartilhado com o 360social.
+- O mesmo projeto também contém o CT360 no esquema `ct360`. A fonte canônica
+  das migrações dos três produtos fica em `mevam-sistemas/ct360`, conforme
+  `docs/GOVERNANCA-BANCO.md`; este repositório não deve executar `db push`.
 - As tabelas do MODOX estão no esquema `public`; autenticação e arquivos usam
   os esquemas e serviços `auth` e `storage`.
 - A chave pública do Supabase pode existir no navegador. Chaves `service_role`,
@@ -39,10 +42,8 @@ arquivos, aumentando complexidade sem melhorar a recuperação. O alerta e a
 responsabilidade operacional do backup devem ser tratados como compartilhados
 pelos dois produtos.
 
-O teste automatizado atual comprova trimestralmente a restauração do esquema
-`social`. O dump contém o esquema `public` do MODOX, mas ainda falta um ensaio
-automatizado específico de restauração desse esquema. Até esse ensaio passar,
-não considerar a recuperação do MODOX integralmente comprovada.
+O teste automatizado comprova trimestralmente a restauração dos esquemas
+`public` (MODOX) e `social` em PostgreSQL descartável, sem tocar na produção.
 
 ## Verificação rápida após implantação
 
