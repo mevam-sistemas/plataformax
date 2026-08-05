@@ -4,6 +4,11 @@ Este arquivo registra mudanças publicadas no produto. A versão segue o formato
 `MAIOR.MENOR.CORREÇÃO`: incompatibilidade, funcionalidade e correção,
 respectivamente.
 
+## 1.4.5 — 2026-08-04
+
+- Recuperação de senha passa a retornar sempre ao domínio canônico do MODOX.
+- Assuntos e mensagens de autenticação ganham identidade própria e linguagem adequada a gestor, professor e aluno.
+
 ## 1.4.4 — 2026-08-04
 
 - A governança do banco compartilhado passa a apontar o CT360 como fonte canônica das 44 migrações alinhadas.
