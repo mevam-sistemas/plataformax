@@ -1147,7 +1147,7 @@ $('b-esqueci-senha').onclick = async () => {
   const email = $('email').value.trim().toLowerCase();
   if(!email.includes('@')){ erro('m1','Digite seu e-mail ali em cima primeiro.'); return; }
   info('m1','Enviando link de redefinição…');
-  const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname });
+  const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: 'https://modox.com.br/app/' });
   if(error){ console.error('[login] redefinir senha', error); erro('m1','Não consegui enviar agora. Tente de novo em instantes.'); return; }
   info('m1','Te mandamos um link por e-mail pra redefinir a senha. Confira sua caixa de entrada.');
 };
