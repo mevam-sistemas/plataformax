@@ -4,6 +4,15 @@ Este arquivo registra mudanças publicadas no produto. A versão segue o formato
 `MAIOR.MENOR.CORREÇÃO`: incompatibilidade, funcionalidade e correção,
 respectivamente.
 
+## 1.5.6 — 2026-08-06
+
+- Cadastro, convite, recuperação de senha e aniversário passam a usar remetente,
+  linguagem, acabamento visual e rodapé únicos do MODOX e da Arbor Labs.
+- Remetente SMTP deixa de usar endereço pessoal e passa a responder oficialmente
+  por `contato@arborlabs.com.br`, melhorando consistência e entregabilidade.
+- Falhas e confirmações do provedor de convite passam a registrar diagnóstico e
+  identificador da mensagem para suporte.
+
 ## 1.5.5 — 2026-08-06
 
 - Download do QR de presença passa a usar a biblioteca local correta, sem depender

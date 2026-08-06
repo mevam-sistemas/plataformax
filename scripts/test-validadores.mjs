@@ -3,6 +3,10 @@ import vm from 'node:vm';
 
 const html = fs.readFileSync('app/index.html', 'utf8');
 const convite = fs.readFileSync('supabase/functions/convidar-equipe-modox/index.ts', 'utf8');
+const aniversario = fs.readFileSync('supabase/functions/aniversarios/index.ts', 'utf8');
+const emails = ['recovery', 'confirmation', 'invite'].map((tipo) =>
+  fs.readFileSync(`supabase/email-templates/${tipo}.html`, 'utf8')
+);
 const headers = fs.readFileSync('_headers', 'utf8');
 const sw = fs.readFileSync('app/sw.js', 'utf8');
 const inscricaoSegura = fs.readFileSync('supabase/migrations/20260806154000_proteger_inscricao_publica.sql', 'utf8');
@@ -32,6 +36,18 @@ for (const contrato of ['listUsers({page:1,perPage:1000})', 'auth_user_id:novoUi
   if (!convite.includes(contrato)) throw new Error(`Contrato de vínculo do convite ausente: ${contrato}`);
 }
 console.log('✓ convite vincula o usuário autenticado ao cadastro da equipe');
+
+for (const modelo of emails) {
+  for (const contrato of ['MODO', 'produto Arbor Labs', '#f26a1b', 'desenvolvido no Brasil']) {
+    if (!modelo.includes(contrato)) throw new Error(`Modelo de e-mail fora do padrão Arbor Labs: ${contrato}`);
+  }
+}
+for (const origem of [convite, aniversario]) {
+  for (const contrato of ["name:'MODOX · Arbor Labs'", "email:'contato@arborlabs.com.br'", 'replyTo']) {
+    if (!origem.includes(contrato)) throw new Error(`Remetente transacional inconsistente: ${contrato}`);
+  }
+}
+console.log('✓ e-mails do MODOX seguem identidade e remetente padrão Arbor Labs');
 
 for (const contrato of [
   "Content-Security-Policy: default-src 'self'",
