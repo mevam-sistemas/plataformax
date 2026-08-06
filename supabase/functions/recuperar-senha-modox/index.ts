@@ -26,7 +26,7 @@ Deno.serve(async req=>{
   const chave=await sha(`${email}|${ip}`);
   const desde=new Date(Date.now()-15*60*1000).toISOString();
   const {count}=await admin.from('recuperacoes_senha').select('id',{count:'exact',head:true})
-    .eq('chave',chave).gte('criado_em',desde);
+    .eq('chave',chave).in('status',['recebida','aceita_provedor']).gte('criado_em',desde);
   if((count||0)>=3)return json(resposta);
   const {data:tentativa}=await admin.from('recuperacoes_senha').insert({chave,status:'recebida'}).select('id').single();
 
