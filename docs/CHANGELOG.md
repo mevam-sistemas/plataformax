@@ -4,6 +4,15 @@ Este arquivo registra mudanças publicadas no produto. A versão segue o formato
 `MAIOR.MENOR.CORREÇÃO`: incompatibilidade, funcionalidade e correção,
 respectivamente.
 
+## 1.6.0 — 2026-08-06
+
+- Cada turma passa a aceitar vários professores responsáveis, todos com acesso
+  pedagógico integral aos alunos, presença, perguntas e interações da turma.
+- Um professor pode conduzir várias turmas sem ser removido automaticamente da
+  anterior, e gestores selecionam os responsáveis por caixas de seleção.
+- Listagens, cartões e impressão do QR passam a exibir conjuntamente os nomes de
+  todos os professores vinculados.
+
 ## 1.5.9 — 2026-08-06
 
 - A tela de turmas elimina a mistura decorativa de verde, terracota e laranja:
