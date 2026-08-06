@@ -11,8 +11,11 @@ const SHELL = [
 ];
 
 self.addEventListener('install', event => {
-  self.skipWaiting();
   event.waitUntil(caches.open(VERSION).then(cache => cache.addAll(SHELL)));
+});
+
+self.addEventListener('message', event => {
+  if(event.data?.tipo === 'ATUALIZAR_AGORA') self.skipWaiting();
 });
 
 self.addEventListener('activate', event => {

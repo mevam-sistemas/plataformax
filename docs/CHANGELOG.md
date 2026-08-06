@@ -4,6 +4,11 @@ Este arquivo registra mudanças publicadas no produto. A versão segue o formato
 `MAIOR.MENOR.CORREÇÃO`: incompatibilidade, funcionalidade e correção,
 respectivamente.
 
+## 1.4.8 — 2026-08-06
+
+- O PWA deixa de recarregar sozinho no meio de um formulário ou atividade.
+- Novas versões exibem um aviso acessível e só assumem o controle quando a pessoa toca em “Atualizar agora”.
+
 ## 1.4.7 — 2026-08-06
 
 - Autenticação fica limitada ao domínio oficial do MODOX, exige senha de 10 caracteres e verifica credenciais conhecidas em vazamentos.
