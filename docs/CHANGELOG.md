@@ -4,6 +4,12 @@ Este arquivo registra mudanças publicadas no produto. A versão segue o formato
 `MAIOR.MENOR.CORREÇÃO`: incompatibilidade, funcionalidade e correção,
 respectivamente.
 
+## 1.5.7 — 2026-08-06
+
+- O Painel Arbor Labs recebe recuperação com identidade própria mesmo usando a
+  infraestrutura de autenticação compartilhada com o MODOX.
+- Endereços de retorno do painel passam a integrar a lista segura do provedor.
+
 ## 1.5.6 — 2026-08-06
 
 - Cadastro, convite, recuperação de senha e aniversário passam a usar remetente,
