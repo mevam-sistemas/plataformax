@@ -5,6 +5,8 @@ const SHELL = [
   '/app/index.html',
   '/app/manifest.webmanifest',
   '/app/version.js',
+  '/app/supabase.min.js',
+  '/app/qrcode.min.js',
   '/img/icon-192.png',
   '/img/icon-512.png',
   '/img/modox-x.svg'

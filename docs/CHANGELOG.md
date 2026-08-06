@@ -4,6 +4,13 @@ Este arquivo registra mudanças publicadas no produto. A versão segue o formato
 `MAIOR.MENOR.CORREÇÃO`: incompatibilidade, funcionalidade e correção,
 respectivamente.
 
+## 1.5.2 — 2026-08-06
+
+- Resíduos arquivados de produtos que já compartilharam o projeto deixam de ser acessíveis aos papéis do Modox.
+- Buckets legados do CT360 e do 360social deixam de servir arquivos por URL pública.
+- Os dados históricos continuam preservados apenas no backup restaurável, sem participação na aplicação atual.
+- Bibliotecas do Supabase e QR Code passam a ser servidas pelo próprio Modox, retirando dependências executáveis de CDN.
+
 ## 1.5.1 — 2026-08-06
 
 - A ação de notificações recebe um rótulo compacto no cabeçalho para não comprimir a navegação em celulares.

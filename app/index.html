@@ -133,6 +133,8 @@ input,textarea,select{width:100%;border:1px solid var(--line);background:var(--c
   padding:13px 14px;font-size:15.5px;font-family:inherit;color:var(--ink);outline:none;
   transition:border-color .15s,box-shadow .15s;resize:vertical}
 input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3.5px var(--accent-soft)}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,[tabindex]:focus-visible{
+  outline:3px solid var(--accent);outline-offset:3px}
 /* upload de arquivo: o input nativo do navegador (botão cinza dos anos 90)
    troca de roupa pra combinar com o resto — mesma pílula dos outros botões */
 input[type=file]{padding:9px 12px;font-size:13.5px;color:var(--sub);
@@ -438,7 +440,7 @@ h2 .ic,h3 .ic{width:.9em;height:.9em;margin-right:2px}
   display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
 .pe-pagina-br{display:flex;align-items:center;gap:9px;font-size:12.5px;font-weight:600;color:var(--sub)}
 .pe-pagina-br svg{flex:none;border-radius:2.5px;box-shadow:0 0 0 .5px rgba(0,0,0,.12)}
-.pe-pagina-arbor{display:flex;align-items:center;gap:9px;text-decoration:none;opacity:.72;transition:.18s}
+.pe-pagina-arbor{display:inline-flex;align-items:center;gap:9px;text-decoration:none;opacity:.72;transition:.18s;min-height:44px;padding:8px 0}
 .pe-pagina-arbor:hover{opacity:1}
 .pe-pagina-arbor svg{flex:none}
 .pe-pagina-arbor span{font-size:11px;font-weight:750;letter-spacing:.14em;text-transform:uppercase;color:var(--sub)}
@@ -547,7 +549,7 @@ h2 .ic,h3 .ic{width:.9em;height:.9em;margin-right:2px}
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="sig-modox" viewBox="0 0 32 32">
   <path d="M0.39,3.00 L8.73,3.00 L31.61,29.00 L23.27,29.00 Z M23.27,3.00 L31.61,3.00 L8.73,29.00 L0.39,29.00 Z" fill="var(--marca)"/>
 </symbol></svg>
-<div class="wrap">
+<main class="wrap" id="conteudo-principal">
 
 <!-- ══════════ LOGIN ══════════ (01/08/2026: só e-mail + senha, sem código) -->
 <section class="screen on" id="s-email">
@@ -580,7 +582,7 @@ h2 .ic,h3 .ic{width:.9em;height:.9em;margin-right:2px}
     <label for="cc-email">Seu e-mail</label>
     <input id="cc-email" type="email" inputmode="email" autocomplete="email" placeholder="voce@exemplo.com">
     <label for="cc-senha">Senha</label>
-    <input id="cc-senha" type="password" autocomplete="new-password" placeholder="Mínimo 6 caracteres">
+    <input id="cc-senha" type="password" autocomplete="new-password" placeholder="Mínimo 10 caracteres">
     <button class="btn w" id="b-criar-conta">Criar conta</button>
     <div class="msg c" id="m-cc"></div>
   </div>
@@ -593,7 +595,7 @@ h2 .ic,h3 .ic{width:.9em;height:.9em;margin-right:2px}
     <h1>Escolher nova senha</h1>
     <p class="sub">Defina a nova senha da sua conta.</p>
     <label for="rs-senha">Nova senha</label>
-    <input id="rs-senha" type="password" autocomplete="new-password" placeholder="Mínimo 6 caracteres">
+    <input id="rs-senha" type="password" autocomplete="new-password" placeholder="Mínimo 10 caracteres">
     <button class="btn w" id="b-redefinir">Salvar nova senha</button>
     <div class="msg c" id="m-rs"></div>
   </div>
@@ -904,7 +906,7 @@ h2 .ic,h3 .ic{width:.9em;height:.9em;margin-right:2px}
     <p style="font-size:14px;color:var(--sub);line-height:1.7">Entrada direta na escola, resumo operacional, pendências reais de logo, professor e matrículas, além de melhorias responsivas.</p></div>
 </section>
 
-</div>
+</main>
 
 <!-- ══════════ RODAPÉ — em todas as páginas ══════════ -->
 <footer class="pe-pagina">
@@ -926,8 +928,8 @@ h2 .ic,h3 .ic{width:.9em;height:.9em;margin-right:2px}
   </a>
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+<script src="/app/supabase.min.js"></script>
+<script src="/app/qrcode.min.js"></script>
 <script src="/app/version.js"></script>
 <script>
 const APP_VERSION=self.MODOX_VERSION;
@@ -949,6 +951,31 @@ const SB_KEY = 'sb_publishable_7-sR87eV6b4I8nx-k6Hriw_DEVprjfz';
 const sb = supabase.createClient(SB_URL, SB_KEY);
 const VAPID_PUBLICA='BJf1bd7Qw3hKyqmFQYvWoAeI-vpYMatzB-szpevJb7amDdMt5UrsBPnSYm4FQ-udVJuS9xr_KzjnhE5VEILwQNQ';
 const $ = id => document.getElementById(id);
+let a11yCampoSeq = 0;
+function associarRotulos(root=document){
+  const escopo = root.querySelectorAll ? root : document;
+  escopo.querySelectorAll('label:not([for])').forEach(label => {
+    if(label.querySelector('input,select,textarea')) return;
+    let campo = label.nextElementSibling;
+    if(!campo?.matches?.('input,select,textarea')){
+      const candidatos = label.parentElement?.querySelectorAll(':scope > input,:scope > select,:scope > textarea') || [];
+      if(candidatos.length === 1) campo = candidatos[0];
+    }
+    if(!campo?.matches?.('input,select,textarea')) return;
+    if(!campo.id) campo.id = `campo-acessivel-${++a11yCampoSeq}`;
+    label.htmlFor = campo.id;
+  });
+  escopo.querySelectorAll('input:not([type=hidden]),select,textarea').forEach(campo => {
+    if(campo.labels?.length || campo.hasAttribute('aria-label') || campo.hasAttribute('aria-labelledby')) return;
+    const nome = campo.getAttribute('placeholder') || campo.getAttribute('name');
+    if(nome) campo.setAttribute('aria-label', nome);
+  });
+}
+associarRotulos();
+const observadorA11y = new MutationObserver(mudancas => {
+  mudancas.forEach(m => m.addedNodes.forEach(no => { if(no.nodeType === 1) associarRotulos(no); }));
+});
+observadorA11y.observe(document.body,{childList:true,subtree:true});
 $('app-versao').textContent=APP_VERSION;
 const bytesBase64Url=s=>{const p='='.repeat((4-s.length%4)%4),b=atob((s+p).replace(/-/g,'+').replace(/_/g,'/'));return Uint8Array.from([...b].map(c=>c.charCodeAt(0)));};
 async function registrarNotificacoes(pedirPermissao=true){
@@ -4885,7 +4912,7 @@ async function carregarInscricao(){
     <input id="in-email" type="email" inputmode="email" autocomplete="email" placeholder="voce@exemplo.com">
     <div class="hint">É por aqui que você recebe as novidades e acessa a plataforma depois.</div>
     <label>Crie uma senha</label>
-    <input id="in-senha" type="password" autocomplete="new-password" placeholder="Mínimo 6 caracteres">
+    <input id="in-senha" type="password" autocomplete="new-password" placeholder="Mínimo 10 caracteres">
     <div class="hint">Pra entrar na plataforma depois — sem código, é só e-mail e senha, igual em qualquer lugar.</div>
     <label>WhatsApp <span class="opt">— com DDD</span></label>
     <input id="in-zap" inputmode="tel" autocomplete="tel" placeholder="(00) 00000-0000">
