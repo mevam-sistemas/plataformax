@@ -51,6 +51,19 @@ for (const local of ['/app/supabase.min.js', '/app/qrcode.min.js']) {
 if (headers.includes('cdn.jsdelivr.net')) throw new Error('CSP ainda permite CDN executável desnecessária');
 console.log('✓ dependências executáveis críticas são locais e entram no shell versionado');
 
+for (const contrato of [
+  "typeof qrcode !== 'function'",
+  'codigo.createDataURL(tamanhoCelula, margem)',
+  'class="qr-presenca-card"',
+  'class="qr-presenca-acoes"'
+]) {
+  if (!html.includes(contrato)) throw new Error(`Geração ou composição do QR incompleta: ${contrato}`);
+}
+if (html.includes('QRCode.toCanvas')) {
+  throw new Error('A aplicação ainda chama uma API incompatível com a biblioteca local de QR');
+}
+console.log('✓ QR de presença usa geração local compatível e composição responsiva');
+
 for (const caminho of ['/app/sw.js', '/app/version.js']) {
   const bloco = headers.match(new RegExp(`${caminho.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\n([\\s\\S]*?)(?=\\n\\S|$)`))?.[1] || '';
   if (!bloco.includes('Cache-Control: no-cache, no-store, must-revalidate')) {

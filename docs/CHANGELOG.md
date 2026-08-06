@@ -4,6 +4,13 @@ Este arquivo registra mudanças publicadas no produto. A versão segue o formato
 `MAIOR.MENOR.CORREÇÃO`: incompatibilidade, funcionalidade e correção,
 respectivamente.
 
+## 1.5.5 — 2026-08-06
+
+- Download do QR de presença passa a usar a biblioteca local correta, sem depender
+  de serviço externo e sem falhar ao preparar a folha A4.
+- QR, instruções e botão de download recebem alinhamento central, proporções
+  consistentes e adaptação para celular.
+
 ## 1.5.4 — 2026-08-06
 
 - A inscrição pública deixa de alterar nome, telefone, endereço ou foto de um cadastro existente apenas pela coincidência de e-mail.

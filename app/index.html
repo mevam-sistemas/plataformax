@@ -172,6 +172,14 @@ input[type=date]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .btn.xs{padding:8px 11px;font-size:12.5px;border-radius:9px;min-height:44px}
 .btn.dgr{color:var(--danger)}
 .btn.dgr:hover{background:#fdeeee;border-color:#f6c9ca}
+.qr-presenca-card{display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:12px;padding:22px;
+  border:1px solid var(--line);border-radius:var(--r-lg);background:linear-gradient(180deg,#fff,var(--tint));text-align:center}
+.qr-presenca-card .hint{max-width:620px;margin:0 auto 4px}
+.qr-presenca-card canvas,.qr-presenca-card img{display:block;width:min(280px,82vw);height:auto;margin:4px auto;
+  padding:10px;border:1px solid var(--line);border-radius:14px;background:#fff;box-shadow:var(--sh-1)}
+.qr-presenca-acoes{display:flex;justify-content:center;width:100%;margin-top:4px}
+.qr-presenca-acoes .btn{min-width:min(100%,280px)}
+@media(max-width:520px){.qr-presenca-card{padding:16px 12px}.qr-presenca-acoes .btn{width:100%}}
 
 /* ---------- cartões ---------- */
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:20px;box-shadow:var(--sh-1)}
@@ -2142,14 +2150,38 @@ function cargaTxt(min){
 }
 async function desenharQR(el, texto){
   try{
-    if(typeof QRCode === 'undefined') throw new Error('sem lib');
-    await QRCode.toCanvas(el, texto, { width:208, margin:1, color:{ dark:'#141416', light:'#ffffff' } });
+    const dataUrl = montarQrDataUrl(texto, 7, 3);
+    const img = new Image();
+    await new Promise((resolve, reject) => {
+      img.onload = resolve;
+      img.onerror = reject;
+      img.src = dataUrl;
+    });
+    el.width = 208;
+    el.height = 208;
+    el.getContext('2d').drawImage(img, 0, 0, 208, 208);
   } catch(_){
     const img = document.createElement('img');
     img.className = 'qr'; img.alt = 'QR do certificado';
     img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=208x208&data=' + encodeURIComponent(texto);
     el.replaceWith(img);
   }
+}
+function montarQrDataUrl(texto, tamanhoCelula=8, margem=3){
+  if(typeof qrcode !== 'function') throw new Error('Biblioteca local de QR indisponível.');
+  const codigo = qrcode(0, 'M');
+  codigo.addData(texto);
+  codigo.make();
+  return codigo.createDataURL(tamanhoCelula, margem);
+}
+async function carregarImagem(src){
+  const img = new Image();
+  await new Promise((resolve, reject) => {
+    img.onload = resolve;
+    img.onerror = reject;
+    img.src = src;
+  });
+  return img;
 }
 async function emitirCertificado(cursoId){
   const alvo = cursoId || ctx.curso;
@@ -3258,12 +3290,12 @@ async function abrirQrEncontro(eid, tid){
   const { data: token, error } = await sb.rpc('qr_token_encontro', { p_evento: eid });
   if(error) return slot.innerHTML = `<div class="hint">Não consegui gerar o QR: ${esc(error.message)}</div>`;
   const url = location.origin + '/?c=' + token;
-  slot.innerHTML = `<div class="inline" style="margin-top:10px;align-items:center;text-align:center">
+  slot.innerHTML = `<div class="qr-presenca-card">
     <b style="font-size:13.5px">QR de presença deste encontro</b>
-    <div class="hint" style="margin-bottom:8px">O aluno escaneia, digita o e-mail do cadastro e a presença é marcada na hora.
+    <div class="hint">O aluno escaneia, digita o e-mail do cadastro e a presença é marcada na hora.
       Vale só para este encontro.</div>
-    <canvas id="qrimg-${eid}" style="display:block;margin:8px auto"></canvas>
-    <button class="btn xs" onclick="baixarQrEncontro('${eid}','${tid}','${token}')">Baixar PNG para imprimir (A4)</button>
+    <canvas id="qrimg-${eid}" aria-label="QR code de presença"></canvas>
+    <div class="qr-presenca-acoes"><button class="btn xs" onclick="baixarQrEncontro('${eid}','${tid}','${token}')">Baixar PNG para imprimir (A4)</button></div>
   </div>`;
   desenharQR($('qrimg-'+eid), url);
 }
@@ -3276,9 +3308,14 @@ async function baixarQrEncontro(eid, tid, token){
   // canvas do QR isolado (maior, pra ficar nítido impresso)
   const qrCanvas = document.createElement('canvas');
   try{
-    if(typeof QRCode === 'undefined') throw new Error('sem lib');
-    await QRCode.toCanvas(qrCanvas, url, { width:900, margin:1, color:{ dark:'#141416', light:'#ffffff' } });
-  }catch(_){
+    const qrImage = await carregarImagem(montarQrDataUrl(url, 14, 4));
+    qrCanvas.width = 900;
+    qrCanvas.height = 900;
+    const qrContext = qrCanvas.getContext('2d');
+    qrContext.imageSmoothingEnabled = false;
+    qrContext.drawImage(qrImage, 0, 0, 900, 900);
+  }catch(error){
+    console.error('Falha ao preparar QR para impressão:', error);
     alert('Não consegui montar o QR code agora — tente de novo em alguns segundos.');
     return;
   }
