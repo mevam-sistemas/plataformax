@@ -4,6 +4,12 @@ Este arquivo registra mudanças publicadas no produto. A versão segue o formato
 `MAIOR.MENOR.CORREÇÃO`: incompatibilidade, funcionalidade e correção,
 respectivamente.
 
+## 1.5.4 — 2026-08-06
+
+- A inscrição pública deixa de alterar nome, telefone, endereço ou foto de um cadastro existente apenas pela coincidência de e-mail.
+- Entradas públicas passam a validar limites de texto, respostas e caminho da foto no servidor.
+- A reserva de vagas é serializada para impedir exceder a capacidade da turma em inscrições simultâneas.
+
 ## 1.5.3 — 2026-08-06
 
 - “Esqueci minha senha” passa a abrir uma tela própria, com e-mail, instruções e retorno acessível.

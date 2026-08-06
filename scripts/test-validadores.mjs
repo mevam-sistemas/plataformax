@@ -5,6 +5,7 @@ const html = fs.readFileSync('app/index.html', 'utf8');
 const convite = fs.readFileSync('supabase/functions/convidar-equipe-modox/index.ts', 'utf8');
 const headers = fs.readFileSync('_headers', 'utf8');
 const sw = fs.readFileSync('app/sw.js', 'utf8');
+const inscricaoSegura = fs.readFileSync('supabase/migrations/20260806154000_proteger_inscricao_publica.sql', 'utf8');
 const bloco = html.match(/function cpfValido\(c\)[\s\S]*?\nasync function abrirPerfil/);
 if (!bloco) throw new Error('Validadores de CPF/CNPJ não encontrados');
 
@@ -105,3 +106,16 @@ for (const [arquivo, limite] of [['app/index.html', 380_000], ['app/supabase.min
 }
 if (/<script[^>]+src=["']https?:\/\//i.test(html)) throw new Error('Aplicação principal voltou a executar script de terceiros');
 console.log('✓ arquivos críticos respeitam o orçamento e não executam scripts remotos');
+
+for (const contrato of [
+  'for update of t',
+  "octet_length(respostas_seguras::text) > 20000",
+  "p_foto !~ '^inscricoes/",
+  'select id into pid from public.pessoas where email = email_normalizado'
+]) {
+  if (!inscricaoSegura.includes(contrato)) throw new Error(`Proteção da inscrição pública ausente: ${contrato}`);
+}
+if (/update\s+(public[.])?pessoas\s+set/i.test(inscricaoSegura)) {
+  throw new Error('A inscrição pública não pode alterar dados de uma pessoa existente');
+}
+console.log('✓ inscrição pública não sobrescreve PII e serializa a contagem de vagas');
