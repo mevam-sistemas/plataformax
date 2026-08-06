@@ -1,1 +1,1 @@
-self.MODOX_VERSION = '1.4.5';
+self.MODOX_VERSION = '1.4.6';

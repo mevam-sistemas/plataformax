@@ -57,7 +57,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Inter
 .top-in{max-width:1180px;margin:0 auto;padding:12px 22px;display:flex;align-items:center;gap:14px}
 .brand{font-size:17px;font-weight:800;letter-spacing:-.02em;white-space:nowrap;
   display:flex;align-items:center;gap:9px;cursor:pointer;background:none;border:0;
-  font-family:inherit;color:var(--ink);padding:0}
+  font-family:inherit;color:var(--ink);padding:0;min-height:44px}
 .brand b{color:var(--accent)}
 /* marca: o sinal em laranja + a palavra. O X é o mesmo sinal, em texto. */
 .marca-sig{width:26px;height:26px;flex:none;display:block}
@@ -91,7 +91,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Inter
 @media(max-width:640px){ .ctx{max-width:56vw} }
 .top-sp{flex:1}
 .tlink{font-size:13.5px;color:var(--sub);background:none;border:0;cursor:pointer;
-  font-family:inherit;font-weight:600;padding:6px 4px;border-radius:8px}
+  font-family:inherit;font-weight:600;padding:8px 8px;border-radius:8px;min-height:44px}
 .tlink:hover{color:var(--ink)}
 
 /* ---------- layout ---------- */
@@ -158,7 +158,7 @@ input[type=date]::-webkit-calendar-picker-indicator:hover{opacity:1}
 /* ---------- botões ---------- */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--accent);color:#fff;
   border:0;border-radius:12px;padding:13px 20px;font-size:15px;font-weight:720;cursor:pointer;
-  font-family:inherit;transition:transform .12s,filter .15s,box-shadow .15s;box-shadow:0 2px 7px rgba(75,42,24,.12)}
+  font-family:inherit;transition:transform .12s,filter .15s,box-shadow .15s;box-shadow:0 2px 7px rgba(75,42,24,.12);min-height:44px}
 .btn:hover{filter:brightness(1.04);box-shadow:0 4px 12px rgba(75,42,24,.16)}
 .btn:active{transform:scale(.985)}
 .btn[disabled]{opacity:.5;cursor:default}
@@ -167,7 +167,7 @@ input[type=date]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .btn.ghost:hover{border-color:var(--accent);background:var(--accent-soft)}
 .btn.link{background:none;color:var(--accent);box-shadow:none;padding:10px 4px}
 .btn.sm{padding:9px 14px;font-size:13.5px}
-.btn.xs{padding:6px 11px;font-size:12.5px;border-radius:9px}
+.btn.xs{padding:8px 11px;font-size:12.5px;border-radius:9px;min-height:44px}
 .btn.dgr{color:var(--danger)}
 .btn.dgr:hover{background:#fdeeee;border-color:#f6c9ca}
 
@@ -554,9 +554,9 @@ h2 .ic,h3 .ic{width:.9em;height:.9em;margin-right:2px}
     <div class="brand marca-g" style="font-size:22px;margin-bottom:26px"><svg class="marca-sig" style="width:32px;height:32px"><use href="#sig-modox"/></svg><span class="marca-nome" style="font-size:23px">MODO<i>X</i></span></div>
     <h1>Bom te ver aqui</h1>
     <p class="sub">Use seu e-mail e senha para entrar.</p>
-    <label>Seu e-mail</label>
+    <label for="email">Seu e-mail</label>
     <input id="email" type="email" inputmode="email" autocomplete="email" placeholder="voce@exemplo.com">
-    <label>Senha</label>
+    <label for="senha">Senha</label>
     <input id="senha" type="password" autocomplete="current-password" placeholder="Sua senha">
     <button class="btn w" id="b-enviar">Entrar</button>
     <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
@@ -574,11 +574,11 @@ h2 .ic,h3 .ic{width:.9em;height:.9em;margin-right:2px}
     <div class="brand marca-g" style="font-size:22px;margin-bottom:26px"><svg class="marca-sig" style="width:32px;height:32px"><use href="#sig-modox"/></svg><span class="marca-nome" style="font-size:23px">MODO<i>X</i></span></div>
     <h1>Criar sua conta</h1>
     <p class="sub">Crie seu acesso de diretor ou responsável. Depois você cadastra a escola, a empresa ou o curso e começa sete dias grátis — sem cartão.</p>
-    <label>Seu nome</label>
+    <label for="cc-nome">Seu nome</label>
     <input id="cc-nome" type="text" autocomplete="name" placeholder="Como você quer ser chamado?">
-    <label>Seu e-mail</label>
+    <label for="cc-email">Seu e-mail</label>
     <input id="cc-email" type="email" inputmode="email" autocomplete="email" placeholder="voce@exemplo.com">
-    <label>Senha</label>
+    <label for="cc-senha">Senha</label>
     <input id="cc-senha" type="password" autocomplete="new-password" placeholder="Mínimo 6 caracteres">
     <button class="btn w" id="b-criar-conta">Criar conta</button>
     <div class="msg c" id="m-cc"></div>
@@ -591,7 +591,7 @@ h2 .ic,h3 .ic{width:.9em;height:.9em;margin-right:2px}
     <div class="brand marca-g" style="font-size:22px;margin-bottom:26px"><svg class="marca-sig" style="width:32px;height:32px"><use href="#sig-modox"/></svg><span class="marca-nome" style="font-size:23px">MODO<i>X</i></span></div>
     <h1>Escolher nova senha</h1>
     <p class="sub">Defina a nova senha da sua conta.</p>
-    <label>Nova senha</label>
+    <label for="rs-senha">Nova senha</label>
     <input id="rs-senha" type="password" autocomplete="new-password" placeholder="Mínimo 6 caracteres">
     <button class="btn w" id="b-redefinir">Salvar nova senha</button>
     <div class="msg c" id="m-rs"></div>

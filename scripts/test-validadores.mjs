@@ -49,3 +49,16 @@ for (const caminho of ['/app/sw.js', '/app/version.js']) {
   }
 }
 console.log('✓ service worker e versão não ficam presos no cache da CDN');
+
+for (const association of [
+  '<label for="email">Seu e-mail</label>',
+  '<label for="senha">Senha</label>',
+  '<label for="cc-email">Seu e-mail</label>',
+  '<label for="rs-senha">Nova senha</label>'
+]) {
+  if (!html.includes(association)) throw new Error(`Rótulo sem associação semântica: ${association}`);
+}
+if (!html.includes('.btn.xs{padding:8px 11px;font-size:12.5px;border-radius:9px;min-height:44px}')) {
+  throw new Error('Botões compactos não respeitam alvo de toque de 44 px');
+}
+console.log('✓ login, recuperação e botões compactos atendem os contratos de acessibilidade');

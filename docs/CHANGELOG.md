@@ -4,6 +4,12 @@ Este arquivo registra mudanças publicadas no produto. A versão segue o formato
 `MAIOR.MENOR.CORREÇÃO`: incompatibilidade, funcionalidade e correção,
 respectivamente.
 
+## 1.4.6 — 2026-08-06
+
+- Login e recuperação recebem associação semântica entre rótulos e campos.
+- Botões compactos, navegação e marca interativa passam a respeitar alvos de toque de 44 px.
+- Auditoria de segurança inicia a separação definitiva do banco usado pelo 360social.
+
 ## 1.4.5 — 2026-08-04
 
 - Recuperação de senha passa a retornar sempre ao domínio canônico do MODOX.
