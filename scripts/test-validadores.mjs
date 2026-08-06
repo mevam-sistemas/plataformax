@@ -67,3 +67,10 @@ if ((html.match(/senha\.length < 10/g) || []).length < 3 || html.includes('senha
   throw new Error('A política de senha do cliente diverge dos 10 caracteres exigidos no servidor');
 }
 console.log('✓ criação, matrícula e recuperação exigem senha com 10 caracteres');
+
+for (const contrato of ['PushManager', "sb.rpc('registrar_push'", "sb.functions.invoke('notificar-conversa'", "event.data?.tipo === 'ATUALIZAR_AGORA'"]) {
+  if (!html.includes(contrato) && !fs.readFileSync('app/sw.js', 'utf8').includes(contrato)) {
+    throw new Error(`Contrato do PWA ausente: ${contrato}`);
+  }
+}
+console.log('✓ PWA possui atualização controlada e notificações vinculadas ao usuário');

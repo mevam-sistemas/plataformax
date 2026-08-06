@@ -538,6 +538,7 @@ h2 .ic,h3 .ic{width:.9em;height:.9em;margin-right:2px}
     <div class="ctx" id="ctx-chip">Início</div>
     <div class="top-sp"></div>
     <button class="tlink" id="t-inicio">Início</button>
+    <button class="tlink" id="t-notif" style="display:none">Ativar notificações</button>
     <button class="tlink" id="t-cadastro">Meu cadastro</button>
     <button class="tlink" id="t-sair">Sair</button>
   </div>
@@ -946,8 +947,28 @@ const APP_VERSION=self.MODOX_VERSION;
 const SB_URL = 'https://lshjtlzlywipxtfwbxxe.supabase.co';
 const SB_KEY = 'sb_publishable_7-sR87eV6b4I8nx-k6Hriw_DEVprjfz';
 const sb = supabase.createClient(SB_URL, SB_KEY);
+const VAPID_PUBLICA='BJf1bd7Qw3hKyqmFQYvWoAeI-vpYMatzB-szpevJb7amDdMt5UrsBPnSYm4FQ-udVJuS9xr_KzjnhE5VEILwQNQ';
 const $ = id => document.getElementById(id);
 $('app-versao').textContent=APP_VERSION;
+const bytesBase64Url=s=>{const p='='.repeat((4-s.length%4)%4),b=atob((s+p).replace(/-/g,'+').replace(/_/g,'/'));return Uint8Array.from([...b].map(c=>c.charCodeAt(0)));};
+async function registrarNotificacoes(pedirPermissao=true){
+  if(!('serviceWorker'in navigator)||!('PushManager'in window)||!('Notification'in window))return false;
+  let permissao=Notification.permission;
+  if(pedirPermissao&&permissao==='default')permissao=await Notification.requestPermission();
+  if(permissao!=='granted')return false;
+  const reg=await navigator.serviceWorker.ready;
+  let sub=await reg.pushManager.getSubscription();
+  if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:bytesBase64Url(VAPID_PUBLICA)});
+  const s=sub.toJSON();
+  const {error}=await sb.rpc('registrar_push',{p_endpoint:s.endpoint,p_p256dh:s.keys?.p256dh,p_auth:s.keys?.auth,p_agente:navigator.userAgent});
+  if(error)throw error;
+  const botao=$('t-notif');if(botao){botao.textContent='Notificações ativas';botao.style.display='';botao.disabled=true;}
+  return true;
+}
+function notificarConversa(conversa_id,mensagem_id){
+  if(!conversa_id||!mensagem_id)return;
+  sb.functions.invoke('notificar-conversa',{body:{conversa_id,mensagem_id}}).catch(e=>console.error('[push conversa]',e));
+}
 // avisa por e-mail (nunca travar a tela por causa disso)
 function notificar(tipo, matricula_id){
   if(!matricula_id) return;
@@ -1188,8 +1209,11 @@ $('b-redefinir').onclick = async () => {
   if(error){ console.error('[login] redefinir senha', error); erro('m-rs','Não consegui salvar agora. Tente de novo depois.'); return; }
   entrar();
 };
-$('t-sair').onclick = async () => { await sb.auth.signOut(); me=null; mundo('publico'); go('email'); };
+$('t-sair').onclick = async () => { await sb.auth.signOut(); me=null; $('t-notif').style.display='none'; mundo('publico'); go('email'); };
 $('t-inicio').onclick = () => entrar();
+$('t-notif').onclick = async () => {
+  try{await registrarNotificacoes(true);}catch(e){alert('Não foi possível ativar as notificações neste aparelho.');}
+};
 $('b-marca').onclick = () => entrar();
 $('t-cadastro').onclick = async () => {
   const { data: p } = await sb.from('pessoas').select('id,nome,cpf,telefone,nascimento,endereco,foto_url').eq('id', me.id).single();
@@ -1219,6 +1243,12 @@ async function entrar(){
   const { data: p } = await sb.from('pessoas')
     .select('id,nome,cpf,telefone,nascimento,endereco,foto_url').eq('auth_user_id', user.id).single();
   me = p || null;
+  if('Notification'in window&&'PushManager'in window){
+    $('t-notif').style.display='';
+    $('t-notif').disabled=false;
+    $('t-notif').textContent=Notification.permission==='granted'?'Notificações ativas':'Ativar notificações';
+    if(Notification.permission==='granted')registrarNotificacoes(false).catch(()=>{});
+  }
   if(p && (!p.cpf || !p.telefone)) return abrirPerfil(p);
 
   ctx.escola = null; ctx.escolaLogo = '';   // home lista várias escolas — nenhuma logo única faz sentido aqui
@@ -3509,6 +3539,7 @@ async function enviarNovaConversa(){
   if(error){msg.textContent='Ops: '+error.message;return;}
   if(audio)await subirAudioConversa(data.conversa_id,data.mensagem_id,audio);
   if(anexo)await subirImagemConversa(data.conversa_id,data.mensagem_id,anexo);
+  notificarConversa(data.conversa_id,data.mensagem_id);
   delete recs['cv-nova'];ctx.conversaFoco=data.conversa_id;$('cv-nova').innerHTML=formNovaConversa();await carregarConversas();
 }
 
@@ -3536,6 +3567,7 @@ async function enviarMensagemConversa(cid){
   const {data,error}=await sb.rpc('adicionar_mensagem_conversa',{p_conversa:cid,p_texto:txt||null,p_tem_audio:!!audio,p_tem_anexo:!!anexo});if(error){msg.textContent='Ops: '+error.message;return;}
   if(audio){const e=await subirAudioConversa(cid,data.mensagem_id,audio);if(e){msg.textContent=e;return;}}delete recs['cv-'+cid];await carregarConversas();
   if(anexo){const e=await subirImagemConversa(cid,data.mensagem_id,anexo);if(e){msg.textContent=e;return;}}delete recs['cv-'+cid];await carregarConversas();
+  notificarConversa(cid,data.mensagem_id);
 }
 async function subirAudioConversa(cid,mid,blob){
   const tipo=blob.type||'audio/webm',ext=tipo.includes('mp4')?'m4a':tipo.includes('ogg')?'ogg':tipo.includes('mpeg')?'mp3':'webm';
@@ -3546,7 +3578,7 @@ async function subirImagemConversa(cid,mid,file){
   try{const blob=await comprimirImagem(file),key=`conversas/${cid}/${mid}.jpg`;const {error}=await sb.storage.from('conversas').upload(key,blob,{contentType:'image/jpeg'});if(error)return 'Falha no envio da imagem: '+error.message;const {error:e}=await sb.rpc('anexar_imagem_conversa',{p_mensagem:mid,p_caminho:key});return e?'Falha ao registrar a imagem: '+e.message:null;}catch(e){return 'Falha na imagem: '+e.message;}
 }
 function formNovaOrientacao(){return `<div class="card" style="margin:16px 0"><h3>${ic('caixaEntrada')} Publicar orientação para a turma</h3><textarea id="cv-orientacao" rows="3" maxlength="1000" placeholder="Escreva a orientação da equipe…"></textarea><label>Áudio <span class="opt">— opcional</span></label>${montarGravador('cv-orientacao',false)}<label>Imagem ou anexo <span class="opt">— opcional</span></label><input id="cv-arq-orientacao" type="file" accept="image/*"><button class="btn sm" style="margin-top:14px" onclick="enviarOrientacao()">Publicar para a turma</button><div class="msg" id="m-cv-orientacao"></div></div>`;}
-async function enviarOrientacao(){const txt=($('cv-orientacao')?.value||'').trim(),audio=recs['cv-orientacao']?.blob,anexo=$('cv-arq-orientacao')?.files?.[0],msg=$('m-cv-orientacao');if(txt.length<2){msg.textContent='Escreva a orientação.';return;}msg.textContent='Publicando…';const {data,error}=await sb.rpc('publicar_orientacao',{p_turma:ctx.conversasTurma,p_texto:txt});if(error){msg.textContent='Ops: '+error.message;return;}if(audio)await subirAudioConversa(data.conversa_id,data.mensagem_id,audio);if(anexo)await subirImagemConversa(data.conversa_id,data.mensagem_id,anexo);delete recs['cv-orientacao'];$('cv-nova').innerHTML=formNovaOrientacao();await carregarConversas();}
+async function enviarOrientacao(){const txt=($('cv-orientacao')?.value||'').trim(),audio=recs['cv-orientacao']?.blob,anexo=$('cv-arq-orientacao')?.files?.[0],msg=$('m-cv-orientacao');if(txt.length<2){msg.textContent='Escreva a orientação.';return;}msg.textContent='Publicando…';const {data,error}=await sb.rpc('publicar_orientacao',{p_turma:ctx.conversasTurma,p_texto:txt});if(error){msg.textContent='Ops: '+error.message;return;}if(audio)await subirAudioConversa(data.conversa_id,data.mensagem_id,audio);if(anexo)await subirImagemConversa(data.conversa_id,data.mensagem_id,anexo);notificarConversa(data.conversa_id,data.mensagem_id);delete recs['cv-orientacao'];$('cv-nova').innerHTML=formNovaOrientacao();await carregarConversas();}
 
 // ═══════════════ AGENDA DO ALUNO ═══════════════
 async function abrirAgenda(){

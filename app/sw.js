@@ -18,6 +18,24 @@ self.addEventListener('message', event => {
   if(event.data?.tipo === 'ATUALIZAR_AGORA') self.skipWaiting();
 });
 
+self.addEventListener('push', event => {
+  let data={};
+  try{data=event.data?.json()||{}}catch{data={texto:event.data?.text()||'Há uma nova interação no MODOX.'}}
+  event.waitUntil(self.registration.showNotification(data.titulo||'MODOX',{
+    body:data.texto||'Há uma nova interação aguardando você.',
+    icon:'/img/icon-192.png',badge:'/img/icon-192.png',
+    data:{url:'/app/',conversa_id:data.conversa_id||null},tag:data.conversa_id?`conversa-${data.conversa_id}`:'modox',
+  }));
+});
+
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  event.waitUntil(clients.matchAll({type:'window',includeUncontrolled:true}).then(janelas=>{
+    const aberta=janelas.find(c=>c.url.startsWith(self.location.origin+'/app/'));
+    return aberta?aberta.focus():clients.openWindow('/app/');
+  }));
+});
+
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys()

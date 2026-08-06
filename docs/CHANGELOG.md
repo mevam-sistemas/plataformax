@@ -4,6 +4,12 @@ Este arquivo registra mudanças publicadas no produto. A versão segue o formato
 `MAIOR.MENOR.CORREÇÃO`: incompatibilidade, funcionalidade e correção,
 respectivamente.
 
+## 1.5.0 — 2026-08-06
+
+- Professores, gestão e alunos podem ativar notificações push no PWA pelo próprio cabeçalho.
+- Novas perguntas, respostas e orientações notificam apenas os participantes adequados à turma e ao tipo de conversa.
+- O servidor confere autoria e vínculo antes de enviar, e remove automaticamente inscrições expiradas.
+
 ## 1.4.9 — 2026-08-06
 
 - Criação de conta, matrícula e redefinição passam a validar os mesmos 10 caracteres exigidos pelo servidor.
