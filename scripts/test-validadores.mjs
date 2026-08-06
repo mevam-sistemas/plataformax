@@ -62,3 +62,8 @@ if (!html.includes('.btn.xs{padding:8px 11px;font-size:12.5px;border-radius:9px;
   throw new Error('Botões compactos não respeitam alvo de toque de 44 px');
 }
 console.log('✓ login, recuperação e botões compactos atendem os contratos de acessibilidade');
+
+if ((html.match(/senha\.length < 10/g) || []).length < 3 || html.includes('senha.length < 6')) {
+  throw new Error('A política de senha do cliente diverge dos 10 caracteres exigidos no servidor');
+}
+console.log('✓ criação, matrícula e recuperação exigem senha com 10 caracteres');

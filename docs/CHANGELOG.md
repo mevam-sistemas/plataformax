@@ -4,6 +4,11 @@ Este arquivo registra mudanças publicadas no produto. A versão segue o formato
 `MAIOR.MENOR.CORREÇÃO`: incompatibilidade, funcionalidade e correção,
 respectivamente.
 
+## 1.4.9 — 2026-08-06
+
+- Criação de conta, matrícula e redefinição passam a validar os mesmos 10 caracteres exigidos pelo servidor.
+- A interface deixa de aceitar uma senha que o banco recusaria em seguida.
+
 ## 1.4.8 — 2026-08-06
 
 - O PWA deixa de recarregar sozinho no meio de um formulário ou atividade.

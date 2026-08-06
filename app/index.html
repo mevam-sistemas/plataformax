@@ -1161,7 +1161,7 @@ $('b-criar-conta').onclick = async () => {
   const senha = $('cc-senha').value;
   if(nome.length < 2){ erro('m-cc','Coloque seu nome.'); return; }
   if(!email.includes('@')){ erro('m-cc','Confere o e-mail — parece que falta algo.'); return; }
-  if(senha.length < 6){ erro('m-cc','A senha precisa de pelo menos 6 caracteres.'); return; }
+  if(senha.length < 10){ erro('m-cc','A senha precisa de pelo menos 10 caracteres.'); return; }
   $('b-criar-conta').disabled = true; info('m-cc','Criando sua conta…');
   const { data, error } = await sb.auth.signUp({ email, password: senha,
     options: { data: { nome, origem:'cliente_gestor' }, emailRedirectTo: location.origin + location.pathname } });
@@ -1181,7 +1181,7 @@ $('b-criar-conta').onclick = async () => {
    acesso agora que não existe mais código por e-mail.) */
 $('b-redefinir').onclick = async () => {
   const senha = $('rs-senha').value || '';
-  if(senha.length < 6){ erro('m-rs','A senha precisa de pelo menos 6 caracteres.'); return; }
+  if(senha.length < 10){ erro('m-rs','A senha precisa de pelo menos 10 caracteres.'); return; }
   $('b-redefinir').disabled = true; info('m-rs','Salvando…');
   const { error } = await sb.auth.updateUser({ password: senha });
   $('b-redefinir').disabled = false;
@@ -4927,7 +4927,7 @@ async function enviarInscricao(){
   const setErr = t => erro('m-in', t);
   if(nome.split(' ').filter(Boolean).length < 2) return setErr('Coloque seu nome completo, por favor.');
   if(!email.includes('@')) return setErr('Confere o e-mail?');
-  if(senha.length < 6) return setErr('A senha precisa de pelo menos 6 caracteres.');
+  if(senha.length < 10) return setErr('A senha precisa de pelo menos 10 caracteres.');
   if(zap.replace(/\D/g,'').length < 10) return setErr('Coloque seu WhatsApp com DDD.');
   if(!$('in-rua').value.trim()) return setErr('Falta o endereço.');
   if(!$('in-cidade').value.trim()) return setErr('Falta a cidade.');
