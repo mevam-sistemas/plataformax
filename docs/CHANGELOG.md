@@ -4,6 +4,10 @@ Este arquivo registra mudanças publicadas no produto. A versão segue o formato
 `MAIOR.MENOR.CORREÇÃO`: incompatibilidade, funcionalidade e correção,
 respectivamente.
 
+## 1.5.1 — 2026-08-06
+
+- A ação de notificações recebe um rótulo compacto no cabeçalho para não comprimir a navegação em celulares.
+
 ## 1.5.0 — 2026-08-06
 
 - Professores, gestão e alunos podem ativar notificações push no PWA pelo próprio cabeçalho.

@@ -538,7 +538,7 @@ h2 .ic,h3 .ic{width:.9em;height:.9em;margin-right:2px}
     <div class="ctx" id="ctx-chip">Início</div>
     <div class="top-sp"></div>
     <button class="tlink" id="t-inicio">Início</button>
-    <button class="tlink" id="t-notif" style="display:none">Ativar notificações</button>
+    <button class="tlink" id="t-notif" style="display:none" aria-label="Ativar notificações">Avisos</button>
     <button class="tlink" id="t-cadastro">Meu cadastro</button>
     <button class="tlink" id="t-sair">Sair</button>
   </div>
@@ -962,7 +962,7 @@ async function registrarNotificacoes(pedirPermissao=true){
   const s=sub.toJSON();
   const {error}=await sb.rpc('registrar_push',{p_endpoint:s.endpoint,p_p256dh:s.keys?.p256dh,p_auth:s.keys?.auth,p_agente:navigator.userAgent});
   if(error)throw error;
-  const botao=$('t-notif');if(botao){botao.textContent='Notificações ativas';botao.style.display='';botao.disabled=true;}
+  const botao=$('t-notif');if(botao){botao.textContent='Avisos ativos';botao.style.display='';botao.disabled=true;}
   return true;
 }
 function notificarConversa(conversa_id,mensagem_id){
@@ -1246,7 +1246,7 @@ async function entrar(){
   if('Notification'in window&&'PushManager'in window){
     $('t-notif').style.display='';
     $('t-notif').disabled=false;
-    $('t-notif').textContent=Notification.permission==='granted'?'Notificações ativas':'Ativar notificações';
+    $('t-notif').textContent=Notification.permission==='granted'?'Avisos ativos':'Avisos';
     if(Notification.permission==='granted')registrarNotificacoes(false).catch(()=>{});
   }
   if(p && (!p.cpf || !p.telefone)) return abrirPerfil(p);
