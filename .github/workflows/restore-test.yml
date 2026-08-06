@@ -1,0 +1,71 @@
+name: Teste de restauração
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "30 6 1 1,4,7,10 *"
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  validar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+      BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Instalar ferramentas
+        run: |
+          set -euo pipefail
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl --fail --silent --show-error --location \
+            --output /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc \
+            https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          . /etc/os-release
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt ${VERSION_CODENAME}-pgdg main" \
+            | sudo tee /etc/apt/sources.list.d/pgdg.list >/dev/null
+          sudo apt-get update
+          sudo apt-get install --yes age expect postgresql-client-17 zstd unzip
+      - name: Baixar o backup mais recente
+        run: |
+          set -euo pipefail
+          artifact_id="$(gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts?per_page=100" \
+            --jq '[.artifacts[] | select(.expired==false and (.name|startswith("modox-backup-")))] | sort_by(.created_at) | last | .id')"
+          [[ -n "$artifact_id" ]] || { echo 'Nenhum backup disponível.' >&2; exit 1; }
+          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${artifact_id}/zip" > "${RUNNER_TEMP}/artifact.zip"
+          unzip -q "${RUNNER_TEMP}/artifact.zip" -d "${RUNNER_TEMP}/artifact"
+          backup_file="$(find "${RUNNER_TEMP}/artifact" -type f -name '*.age' -print -quit)"
+          [[ -n "$backup_file" ]] || { echo 'Arquivo cifrado não encontrado.' >&2; exit 1; }
+          echo "BACKUP_FILE=$backup_file" >> "$GITHUB_ENV"
+      - name: Decifrar e verificar integridade
+        run: |
+          set -euo pipefail
+          export INPUT_ARCHIVE="$BACKUP_FILE" OUTPUT_ARCHIVE="${RUNNER_TEMP}/backup.tar.zst"
+          expect <<'EXPECT_EOF'
+          set timeout -1
+          log_user 0
+          spawn age --decrypt --output $env(OUTPUT_ARCHIVE) $env(INPUT_ARCHIVE)
+          expect "Enter passphrase"
+          send -- "$env(BACKUP_PASSPHRASE)\r"
+          expect eof
+          catch wait result
+          exit [lindex $result 3]
+          EXPECT_EOF
+          zstd --decompress --stdout "$OUTPUT_ARCHIVE" | tar --directory="${RUNNER_TEMP}" --extract
+          cd "${RUNNER_TEMP}/modox-backup"
+          sha256sum --check SHA256SUMS
+          /usr/lib/postgresql/17/bin/pg_restore --list database/modox.dump > "${RUNNER_TEMP}/contents.list"
+          for tabela in pessoas escolas cursos turmas matriculas; do
+            grep -Eq "TABLE( DATA)? public ${tabela} " "${RUNNER_TEMP}/contents.list" || {
+              echo "Tabela essencial ausente do backup: $tabela" >&2
+              exit 1
+            }
+          done
+          test -s storage/buckets.json
+          test -s storage/storage-summary.json
+      - name: Registrar resultado
+        run: echo 'Backup cifrado decifrado, checksums conferidos e estrutura essencial restaurável.' >> "$GITHUB_STEP_SUMMARY"
