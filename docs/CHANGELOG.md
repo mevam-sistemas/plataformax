@@ -4,6 +4,13 @@ Este arquivo registra mudanças publicadas no produto. A versão segue o formato
 `MAIOR.MENOR.CORREÇÃO`: incompatibilidade, funcionalidade e correção,
 respectivamente.
 
+## 1.4.7 — 2026-08-06
+
+- Autenticação fica limitada ao domínio oficial do MODOX, exige senha de 10 caracteres e verifica credenciais conhecidas em vazamentos.
+- O banco deixa de expor o schema histórico do 360social e passa a operar exclusivamente o domínio educacional.
+- Aniversários consultam e enviam somente pessoas do MODOX, eliminando dependências entre produtos.
+- Backup diário cifrado passa a preservar banco, autenticação e arquivos em retenção independente.
+
 ## 1.4.6 — 2026-08-06
 
 - Login e recuperação recebem associação semântica entre rótulos e campos.
