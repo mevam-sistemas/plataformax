@@ -59,9 +59,11 @@ jobs:
         run: |
           set -euo pipefail
           if [[ -n "${PR_BASE_SHA:-}" ]]; then
-            git diff --check "$PR_BASE_SHA"...HEAD
+            git diff --check "$PR_BASE_SHA"...HEAD -- . \
+              ':(exclude)app/supabase.min.js' ':(exclude)app/qrcode.min.js'
           else
-            git show --check --format= HEAD
+            git show --check --format= HEAD -- . \
+              ':(exclude)app/supabase.min.js' ':(exclude)app/qrcode.min.js'
           fi
 
       - name: Validar convenções das migrações
