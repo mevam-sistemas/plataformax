@@ -3,6 +3,7 @@ import vm from 'node:vm';
 
 const html = fs.readFileSync('app/index.html', 'utf8');
 const convite = fs.readFileSync('supabase/functions/convidar-equipe-modox/index.ts', 'utf8');
+const recuperacaoSenha = fs.readFileSync('supabase/functions/recuperar-senha-modox/index.ts', 'utf8');
 const aniversario = fs.readFileSync('supabase/functions/aniversarios/index.ts', 'utf8');
 const emails = ['recovery', 'confirmation', 'invite'].map((tipo) =>
   fs.readFileSync(`supabase/email-templates/${tipo}.html`, 'utf8')
@@ -42,7 +43,7 @@ for (const modelo of emails) {
     if (!modelo.includes(contrato)) throw new Error(`Modelo de e-mail fora do padrão Arbor Labs: ${contrato}`);
   }
 }
-for (const origem of [convite, aniversario]) {
+for (const origem of [convite, aniversario, recuperacaoSenha]) {
   for (const contrato of ["name:'MODOX · Arbor Labs'", "email:'contato@arborlabs.com.br'", 'replyTo']) {
     if (!origem.includes(contrato)) throw new Error(`Remetente transacional inconsistente: ${contrato}`);
   }
@@ -96,8 +97,11 @@ for (const association of [
 ]) {
   if (!html.includes(association)) throw new Error(`Rótulo sem associação semântica: ${association}`);
 }
-for (const recuperacao of ['id="s-recuperar"', 'for="rc-email"', "go('recuperar')", "resetPasswordForEmail(email", 'Se este e-mail estiver cadastrado']) {
+for (const recuperacao of ['id="s-recuperar"', 'for="rc-email"', "go('recuperar')", "functions.invoke('recuperar-senha-modox'", 'Se este e-mail estiver cadastrado']) {
   if (!html.includes(recuperacao)) throw new Error(`Fluxo dedicado de recuperação incompleto: ${recuperacao}`);
+}
+for (const contrato of ['auth.admin.generateLink', "subject:'RECUPERAÇÃO DE SENHA - MODOX'", "from('recuperacoes_senha')", 'message_id']) {
+  if (!recuperacaoSenha.includes(contrato)) throw new Error(`Recuperação transacional incompleta: ${contrato}`);
 }
 if (!html.includes('.btn.xs{padding:8px 11px;font-size:12.5px;border-radius:9px;min-height:44px}')) {
   throw new Error('Botões compactos não respeitam alvo de toque de 44 px');

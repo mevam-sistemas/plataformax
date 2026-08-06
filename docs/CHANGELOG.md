@@ -4,6 +4,15 @@ Este arquivo registra mudanças publicadas no produto. A versão segue o formato
 `MAIOR.MENOR.CORREÇÃO`: incompatibilidade, funcionalidade e correção,
 respectivamente.
 
+## 1.5.9 — 2026-08-06
+
+- A tela de turmas elimina a mistura decorativa de verde, terracota e laranja:
+  metadados de alunos e professor passam a usar a identidade MODOX.
+- Botões secundários passam a ter texto neutro e os botões laranja recebem texto
+  branco, mantendo uma hierarquia visual simples entre ação principal e apoio.
+- Recuperação de senha passa pelo remetente transacional da Arbor Labs, com
+  identidade MODOX, resposta neutra e limitação contra abuso.
+
 ## 1.5.8 — 2026-08-06
 
 - Ações principais passam a usar o laranja oficial da marca MODOX em todas as
