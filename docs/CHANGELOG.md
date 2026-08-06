@@ -4,6 +4,11 @@ Este arquivo registra mudanças publicadas no produto. A versão segue o formato
 `MAIOR.MENOR.CORREÇÃO`: incompatibilidade, funcionalidade e correção,
 respectivamente.
 
+## 1.5.3 — 2026-08-06
+
+- “Esqueci minha senha” passa a abrir uma tela própria, com e-mail, instruções e retorno acessível.
+- A resposta não revela se determinado endereço possui ou não uma conta cadastrada.
+
 ## 1.5.2 — 2026-08-06
 
 - Resíduos arquivados de produtos que já compartilharam o projeto deixam de ser acessíveis aos papéis do Modox.

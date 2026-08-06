@@ -570,6 +570,20 @@ h2 .ic,h3 .ic{width:.9em;height:.9em;margin-right:2px}
   </div>
 </section>
 
+<!-- ══════════ RECUPERAR SENHA ══════════ -->
+<section class="screen" id="s-recuperar">
+  <div class="col">
+    <button class="btn link" data-back="email-login">‹ Voltar para entrar</button>
+    <div class="brand marca-g" style="font-size:22px;margin:22px 0 26px"><svg class="marca-sig" style="width:32px;height:32px"><use href="#sig-modox"/></svg><span class="marca-nome" style="font-size:23px">MODO<i>X</i></span></div>
+    <h1>Recuperar minha senha</h1>
+    <p class="sub">Informe o e-mail usado no MODOX. Enviaremos um link pessoal para você criar uma nova senha.</p>
+    <label for="rc-email">Seu e-mail</label>
+    <input id="rc-email" type="email" inputmode="email" autocomplete="email" placeholder="voce@exemplo.com">
+    <button class="btn w" id="b-recuperar">Enviar link de recuperação</button>
+    <div class="msg c" id="m-rc" role="status" aria-live="polite"></div>
+  </div>
+</section>
+
 <!-- ══════════ CRIAR CONTA ══════════ (01/08/2026: substitui o código por e-mail) -->
 <section class="screen" id="s-criar-conta">
   <div class="col">
@@ -1160,7 +1174,7 @@ function go(s, opts){
   document.querySelectorAll('.screen').forEach(e=>e.classList.remove('on'));
   $('s-'+s).classList.add('on');
   const logado = !!me;
-  $('topbar').style.display = (logado && !['email','criar-conta','redefinir','inscricao','inscrito'].includes(s)) ? '' : 'none';
+  $('topbar').style.display = (logado && !['email','recuperar','criar-conta','redefinir','inscricao','inscrito'].includes(s)) ? '' : 'none';
   if(opts?.mundo) mundo(opts.mundo, opts.chip);
   window.scrollTo(0,0);
 }
@@ -1191,13 +1205,15 @@ $('b-enviar').onclick = async () => {
   if(error){ erro('m1','E-mail ou senha não conferem.'); return; }
   entrar();
 };
-$('b-esqueci-senha').onclick = async () => {
-  const email = $('email').value.trim().toLowerCase();
-  if(!email.includes('@')){ erro('m1','Digite seu e-mail ali em cima primeiro.'); return; }
-  info('m1','Enviando link de redefinição…');
+$('b-esqueci-senha').onclick = () => { $('rc-email').value = $('email').value; go('recuperar'); };
+$('b-recuperar').onclick = async () => {
+  const email = $('rc-email').value.trim().toLowerCase();
+  if(!email.includes('@')){ erro('m-rc','Confira o e-mail informado.'); return; }
+  $('b-recuperar').disabled = true; info('m-rc','Enviando link de recuperação…');
   const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: 'https://modox.com.br/app/' });
-  if(error){ console.error('[login] redefinir senha', error); erro('m1','Não consegui enviar agora. Tente de novo em instantes.'); return; }
-  info('m1','Te mandamos um link por e-mail pra redefinir a senha. Confira sua caixa de entrada.');
+  $('b-recuperar').disabled = false;
+  if(error){ console.error('[login] redefinir senha', error); erro('m-rc','Não foi possível enviar agora. Tente novamente em instantes.'); return; }
+  info('m-rc','Se este e-mail estiver cadastrado, o link chegará em instantes. Confira também a caixa de spam.');
 };
 $('b-ir-criar-conta').onclick = () => { $('cc-email').value = $('email').value; go('criar-conta'); };
 

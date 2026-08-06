@@ -66,6 +66,9 @@ for (const association of [
 ]) {
   if (!html.includes(association)) throw new Error(`Rótulo sem associação semântica: ${association}`);
 }
+for (const recuperacao of ['id="s-recuperar"', 'for="rc-email"', "go('recuperar')", "resetPasswordForEmail(email", 'Se este e-mail estiver cadastrado']) {
+  if (!html.includes(recuperacao)) throw new Error(`Fluxo dedicado de recuperação incompleto: ${recuperacao}`);
+}
 if (!html.includes('.btn.xs{padding:8px 11px;font-size:12.5px;border-radius:9px;min-height:44px}')) {
   throw new Error('Botões compactos não respeitam alvo de toque de 44 px');
 }
