@@ -13,43 +13,32 @@
 <link rel="apple-touch-icon" href="/img/icon-192.png">
 <style>
 /* ============================================================
-   PLATAFORMAX — sistema de design
-   3 mundos com identidade própria, pra você sempre saber onde está:
-   • aluno    → verde esmeralda  (estudar: calmo, acolhedor)
-   • gestao   → terracota        (administrar: sóbrio, humano)
-   • publico  → laranja          (inscrição: convite, boas-vindas)
+   MODOX — sistema visual unificado
+   O laranja oficial identifica todas as ações principais. Cores
+   semânticas ficam reservadas a sucesso, atenção e erro.
    ============================================================ */
 :root{
-  --ink:#141416; --sub:#6b6b73; --line:#e7e7ee; --card:#fff;
+  --ink:#141416; --sub:#62636b; --line:#e5e7eb; --line-strong:#d6d9df; --card:#fff;
   --ok:#12a150; --warn:#e08700; --warn-bg:#fff8ec; --danger:#e5484d;
-  --r-sm:12px; --r-md:16px; --r-lg:22px; --r-xl:28px;
-  --sh-1:0 1px 2px rgba(20,20,30,.05), 0 1px 3px rgba(20,20,30,.04);
-  --sh-2:0 4px 16px rgba(20,20,40,.07);
-  --accent:#c8500c; --accent-soft:#fff1e6; --accent-ink:#8f3907;
-  --bg:#f5f6f8; --tint:#ffffff;
-  /* laranja da marca — o fio condutor que atravessa os três mundos */
-  --marca:#f26a1b; --marca-esc:#c8500c; --marca-clr:#fff1e6;
+  --r-sm:12px; --r-md:16px; --r-lg:20px; --r-xl:26px;
+  --sh-1:0 1px 2px rgba(20,20,22,.04),0 6px 18px rgba(20,20,22,.045);
+  --sh-2:0 12px 36px rgba(20,20,22,.10);
+  --marca:#f26a1b; --marca-hover:#db5710; --marca-esc:#a83f08; --marca-clr:#fff0e7;
+  --accent:var(--marca); --accent-soft:var(--marca-clr); --accent-ink:var(--marca-esc);
+  --bg:#f7f7f8; --tint:#fbfbfc;
 }
-body[data-mundo="aluno"]{ --accent:#0d9668; --accent-soft:#e4f6ee; --accent-ink:#046646;
-  --bg:#f4f7f5; --tint:#f9fdfa; }
-body[data-mundo="gestao"]{ --accent:#a94712; --accent-soft:#fff0e6; --accent-ink:#71300d;
-  --bg:#f7f5f2; --tint:#fcfaf7; }
-/* O mundo "público" é a porta de entrada e as páginas que o candidato vê antes
-   de existir conta: é onde a marca precisa aparecer. Por isso ele usa o laranja,
-   e não uma cor de mundo. O tom é o escuro da marca (#c8500c) porque o laranja
-   vivo com texto branco fica em 3:1 de contraste — bonito no monitor, ruim no
-   celular no sol. Este passa em 4,5:1. */
-body[data-mundo="publico"]{ --accent:#c8500c; --accent-soft:#fff1e6; --accent-ink:#8f3907;
-  --bg:#faf8f5; --tint:#fffdf9; }
+body[data-mundo="aluno"]{--bg:#f7f8f7;--tint:#fbfcfb}
+body[data-mundo="gestao"]{--bg:#f7f7f8;--tint:#fbfbfc}
+body[data-mundo="publico"]{--bg:#faf9f8;--tint:#fffdfb}
 
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{-webkit-text-size-adjust:100%}
-body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+body{font-family:Inter,-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   background:var(--bg);color:var(--ink);min-height:100vh;font-size:16px;line-height:1.5;
   transition:background .35s ease;display:flex;flex-direction:column}
 
 /* ---------- barra superior ---------- */
-.top{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.82);
+.top{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.9);
   backdrop-filter:saturate(180%) blur(18px);-webkit-backdrop-filter:saturate(180%) blur(18px);
   border-bottom:1px solid var(--line)}
 .top:after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:2px;
@@ -158,16 +147,18 @@ input[type=date]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .check span{font-size:13.5px;color:var(--sub);line-height:1.55}
 
 /* ---------- botões ---------- */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--accent);color:#fff;
-  border:0;border-radius:12px;padding:13px 20px;font-size:15px;font-weight:720;cursor:pointer;
-  font-family:inherit;transition:transform .12s,filter .15s,box-shadow .15s;box-shadow:0 2px 7px rgba(75,42,24,.12);min-height:44px}
-.btn:hover{filter:brightness(1.04);box-shadow:0 4px 12px rgba(75,42,24,.16)}
-.btn:active{transform:scale(.985)}
-.btn[disabled]{opacity:.5;cursor:default}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--marca);color:var(--ink);
+  border:1px solid transparent;border-radius:12px;padding:13px 20px;font-size:15px;font-weight:750;cursor:pointer;
+  font-family:inherit;transition:transform .14s,background .15s,border-color .15s,box-shadow .15s;
+  box-shadow:0 5px 14px rgba(242,106,27,.22);min-height:46px}
+.btn:hover{background:var(--marca-hover);box-shadow:0 8px 20px rgba(242,106,27,.28)}
+.btn:active{transform:translateY(1px);box-shadow:0 3px 9px rgba(242,106,27,.20)}
+.btn[disabled]{opacity:.48;cursor:not-allowed;box-shadow:none;transform:none}
 .btn.w{width:100%;margin-top:22px}
-.btn.ghost{background:transparent;color:var(--accent);box-shadow:none;border:1.5px solid var(--line)}
-.btn.ghost:hover{border-color:var(--accent);background:var(--accent-soft)}
-.btn.link{background:none;color:var(--accent);box-shadow:none;padding:10px 4px}
+.btn.ghost{background:#fff;color:var(--marca-esc);box-shadow:none;border:1px solid var(--line-strong)}
+.btn.ghost:hover{border-color:var(--marca);background:var(--marca-clr);box-shadow:0 4px 12px rgba(20,20,22,.06)}
+.btn.link{background:none;color:var(--marca-esc);box-shadow:none;padding:10px 4px;border-color:transparent}
+.btn.link:hover{background:var(--marca-clr);box-shadow:none}
 .btn.sm{padding:9px 14px;font-size:13.5px}
 .btn.xs{padding:8px 11px;font-size:12.5px;border-radius:9px;min-height:44px}
 .btn.dgr{color:var(--danger)}
@@ -182,11 +173,11 @@ input[type=date]::-webkit-calendar-picker-indicator:hover{opacity:1}
 @media(max-width:520px){.qr-presenca-card{padding:16px 12px}.qr-presenca-acoes .btn{width:100%}}
 
 /* ---------- cartões ---------- */
-.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:20px;box-shadow:var(--sh-1)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:22px;box-shadow:var(--sh-1)}
 .card+.card{margin-top:12px}
 .grid .card+.card{margin-top:0}
 .card.tap{cursor:pointer;transition:box-shadow .18s,transform .18s,border-color .18s}
-.card.tap:hover{box-shadow:var(--sh-2);border-color:#d9d9e6;transform:translateY(-1px)}
+.card.tap:hover{box-shadow:var(--sh-2);border-color:#f1b38f;transform:translateY(-2px)}
 .card.alerta{border:1.5px solid #ffdca8;background:var(--warn-bg)}
 .card.arq{opacity:.7;background:#fbfbfc}
 .escola-hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px;align-items:start;
@@ -204,7 +195,7 @@ input[type=date]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .pend-card.ok{border-color:#b8e3cc;border-left-color:var(--ok)}
 .pend-card h3{font-size:15px;display:flex;align-items:center;gap:7px}.pend-card p{font-size:13px;color:var(--sub);line-height:1.55;margin:7px 0 12px}
 .pend-card .btn{min-height:38px}
-.hero{background:linear-gradient(135deg,#292623,#3c352f 72%,var(--accent));color:#fff;
+.hero{background:linear-gradient(135deg,#18181a 0%,#262226 62%,var(--marca-hover) 145%);color:#fff;
   border-radius:var(--r-xl);padding:26px;box-shadow:var(--sh-2);position:relative;overflow:hidden}
 .hero>*{position:relative;z-index:1}
 .hero .e{font-size:11.5px;font-weight:800;letter-spacing:.09em;color:#ffd0ad}
@@ -251,12 +242,12 @@ h2 .ic,h3 .ic{width:.9em;height:.9em;margin-right:2px}
 .pill.dgr{background:#fdeeee;color:#b3282c}
 .pill.mute{background:#f0f0f4;color:var(--sub)}
 .pill.marca{background:var(--marca-clr);color:var(--marca-esc)}
-.btn.marca{background:var(--marca)}
-.btn.marca:hover{background:var(--marca-esc)}
-.abas{display:flex;gap:6px;background:#eeeef4;border-radius:100px;padding:4px;margin:18px 0 14px;overflow-x:auto}
+.btn.marca{background:var(--marca);color:var(--ink)}
+.btn.marca:hover{background:var(--marca-hover);color:#fff}
+.abas{display:flex;gap:6px;background:#f0f1f3;border:1px solid var(--line);border-radius:100px;padding:4px;margin:18px 0 14px;overflow-x:auto}
 .abas button{flex:1;border:0;background:none;font-family:inherit;font-size:13.5px;font-weight:650;color:var(--sub);
   padding:9px 12px;border-radius:100px;cursor:pointer;white-space:nowrap;transition:.15s}
-.abas button.on{background:var(--card);color:var(--ink);box-shadow:var(--sh-1)}
+.abas button.on{background:var(--card);color:var(--marca-esc);box-shadow:0 2px 8px rgba(20,20,22,.08)}
 
 /* ---------- listas de pessoas / aulas ---------- */
 .item{display:flex;align-items:center;gap:13px;padding:14px 2px;border-bottom:1px solid var(--line);flex-wrap:wrap}
@@ -1086,7 +1077,7 @@ function ic(name, cls){
 // em uma linha, em qual modo a pessoa está — e o modo é o que manda no que ela vê.
 function mundo(m, chip){
   document.body.dataset.mundo = m;
-  document.querySelector('meta[name=theme-color]').content = m==='aluno'?'#f4f7f5':m==='gestao'?'#f4f6fa':'#f6f5fb';
+  document.querySelector('meta[name=theme-color]').content = m==='publico'?'#faf9f8':'#f7f7f8';
   if(chip) $('ctx-chip').textContent = chip;
   const el = $('modo-sel');
   if(el){

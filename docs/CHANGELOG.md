@@ -4,6 +4,15 @@ Este arquivo registra mudanças publicadas no produto. A versão segue o formato
 `MAIOR.MENOR.CORREÇÃO`: incompatibilidade, funcionalidade e correção,
 respectivamente.
 
+## 1.5.8 — 2026-08-06
+
+- Ações principais passam a usar o laranja oficial da marca MODOX em todas as
+  visões, eliminando o antigo tom terroso da gestão.
+- Botões, cartões, abas, bordas e sombras recebem acabamento visual unificado,
+  mais leve e responsivo, com estados claros de foco, toque e indisponibilidade.
+- Verde, amarelo e vermelho ficam reservados a mensagens de sucesso, atenção e
+  erro, tornando a leitura da interface mais previsível.
+
 ## 1.5.7 — 2026-08-06
 
 - O Painel Arbor Labs recebe recuperação com identidade própria mesmo usando a
