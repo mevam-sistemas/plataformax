@@ -133,6 +133,19 @@ for (const contrato of ['PushManager', "sb.rpc('registrar_push'", "sb.functions.
 }
 console.log('✓ PWA possui atualização controlada e notificações vinculadas ao usuário');
 
+for (const contrato of [
+  "select('id,telefone').in('id',idsEquipe)",
+  'const wa = waLink(p.telefone,p.nome)',
+  'aria-label="Conversar com ${esc(p.nome',
+  'rel="noopener noreferrer"'
+]) {
+  if (!html.includes(contrato)) throw new Error(`Contato rápido por WhatsApp incompleto: ${contrato}`);
+}
+if (!html.includes('.wa{display:flex;align-items:center;justify-content:center;width:44px;height:44px')) {
+  throw new Error('Atalho de WhatsApp não respeita alvo de toque de 44 px');
+}
+console.log('✓ WhatsApp de alunos e equipe respeita permissão, segurança e alvo de toque');
+
 for (const [arquivo, limite] of [['app/index.html', 380_000], ['app/supabase.min.js', 250_000], ['app/qrcode.min.js', 80_000]]) {
   const tamanho = fs.statSync(arquivo).size;
   if (tamanho > limite) throw new Error(`${arquivo} excedeu o orçamento de desempenho: ${tamanho} > ${limite}`);

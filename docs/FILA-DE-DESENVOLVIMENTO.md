@@ -2,7 +2,7 @@
 
 ## Contato rápido por WhatsApp
 
-**Estado:** planejado.
+**Estado:** concluído na versão 1.6.1; pendente somente de validação visual em produção.
 
 - Exibir o ícone de WhatsApp nas listagens e fichas de **alunos** e **professores** quando houver
   celular válido cadastrado.
@@ -15,4 +15,3 @@
 - Incluir rótulo acessível, alvo de toque adequado, abertura em nova aba e teste em desktop, celular
   e PWA.
 - A restrição deve existir na consulta/API e nas políticas do banco, não apenas no componente visual.
-

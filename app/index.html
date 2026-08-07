@@ -265,8 +265,10 @@ h2 .ic,h3 .ic{width:.9em;height:.9em;margin-right:2px}
 .ck.done{background:var(--ok);border-color:var(--ok)}
 .ck.wait{border-color:var(--warn);color:var(--warn)}
 .av{width:38px;height:38px;border-radius:50%;object-fit:cover;flex:none;background:var(--line)}
-.wa{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;
-  background:#25d366;flex:none;box-shadow:var(--sh-1)}
+.wa{display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;
+  background:#25d366;flex:none;box-shadow:var(--sh-1);transition:transform .15s,filter .15s}
+.wa:hover{filter:brightness(.94);transform:translateY(-1px)}
+.wa:focus-visible{outline:3px solid rgba(37,211,102,.28);outline-offset:3px}
 .det{width:100%;background:var(--bg);border-radius:var(--r-md);padding:14px 16px;margin-top:10px;
   font-size:13.5px;line-height:1.85}
 .det b{color:var(--ink)}
@@ -2564,6 +2566,15 @@ async function abrirEquipe(){
   if(error) return $('eq-corpo').innerHTML = `<div class="card"><div class="hint">Não consegui carregar: ${esc(error.message)}</div></div>`;
   const finMap = {}; (fin||[]).forEach(v => finMap[v.pessoa_id] = v.pode_ver_financeiro);
   ctx.equipe = equipe || [];
+  // A função da equipe entrega somente a identidade necessária à listagem.
+  // Telefones são buscados separadamente e continuam submetidos às políticas
+  // do banco: se o papel atual não puder lê-los, nenhum atalho é renderizado.
+  const idsEquipe = ctx.equipe.map(p=>p.pessoa_id).filter(Boolean);
+  if(idsEquipe.length){
+    const {data: contatos}=await sb.from('pessoas').select('id,telefone').in('id',idsEquipe);
+    const telefonePorPessoa=new Map((contatos||[]).map(p=>[p.id,p.telefone]));
+    ctx.equipe.forEach(p=>{p.telefone=telefonePorPessoa.get(p.pessoa_id)||p.telefone||null;});
+  }
   ctx.turmasEscola = turmas || [];
   const profs = ctx.equipe.filter(p => ['professor','gestor','admin'].includes(p.papel) && p.ativo);
   const semProf = (turmas||[]).filter(t => !(t.turma_professores||[]).length);
@@ -2571,6 +2582,7 @@ async function abrirEquipe(){
   const cartao = p => {
     const ini = (p.nome||'?').trim()[0].toUpperCase();
     const tl = p.turmas || [];
+    const wa = waLink(p.telefone,p.nome);
     return `<div class="card">
       <div class="row" style="justify-content:space-between;align-items:flex-start">
         <div style="flex:1;display:flex;gap:12px;align-items:center">
@@ -2583,6 +2595,11 @@ async function abrirEquipe(){
           ${p.tem_acesso ? `<span class="pill ok">já entrou</span>`
             : `<span class="pill warn">não entrou ainda</span>`}
         </div></div>
+      ${wa?`<div class="row" style="margin-top:12px;align-items:center">
+        <a class="wa" href="${wa}" target="_blank" rel="noopener noreferrer"
+          aria-label="Conversar com ${esc(p.nome||'esta pessoa')} pelo WhatsApp"
+          title="Conversar pelo WhatsApp">${WA_SVG}</a>
+        <span class="hint" style="margin:0">Contato rápido pelo WhatsApp</span></div>`:''}
       ${tl.length ? `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px">
           ${tl.map(t=>`<span class="pill mute">${ic('capelo')}<span class="txt">${esc(t.curso)} · ${esc(t.turma)}</span></span>`).join('')}</div>`
         : p.papel === 'professor' ? `<div class="hint" style="margin-top:12px">
@@ -4058,7 +4075,9 @@ function pessoaItem(m, acoes, onde, valorCents){
     <div class="t"><b>${esc(p.nome || p.email || 'Aluno')}</b>
       <small>${esc(onde || sobre.slice(0,70) || p.email || '')}</small></div>
     ${selo}
-    ${wa?`<a class="wa" href="${wa}" target="_blank" rel="noopener" title="Chamar no WhatsApp">${WA_SVG}</a>`:''}
+    ${wa?`<a class="wa" href="${wa}" target="_blank" rel="noopener noreferrer"
+      aria-label="Conversar com ${esc(p.nome||'este aluno')} pelo WhatsApp"
+      title="Conversar pelo WhatsApp">${WA_SVG}</a>`:''}
     ${acoes||''}
     <button class="btn xs ghost" title="Ver ficha completa"
       onclick="const d=$('${id}');const ab=d.style.display!=='none';d.style.display=ab?'none':'';this.classList.toggle('up',!ab)">${ic('chevron')}</button>
